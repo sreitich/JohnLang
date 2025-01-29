@@ -35,7 +35,7 @@ As optimistic as he was, the great John Language™️ was not the inventive typ
 <td>
 
 ```
-letMeLearnYouSomething("Hello, world");      
+letMeLearnYouSomething("Hello, world")!      
 ```
 
 </td>
@@ -142,7 +142,7 @@ if (x > 50) {
 
 ```
 tilTheCowsComeHome handful x = 0, x < 10, x++ {      
-	console.log(x);
+	letMeLearnYouSomething(x)!
 }
 ```
 
