@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "![](./JohnLangIconAlt2.png)",
   "type": "module",
-  "main": "src/JohnLangauge.js",
+  "main": "src/JohnLang.js",
   "scripts": {
     "test": "c8 node --test test/**/*.test.js"
   },
