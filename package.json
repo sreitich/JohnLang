@@ -1,0 +1,24 @@
+{
+  "name": "johnlang",
+  "version": "1.0.0",
+  "description": "![](./JohnLangIconAlt2.png)",
+  "type": "module",
+  "main": "src/JohnLangauge.js",
+  "scripts": {
+    "test": "c8 node --test test/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sreitich/JohnLang.git"
+  },
+  "keywords": [],
+  "author": "Adi Roitburg, Allen Boyce, Jacob Mendoza, JD Elia, Kyle Matton, Sam Reitich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sreitich/JohnLang/issues"
+  },
+  "homepage": "https://github.com/sreitich/JohnLang#readme",
+  "devDependencies": {
+    "c8": "^10.1.3"
+  }
+}
