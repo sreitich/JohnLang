@@ -1,4 +1,4 @@
-![](./JohnLangIconAlt2.png)
+![](./docs/JohnLangIconAlt2.png)
 
 # John Lang
 
