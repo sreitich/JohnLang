@@ -1,0 +1,6 @@
+gitErDone isOdd(handful x): switcheroo {
+    betterGetGoing nah x % 2 == 0!
+}
+
+handful x: 5!
+letMeLearnYouSomething(isOdd(x))!
