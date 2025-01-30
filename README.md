@@ -4,7 +4,7 @@
 
 Millenia ago, there was a man. He awoke, unexpectantly, from an ancient slumber. His first words in this mysterious world in which he materialized: "Hello, World!" (he was quite the optimist). His name was John Language. And the first thing he did was create the world's first programming language: John Language.[^1 ] The second thing he did was create the Midwest.
 
-As optimistic as he was, the great John Language™️ was not the inventive type (he would not invent creativity for another thousand years!); he's a simple man. Thus, John Language is not the most interesting language—quite mundane even. But, as John Language would tell you, "It'll get ya where you need to go!" Another common saying of John was, "There's no stopping that neck once it gets going." Archaeologists, however, have yet to uncover what he means by this, and John persistently refuses to elaborate (he just yells, "My wife!" upon being confronted).
+As optimistic as he was, the great John Language™️ was not the inventive type (he would not invent creativity for another thousand years!); he's a simple man. Thus, John Language is not the most interesting language—quite mundane even. But, as John Language would tell you, "It'll get ya where you need to go!" Another common saying of John's was, "There's no stopping that neck once it gets going." Archaeologists, however, have yet to uncover what he meant by this.
 
 [^1]: John Language was retroactively renamed to John Lang by Oracle in 2020 following the devastating extinction of giraffes during the COVID-19 Pandemic.
 
