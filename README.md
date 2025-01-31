@@ -6,6 +6,8 @@ Millenia ago, there was a man. He awoke, unexpectantly, from an ancient slumber.
 
 As optimistic as he was, the great John Language™️ was not the inventive type (he would not invent creativity for another thousand years!); he's a simple man. Thus, John Language is not the most interesting language—quite mundane even. But, as John Language would tell you, "It'll get ya where you need to go!" Another common saying of John's was, "There's no stopping that neck once it gets going." Archaeologists, however, have yet to uncover what he meant by this.
 
+###### Even though John Language is the original creator of John Lang, this *compiler* was created by [Adi Roitburg](https://github.com/Adiro777), [Allen Boyce](https://github.com/AllenBoyce),  [Jacob Mendoza](https://github.com/JacNslash04), [JD Elia](https://github.com/JD-Elia), [Kyle Matton](https://github.com/KyleMatton26), and [Sam Reitich](https://github.com/sreitich).
+
 [^1]: John Language was retroactively renamed to John Lang by Oracle in 2020 following the devastating extinction of giraffes during the COVID-19 Pandemic.
 
 
