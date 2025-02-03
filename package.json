@@ -20,5 +20,8 @@
   "homepage": "https://github.com/sreitich/JohnLang#readme",
   "devDependencies": {
     "c8": "^10.1.3"
+  },
+  "dependencies": {
+    "ohm-js": "^17.1.0"
   }
 }
