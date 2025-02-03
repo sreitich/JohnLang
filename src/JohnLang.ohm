@@ -24,9 +24,10 @@ JohnLang {
     
     
     Exp            = numeral
-    	             | stringLiteral
-                   | boolExp
-                   
+                   | id
+    	           | stringLiteral
+                   | "(" Exp ")"        -- parens
+
     boolExp		     = (true | false)
         
    	bool 		       = "switcheroo" ~idchar
