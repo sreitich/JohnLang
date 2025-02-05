@@ -7,11 +7,11 @@ JohnLang {
                    | IfStmt
                    | ForStmt
                    | AssignmentStmt
-                   | id "++" "!"									--increment
+                   | Exp_id "++" "!"									--increment
     
     VarDec         = (string | number | bool) id ":" Exp "!"
     PrintStmt      = print "(" Exp ")" "!"
-    AssignmentStmt = id ":" Exp "!"
+    AssignmentStmt = Exp_id ":" Exp "!"
     Block          = "{" Stmt* "}"
     
     IfStmt         = if Exp Block ElseIfChain? ElseStmt?
@@ -24,7 +24,7 @@ JohnLang {
     
     
     Exp            = numeral
-                   | id
+                   | id                 -- id
     	           | stringLiteral
                    | "(" Exp ")"        -- parens
 
@@ -56,7 +56,7 @@ JohnLang {
     throw          = "whoopsieDaisy" ~idchar
     id             = ~keyword letter idchar*
     idchar         = letter | digit | "_"
-    numeral        = digit+
+    numeral        = digit+ ("." digit+)? (("E"|"e") ("+"|"-")? digit+)?
     stringLiteral  = "\"" (~"\"" any)* "\""   --doubleQuoted
     keyword        = bool  | string   | number   | if        | elseIf | else
     		           | true  | false    | not      | return    | for    | while 

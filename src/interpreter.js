@@ -11,6 +11,8 @@ export default function interpret(match) {
         },
 
         Stmt_increment(id, _op, _exclamation) {
+            const oldVal = id.eval();
+            memory.set(id.sourceString, oldVal + 1);
         },
 
         VarDec(type, id, _colon, exp, _exclamation) {
@@ -21,18 +23,25 @@ export default function interpret(match) {
             console.log(exp.eval());
         },
 
+        AssignmentStmt(id, _eq, exp, _exclamation) {
+            const value = exp.eval();
+            const variable = id.eval();
+            memory.set(id.sourceString, value);
+        },
+
         Exp_parens(_leftParen, exp, _rightParen) {
-            exp.eval();
+            return exp.eval();
         },
 
-        numeral(digits) {
-            return Number(digits.sourceString);
+        numeral(digits, _dot, _fractional, _e, _sign, _exponent) {
+            return Number(this.sourceString);
         },
 
-        id(first, rest) {
-            const name = `${first.sourceString}${rest.sourceString}`;
+        id(_first, _rest) {
+            const name = this.sourceString;
             if (!memory.has(name)) {
-                throw new Error(`Whoa there! I'm not sure what yer talking bout with this ${name} thing.`);
+                // Currently holding the absolute shit out of our horses.
+                throw new Error(`Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`);
             }
             return memory.get(name);
         }
