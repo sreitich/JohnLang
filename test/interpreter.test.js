@@ -7,6 +7,6 @@ describe("Interpreter", () => {
         ok(parse("letMeLearnYouSomething(1)!").succeeded());
     });
     it("throws on syntax errors", () => {
-        throws(parse("letMeLearnYouSomething(1)"), /Expected/);
+        throws(() => parse("letMeLearnYouSomething(1)"), /Expected/);
     });
 });
