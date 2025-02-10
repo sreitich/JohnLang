@@ -43,7 +43,6 @@ export default function interpret(match) {
                 // Currently holding the absolute shit out of our horses.
                 throw new Error(`Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`);
             }
-            return memory.get(name);
         }
     });
 
