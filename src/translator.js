@@ -24,7 +24,7 @@ export default function interpret(match) {
 
         VarDec(type, id, _colon, exp, _exclamation) {
             memory.set(id.sourceString, exp.eval());
-            // "Buster" is short for "buster brown."
+            // "Buster" is short for "Buster Brown."
             check(!locals.has(id.sourceString), `Whoa buster, I think I've seen this ${id.sourceString} thing before.`, this);
         },
 
