@@ -4,6 +4,13 @@ export default function interpret(match) {
     const memory = new Map();
 
     const interpreter = grammar.createSemantics().addOperation("eval", {
+    function check(condition, message, parseTreeNode) {
+        if (!condition) {
+            throw new Error(
+                `${parseTreeNode.source.getLineAndColumnMessage()} ${message}`
+            );
+        }
+    }
         Program(statements) {
             for (const statement of statements.children) {
                 statement.eval();
@@ -17,6 +24,8 @@ export default function interpret(match) {
 
         VarDec(type, id, _colon, exp, _exclamation) {
             memory.set(id.sourceString, exp.eval());
+            // "Buster" is short for "buster brown."
+            check(!locals.has(id.sourceString), `Whoa buster, I think I've seen this ${id.sourceString} thing before.`, this);
         },
 
         PrintStmt(_printKw, _leftParen, exp, _rightParen, _exclamation) {
@@ -39,10 +48,9 @@ export default function interpret(match) {
 
         id(_first, _rest) {
             const name = this.sourceString;
-            if (!memory.has(name)) {
-                // Currently holding the absolute shit out of our horses.
-                throw new Error(`Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`);
-            }
+            // Currently holding the absolute shit out of our horses.
+            check(locals.has(name), `Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`, this);
+            return name;
         }
     });
 
