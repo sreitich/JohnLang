@@ -1,9 +1,9 @@
 export default function interpret(match) {
     const grammar = match.matcher.grammar;
 
-    const memory = new Map();
+    const locals = new Map();
+    let target = [];
 
-    const interpreter = grammar.createSemantics().addOperation("eval", {
     function check(condition, message, parseTreeNode) {
         if (!condition) {
             throw new Error(
@@ -11,35 +11,52 @@ export default function interpret(match) {
             );
         }
     }
+
+    function emit(line) {
+        target.push(line);
+    }
+
+    const translator = grammar.createSemantics().addOperation("evtranslateal", {
         Program(statements) {
             for (const statement of statements.children) {
-                statement.eval();
+                statement.translate();
             }
         },
 
         Stmt_increment(id, _op, _exclamation) {
-            const oldVal = id.eval();
-            memory.set(id.sourceString, oldVal + 1);
+            const variable = id.translate();
+            emit(`${variable}++`);
         },
 
         VarDec(type, id, _colon, exp, _exclamation) {
-            memory.set(id.sourceString, exp.eval());
             // "Buster" is short for "Buster Brown."
             check(!locals.has(id.sourceString), `Whoa buster, I think I've seen this ${id.sourceString} thing before.`, this);
+            const initializer = exp.translate();
+            emit(`let ${id.sourceString} = ${initializer};`);
         },
 
         PrintStmt(_printKw, _leftParen, exp, _rightParen, _exclamation) {
-            console.log(exp.eval());
+            emit(`console.log(${exp.translate()});`);
         },
 
         AssignmentStmt(id, _eq, exp, _exclamation) {
-            const value = exp.eval();
-            const variable = id.eval();
-            memory.set(id.sourceString, value);
+            const value = exp.translate();
+            const variable = id.translate();
+            emit(`${variable} = ${value};`);
+        },
+
+        Stmt_break(_break, semi) {
+            emit(`break;`);
+        },
+
+        Block(_open, statements, close) {
+            for (const statement of statements.children) {
+                statement.translate();
+            }
         },
 
         Exp_parens(_leftParen, exp, _rightParen) {
-            return exp.eval();
+            return exp.translate();
         },
 
         numeral(digits, _dot, _fractional, _e, _sign, _exponent) {
@@ -54,5 +71,6 @@ export default function interpret(match) {
         }
     });
 
-    throw interpreter(match).eval();
+    translator(match).translate();
+    return target;
 }
