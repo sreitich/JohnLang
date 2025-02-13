@@ -1,7 +1,7 @@
 export default function interpret(match) {
     const grammar = match.matcher.grammar;
 
-    const locals = new Map();
+    const locals = new Map(); // string -> entity
     let target = [];
 
     function check(condition, message, parseTreeNode) {
@@ -10,6 +10,32 @@ export default function interpret(match) {
                 `${parseTreeNode.source.getLineAndColumnMessage()} ${message}`
             );
         }
+    }
+
+    function checkNumber(e, parseTreeNode) {
+        check(e.type === "number", `Expected number`, parseTreeNode);
+    }
+
+    function checkBoolean(e, parseTreeNode) {
+        check(e.type === "boolean", `Expected boolean`, parseTreeNode);
+    }
+
+    function checkNotDeclared(name, parseTreeNode) {
+        check(
+            locals.has(name),
+            // Currently holding the absolute shit out of our horses.
+            `Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`,
+            parseTreeNode
+        );
+    }
+
+    function checkAlreadyDeclared(name, parseTreeNode) {
+        check(
+            !locals.has(name),
+            // "Buster" is short for "Buster Brown."
+            `Whoa buster, I think I've seen this ${name} thing before.`,
+            parseTreeNode
+        );
     }
 
     function emit(line) {
@@ -29,10 +55,19 @@ export default function interpret(match) {
         },
 
         VarDec(type, id, _colon, exp, _exclamation) {
-            // "Buster" is short for "Buster Brown."
-            check(!locals.has(id.sourceString), `Whoa buster, I think I've seen this ${id.sourceString} thing before.`, this);
+            checkAlreadyDeclared(id.sourceString, this);
             const initializer = exp.translate();
-            emit(`let ${id.sourceString} = ${initializer};`);
+            const variable = {
+                kind: "variable",
+                name: id.sourceString,
+                mutable: true,
+                type: initializer.type,
+                toString() {
+                    return this.name;
+                }
+            }
+            locals.set(id.sourceString, variable);
+            emit(`let ${variable.name} = ${initializer};`);
         },
 
         PrintStmt(_printKw, _leftParen, exp, _rightParen, _exclamation) {
@@ -55,6 +90,19 @@ export default function interpret(match) {
             }
         },
 
+        Condition_add(left, _op, right) {
+            const x = left.translate();
+            const y = right.translate();
+            checkNumber(x);
+            checkNumber(y);
+            return {
+                type: "number",
+                toString() {
+                    return `(${x} + ${y})`;
+                }
+            };
+        },
+
         Exp_parens(_leftParen, exp, _rightParen) {
             return exp.translate();
         },
@@ -64,13 +112,24 @@ export default function interpret(match) {
         },
 
         id(_first, _rest) {
-            const name = this.sourceString;
-            // Currently holding the absolute shit out of our horses.
-            check(locals.has(name), `Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`, this);
-            return name;
-        }
+            const entity = locals.get(this.sourceString);
+            checkNotDeclared(this.sourceString, this);
+            return entity;
+        },
+
+        true(_) {
+            return true;
+        },
+
+        false(_) {
+            return false;
+        },
     });
 
     translator(match).translate();
     return target;
 }
+
+Number.prototype.type = "number";
+Boolean.prototype.type = "boolean";
+String.prototype.type = "string";
