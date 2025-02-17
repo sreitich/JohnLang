@@ -2,9 +2,9 @@ JohnLang {
 
     Program 	   = Stmt+
     Stmt           = VarDec
-    		   | FieldDec
+    		       | FieldDec
     	           | ForLoopVarDec
-    		   | PrintStmt
+    		       | PrintStmt
                    | WhileStmt
                    | IfStmt
                    | ForStmt
@@ -17,6 +17,7 @@ JohnLang {
                    | ErrThrowStmt
                    | ErrAssertStmt
                    | Exp "++" "!"						  --increment
+                   | break "!"                            --break
     
     VarDec         = Type id ":" Exp "!"                                          --primitiveDeclaration
     		   | ListDec 

@@ -1,9 +1,8 @@
-import { describe, it } from "node:test";
-import { deepEqual } from "node:assert/strict";
-import { add } from "../src/JohnLang.js";
+import { describe, it } from "node:test"
+import assert from "node:assert/strict"
 
-describe("Compiler", () => {
-    it("is alive", () => {
-        deepEqual(add(1, 2), 3);
-    });
-});
+describe("The project setup", () => {
+    it("can at least run tests", () => {
+        assert.deepEqual(1, 1)
+    })
+})

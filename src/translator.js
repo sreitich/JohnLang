@@ -1,3 +1,5 @@
+// NOTE: This file isn't used for the current assignment, and is not currently functional.
+
 export default function interpret(match) {
     const grammar = match.matcher.grammar;
 
