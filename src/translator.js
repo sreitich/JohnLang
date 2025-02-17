@@ -1,6 +1,14 @@
 // NOTE: This file isn't used for the current assignment, and is not currently functional.
 
-export default function interpret(match) {
+import * as core from "./core.js";
+
+export default function translate(program) {
+    throw new Error("Translator not yet implemented.");
+}
+
+// In-class analyzer implementation.
+/**
+export default function analyze(match) {
     const grammar = match.matcher.grammar;
 
     const locals = new Map(); // string -> entity
@@ -44,69 +52,45 @@ export default function interpret(match) {
         target.push(line);
     }
 
-    const translator = grammar.createSemantics().addOperation("evtranslateal", {
+    const analyzer = grammar.createSemantics().addOperation("analyze", {
         Program(statements) {
-            for (const statement of statements.children) {
-                statement.translate();
-            }
+            return core.program(statements.children.map((s) => s.analyze()));
         },
 
         Stmt_increment(id, _op, _exclamation) {
-            const variable = id.translate();
-            emit(`${variable}++`);
+            const variable = id.analyze();
+            return core.incrementStatement(variable);
         },
 
         VarDec(type, id, _colon, exp, _exclamation) {
             checkAlreadyDeclared(id.sourceString, this);
-            const initializer = exp.translate();
-            const variable = {
-                kind: "variable",
-                name: id.sourceString,
-                mutable: true,
-                type: initializer.type,
-                toString() {
-                    return this.name;
-                }
-            }
+            const initializer = exp.analyze();
+            const variable = core.variable(id.sourceString, initializer.type, true);
             locals.set(id.sourceString, variable);
-            emit(`let ${variable.name} = ${initializer};`);
+            return core.variableDeclaration(variable, initializer);
         },
 
         PrintStmt(_printKw, _leftParen, exp, _rightParen, _exclamation) {
-            emit(`console.log(${exp.translate()});`);
+            const argument = exp.analyze();
+            return core.printStatement(argument);
         },
 
         AssignmentStmt(id, _eq, exp, _exclamation) {
-            const value = exp.translate();
-            const variable = id.translate();
-            emit(`${variable} = ${value};`);
+            const source = exp.analyze();
+            const target = id.analyze();
+            return core.assignmentStatement(source, target);
         },
 
         Stmt_break(_break, semi) {
-            emit(`break;`);
+            return core.breakStatement();
         },
 
         Block(_open, statements, close) {
-            for (const statement of statements.children) {
-                statement.translate();
-            }
-        },
-
-        Condition_add(left, _op, right) {
-            const x = left.translate();
-            const y = right.translate();
-            checkNumber(x);
-            checkNumber(y);
-            return {
-                type: "number",
-                toString() {
-                    return `(${x} + ${y})`;
-                }
-            };
+            return statements.children.map((s) => s.analyze());
         },
 
         Exp_parens(_leftParen, exp, _rightParen) {
-            return exp.translate();
+            return exp.analyze();
         },
 
         numeral(digits, _dot, _fractional, _e, _sign, _exponent) {
@@ -128,10 +112,9 @@ export default function interpret(match) {
         },
     });
 
-    translator(match).translate();
-    return target;
+    return analyzer(match).analyze();
 }
-
+**/
 Number.prototype.type = "number";
 Boolean.prototype.type = "boolean";
 String.prototype.type = "string";

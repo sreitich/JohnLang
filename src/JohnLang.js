@@ -3,6 +3,7 @@ import stringify from "graph-stringify"
 import compile from "./compiler.js"
 import parse from "./parser.js";
 import translate from "./translator.js";
+import analyze from "./analyzer.js";
 
 const help = `JohnLang compiler
 
@@ -44,7 +45,8 @@ if (process.argv.length !== 3) {
 try {
     const sourceCode = fs.readFileSync(process.argv[2], "utf8");
     const match = parse(sourceCode);
-    const target = translate(match);
+    const program = analyze(match);
+    const target = translate(program);
     console.log(target.join("\n"));
 } catch (e) {
     console.error(e);
