@@ -20,7 +20,7 @@ JohnLang {
     Params      = "(" ListOf<Param, ","> ")"
     Param       = Type id
 
-    Assignment  = Exp6 ":" Exp "!"
+    Assignment  = ~literal Exp6 ":" Exp "!"
 
     IfStmt      = if Exp Block (elseif Exp Block)* (else Block)?
 
@@ -48,8 +48,8 @@ JohnLang {
     Return      = return Exp "!"                                --exp
                 | return "!"                                    --short
 
-    Exp         = Exp ("||" Exp2)+                             --or
-                | Exp ("&&" Exp2)+                             --and
+    Exp         = Exp ("||" Exp2)+                              --or
+                | Exp ("&&" Exp2)+                              --and
                 | Exp2
     Exp2        = Exp3 relop Exp3                               --compare
                 | Exp3
@@ -78,6 +78,7 @@ JohnLang {
     Type        = id
     relop       = "<=" | "<" | "==" | "!=" | ">=" | ">"
 
+    literal     = true | false | floatlit | intlit | stringlit
     floatlit    = digit+ "." digit+ (("E" | "e") ("+" | "-")? digit+)?
     intlit      = digit+
     stringlit   = "\"" char* "\""
