@@ -1,4 +1,4 @@
-// NOTE: This file isn't used for the current assignment, and is not currently functional.
+// NOTE: This file is only used to follow along with the in-class code-alongs. It is not used for the current assignment, but will eventually become the generator and analyzer.
 
 import * as core from "./core.js";
 
@@ -6,7 +6,7 @@ export default function translate(program) {
     throw new Error("Translator not yet implemented.");
 }
 
-// In-class analyzer implementation.
+// Analyzer.
 /**
 export default function analyze(match) {
     const grammar = match.matcher.grammar;
