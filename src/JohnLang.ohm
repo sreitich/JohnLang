@@ -7,37 +7,49 @@ JohnLang {
                 | Assignment
                 | IfStmt
                 | LoopStmt
-                | Call
+                | Call "!"                                      --call
                 | DotExp
                 | DotCall
                 | ClassDec
                 | Return
-                | break
+                | break "!"                                     --break
 
-    VarDecl     = Type id ":" Exp "!"
+    VarDec      = Type id ":" Exp "!"
 
     FunDec      = function id Params ":" Type Block
     Params      = "(" ListOf<Param, ","> ")"
     Param       = Type id
 
-    Assignment  =
+    Assignment  = Exp6 ":" Exp "!"
 
-    IfStmt =
+    IfStmt      = if Exp Block (elseif Exp Block)* (else Block)?
 
-    LoopStmt =
+    IfStmtOld   = if Exp Block else Block                       --long
+                | if Exp Block else IfStmt                      --elseif
+                | if Exp Block                                  --short
 
-    Call =
+    LoopStmt    = while Exp Block                                               --while
+                | for (Type? id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block     --for
 
-    DotExp =
-    DotCall =
+    Call        = id "(" ListOf<Exp, ","> ")"
 
-    ClassDec =
-    ObjectDec =
+    DotCall     = Exp6 "." Call
+    DotExp      = this "." id
+                | Exp6 "." id
 
-    Return =
+    ClassDec            = class id "{" ConstructorDec MethodDec* "}"
+    ConstructorDec      = construct "(" ListOf<Param, ","> ")" "{" Field* "}"
+    Field               = Type this "." id ":" Exp "!"
+    MethodDec           = function id "(" ListOf<Param, ","> ")" ":" Type Block
+    ObjectDec           = new id "(" ListOf<Exp, ","> ")"
 
-    Exp         = Exp2 ("||" Exp2)+                             --or
-                | Exp2 ("&&" Exp2)+                             --and
+    Block       = "{" Statement* "}"
+
+    Return      = return Exp "!"                                --exp
+                | return "!"                                    --short
+
+    Exp         = Exp ("||" Exp2)+                             --or
+                | Exp ("&&" Exp2)+                             --and
                 | Exp2
     Exp2        = Exp3 relop Exp3                               --compare
                 | Exp3
@@ -52,13 +64,13 @@ JohnLang {
                 | false
                 | floatlit
                 | intlit
-                | ArrayLit
                 | MapLit
                 | Call
-                | DotExp
                 | DotCall
+                | DotExp
                 | ObjectDec
                 | Exp6 "[" Exp "]"                              --subscript
+                | ArrayLit
                 | stringlit
                 | id
                 | "(" Exp ")"                                   --parens
@@ -75,17 +87,18 @@ JohnLang {
     hex         = hexDigit
 
     ArrayLit    = "[" ListOf<Exp, ","> "]"
-    MapLit      = "{" ListOf<MapEntry, ","> "}"
+    MapLit      = "{" ListOf<MapLitEntry, ","> "}"
     MapLitEntry = Exp6 ":" Exp
 
     function    = "gitErDone" ~idchar
     if          = "ope" ~idchar
+    elseif      = "ope welp" ~idchar
     else        = "welp" ~idchar
-    for         = "tilTheCowsComeHome" ~idchari
+    for         = "tilTheCowsComeHome" ~idchar
     while       = "holdMyBeer" ~idchar
     class       = "doohickey" ~idchar
     this        = "me" ~idchar
-    constructor = "slapTogether" ~idchar
+    construct   = "slapTogether" ~idchar
     new         = "whipUp" ~idchar
     return      = "betterGetGoin" ~idchar
     break       = "letsBlowThisPopsicleStand" ~idchar
@@ -93,12 +106,12 @@ JohnLang {
     true        = "youBetcha" ~idchar
     false       = "thinkAgainPal" ~idchar
     not         = "nah" ~idchar
-    list        = "todo" ~idchar
-    dict        = "almanac" ~idchar
 
     id          = ~keyword letter idchar*
     idchar      = letter | digit | "_"
 
-    keyword     = function | if | else | for | while | class | this | constructor | new | return |
-                | break | continue | true | false | not | list | dict
+    keyword     = function | if | elseif | else | for | while | class | this | construct
+                | new | return | break | continue | true | false | not
+
+    space       += "//" (~"\n" any)*                            --comment
 }

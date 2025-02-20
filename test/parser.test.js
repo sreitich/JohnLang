@@ -62,7 +62,7 @@ const syntaxChecks = [
     `],
 
     ["Class declaration", `
-        doohicky Circle {
+        doohickey Circle {
             slapTogether(handful r) {
                 handful me.radius: r!
             }
@@ -90,7 +90,7 @@ const syntaxChecks = [
     ["Advanced assignments", `
         numbers[0]: 100!
         days["monday"]: 2!
-        fridge.fruits[1] = "apple"!
+        fridge.fruits[1]: "apple"!
         shapes.rect.width: 2.0!
     `],
 
@@ -147,13 +147,13 @@ const syntaxChecks = [
     `],
 
     ["For loop", `
-        tilTheCowsComeHome handful x = 0, x < 10, x = x + 1 {
+        tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 {
             letMeLearnYouSomething(x)!
         }
     `],
 
     ["For loop with array", `
-        tilTheCowsComeHome handful x = 0, x < a.len(), x = x + 1 {
+        tilTheCowsComeHome handful x: 0, x < a.len(), x: x + 1 {
             letMeLearnYouSomething(a[x])!
         }
     `],
@@ -163,7 +163,7 @@ const syntaxChecks = [
     `],
 
     ["Conditional operators", `
-        letMeLearnYouSomething(youBetcha || nah)!
+        letMeLearnYouSomething(youBetcha || thinkAgainPal)!
         letMeLearnYouSomething(youBetcha && youBetcha)!
         letMeLearnYouSomething(nah youBetcha || nah thinkAgainPal)!
     `],
@@ -171,7 +171,7 @@ const syntaxChecks = [
     ["Conditional chaining", `
         letMeLearnYouSomething(a || b || c || d)!
         letMeLearnYouSomething(a && b && c && d)!
-        letMeLearnYouSomething(a || (b && c) && (d || (e && f))!
+        letMeLearnYouSomething(a || (b && c) && (d || (e && f)))!
     `],
 
     ["Relational operators", `
@@ -232,8 +232,8 @@ const syntaxChecks = [
     `],
 
     ["Escape characters", `
-        betterGetGoin "\\\a\\n"!
-        betterGetGoin "\\t\\d"!
+        betterGetGoin "\\\\a\\n"!
+        betterGetGoin "\\t"!
         betterGetGoin "\\"Hello\\""!
     `],
 
