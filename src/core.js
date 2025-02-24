@@ -35,6 +35,23 @@ export function variableDeclaration(variable, initializer) {
     };
 }
 
+export function functionDeclaration(fun, body) {
+    return {
+        kind: "FunctionDeclaration",
+        fun,
+        body,
+    };
+}
+
+export function func(name, parameters, returnType) {
+    return {
+        kind: "Function",
+        name,
+        parameters,
+        returnType,
+    }
+}
+
 export function printStatement(argument) {
     return {
         kind: "PrintStatement",

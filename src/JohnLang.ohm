@@ -58,7 +58,8 @@ JohnLang {
     Exp4        = Exp4 ("*"| "/" | "%") Exp5                    --multiply
                 | Exp5
     Exp5        = Exp6 "**" Exp5                                --power
-                | ("-" | not) Exp6                              --unary
+                | "-" Exp6                                      --neg
+                | not Exp6                                      --inv
                 | Exp6
     Exp6        = true
                 | false
