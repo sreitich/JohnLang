@@ -67,10 +67,25 @@ export function assignmentStatement(source, target) {
     };
 }
 
+export function whileStatement(test, body) {
+    return {
+        kind: "WhileStatement",
+        test,
+        body,
+    };
+}
+
 export function block(statements) {
     return {
         kind: "BlockStatement",
         statements,
+    };
+}
+
+export function returnStatement(variable) {
+    return {
+        kind: "ReturnStatement",
+        variable,
     };
 }
 
@@ -91,4 +106,13 @@ export function unaryExpression(op, operand, type) {
         operand,
         type,
     }
+}
+
+export function subscriptExpression(array, index, type) {
+    return {
+        kind: "SubscriptExpression",
+        array,
+        index,
+        type,
+    };
 }

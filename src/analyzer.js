@@ -1,16 +1,23 @@
-import * as core from "./core";
-import {unaryExpression} from "./core";
+import * as core from "./core.js";
 
 export default function analyze(match) {
     // throw new Error("Not yet implemented");
 
     const grammar = match.matcher.grammar;
 
+    let context = {
+        locals: new Map(),
+        parent: null,
+    };
     const locals = new Map();
     const target = [];
 
     function emit(line) {
         target.push(line);
+    }
+
+    function lookup(name) {
+        return context.locals.get(name) ?? (context.parent && context.parent.lookup(name));
     }
 
 /**
@@ -76,7 +83,7 @@ export default function analyze(match) {
 
         // Statements
 
-        Stmt_break(_break, _excl) {
+        Statement_break(_break, _excl) {
             return core.breakStatement();
         },
 
@@ -102,7 +109,7 @@ export default function analyze(match) {
         },
 
         Param(type, id) {
-            checkNotDeclared(id, sourceString, id);
+            checkNotDeclared(id.sourceString, id);
             const param = core.variable(id.sourceString, type.sourceString, false);
             locals.set(id.sourceString, param);
             return param;
@@ -117,23 +124,55 @@ export default function analyze(match) {
             return core.assignmentStatement(source, target);
         },
 
-        /* TODO: We used a single if statement using optionals for simplicity but using the older if statement that's broken up into three
-         * parts will make analyzing easier. */
-        // IfStmt_long(_if, exp, if_block, _else, else_block) {
-        // },
-        //
-        // IfStmt_elseif(_if, exp, if_block, _else, if_stmt) {
-        // },
-        //
-        // IfStmt_short(_if, exp, block) {
-        //
-        // },
+        IfStmt(_if, if_exp, if_block, _elseif, elseif_exp, elseif_block, _else, else_block) {
+
+        },
+
+        LoopStmt_while(_while, exp, block) {
+            const test = exp.analyze();
+            checkBoolean(test, exp);
+            const body = block.analyze();
+            return core.whileStatement(test, body);
+        },
 
         Block(_open, statements, _close) {
             return statements.children.map((s) => s.analyze());
         },
 
+        Return(_ret, exp, _excl) {
+            const x = exp.analyze();
+            return core.returnStatement(x);
+        },
+
         // Expressions
+
+        Exp_or(left, _op, right) {
+            const x = left.analyze();
+            const y = right.analyze();
+            checkBoolean(x, left);
+            checkBoolean(y, right);
+            return core.binaryExpression("||", x, y, "boolean");
+        },
+
+        Exp_and(left, _op, right) {
+            const x = left.analyze();
+            const y = right.analyze();
+            checkBoolean(x, left);
+            checkBoolean(y, right);
+            return core.binaryExpression("&&", x, y, "boolean");
+        },
+
+        Exp2_compare(left, op, right) {
+            const x = left.analyze();
+            const y = right.analyze();
+            if (op.sourceString === "==" || op.sourceString === "!=") {
+                check(x.type === y.type, `Those ain't the same type, pal.`, op);
+            } else {
+                checkNumber(x, left);
+                checkNumber(y, right);
+            }
+            return core.binaryExpression(op.sourceString, x, y, "boolean");
+        },
 
         // TODO: Allow string concatenation (separate Exp3_add and Exp3_sub, add checkNumberOrString, make sure x and y are the same type)
         Exp3_add(left, op, right) {
@@ -147,6 +186,7 @@ export default function analyze(match) {
         Exp4_multiply(left, op, right) {
             const x = left.analyze();
             const y = right.analyze();
+            console.log(left);
             checkNumber(x, left);
             checkNumber(y, right);
             return core.binaryExpression(op.sourceString, x, y, "number");
@@ -172,8 +212,21 @@ export default function analyze(match) {
             return unaryExpression("!", x, "boolean");
         },
 
+        Exp6_subscript(array, _open, index, _close) {
+            return core.subscriptExpression(
+                array.analyze(),
+                index.analyze(),
+                "number"
+            );
+        },
+
+        Exp6_parens(_open, exp, _close) {
+            const x = exp.analyze();
+            return core.unaryExpression("", x, x.type);
+        },
+
         id(_first, _rest) {
-            const entity = locals.get(this.sourceString);
+            const entity = lookup(this.sourceString);
             checkDeclared(this.sourceString, this);
             return entity;
         },

@@ -130,6 +130,21 @@ const syntaxChecks = [
         }
     `],
 
+    ["Long else if statement", `
+        ope youBetcha {
+            letMeLearnYouSomething(1)!
+        }
+        ope welp thinkAgainPal {
+            letMeLearnYouSomething(1)!
+        }
+        ope welp thinkAgainPal {
+            letMeLearnYouSomething(1)!
+        }
+        welp {
+            letMeLearnYouSomething(1)!
+        }
+    `],
+
     ["Empty if statement", `
         ope youBetcha {
         }
