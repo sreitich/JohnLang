@@ -5,6 +5,7 @@ JohnLang {
     Statement   = VarDec
                 | FunDec
                 | Assignment
+                | Print
                 | IfStmt
                 | LoopStmt
                 | Call "!"                                      --call
@@ -21,6 +22,8 @@ JohnLang {
     Param       = Type id
 
     Assignment  = ~literal Exp6 ":" Exp "!"
+
+    Print       = print "(" Exp ")" "!"
 
     IfStmt      = if Exp Block (elseif Exp Block)* (else Block)?
 
@@ -92,6 +95,7 @@ JohnLang {
     MapLitEntry = Exp6 ":" Exp
 
     function    = "gitErDone" ~idchar
+    print       = "letMeLearnYouSomething" ~idchar
     if          = "ope" ~idchar
     elseif      = "ope welp" ~idchar
     else        = "welp" ~idchar

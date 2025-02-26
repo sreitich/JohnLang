@@ -1,4 +1,5 @@
 import * as core from "./core.js";
+import {printStatement} from "./core.js";
 
 export default function analyze(match) {
     // throw new Error("Not yet implemented");
@@ -67,6 +68,10 @@ export default function analyze(match) {
     }
 
     function checkDeclared(name, parseTreeNode) {
+        // TODO: Add proper typing
+        if (name === "handful" || name === "switcheroo" || name === "chitchat") {
+            return;
+        }
         // Currently holding the absolute shit out of our horses.
         check(locals.has(name), `Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`, parseTreeNode);
     }
@@ -122,6 +127,11 @@ export default function analyze(match) {
             const target = left.analyze();
             checkSameTypes(source, target, left);
             return core.assignmentStatement(source, target);
+        },
+
+        Print(_print, _open, exp, _close, _excl) {
+            const argument = exp.analyze();
+            return core.printStatement(argument);
         },
 
         IfStmt(_if, if_exp, if_block, _elseif, elseif_exp, elseif_block, _else, else_block) {
