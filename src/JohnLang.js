@@ -33,23 +33,3 @@ if (process.argv.length !== 4) {
 } else {
     compileFromFile(process.argv[2], process.argv[3])
 }
-
-// Development code for testing the translator.
-/**
-// Check usage.
-if (process.argv.length !== 3) {
-    console.error("Usage: node src/JohnLang.js FILENAME");
-    process.exit(1);
-}
-
-try {
-    const sourceCode = fs.readFileSync(process.argv[2], "utf8");
-    const match = parse(sourceCode);
-    const program = analyze(match);
-    const target = translate(program);
-    console.log(target.join("\n"));
-} catch (e) {
-    console.error(e);
-    process.exit(1);
-}
- **/

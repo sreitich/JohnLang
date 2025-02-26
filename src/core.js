@@ -14,13 +14,6 @@ export function variable(name, type, mutable) {
     };
 }
 
-export function incrementStatement(variable) {
-    return {
-        kind: "IncrementStatement",
-        variable,
-    };
-}
-
 export function breakStatement() {
     return {
         kind: "BreakStatement",
