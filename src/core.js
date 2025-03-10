@@ -136,6 +136,7 @@ export function memberExpression(object, op, field) {
 }
 
 export function memberCall(object, member) {
+    // Aka dot call
     return { kind: "MemberCall", object, member, };
 }
 
