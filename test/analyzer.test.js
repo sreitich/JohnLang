@@ -2,7 +2,7 @@ import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
-import { program, variableDeclaration, variable, } from "../src/core.js"
+import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -64,7 +64,7 @@ const semanticChecks = [
 
     ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
 
-    ["class of arrays and maps", "doohickey S { slapTogether() { todo me.x: []! almanac me.y: {} } }"],
+    ["class of arrays and maps", "doohickey S { slapTogether() { todo me.x: []! almanac me.y: {}! } }"],
 
     [
         "function return types",
@@ -77,137 +77,89 @@ const semanticChecks = [
     ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
 ]
 
-// Programs that are syntactically correct but have semantic errors
+// Programs that are syntactically correct but have semantic errors.
 const semanticErrors = [
-    // ["non-distinct fields", "struct S {x: boolean x: int}", /Fields must be distinct/],
-    // ["non-int increment", "let x=false;x++;", /an integer/],
-    // ["non-int decrement", 'let x=some[""];x++;', /an integer/],
-    // ["undeclared id", "print(x);", /Identifier x not declared/],
-    // ["redeclared id", "let x = 1;let x = 1;", /Identifier x already declared/],
-    // ["recursive struct", "struct S { x: int y: S }", /must not be self-containing/],
-    // ["assign to const", "const x = 1;x = 2;", /Cannot assign to immutable/],
-    // [
-    //     "assign to function",
-    //     "function f() {} function g() {} f = g;",
-    //     /Cannot assign to immutable/,
-    // ],
-    // ["assign to struct", "struct S{} S = 2;", /Cannot assign to immutable/],
-    // [
-    //     "assign to const array element",
-    //     "const a = [1];a[0] = 2;",
-    //     /Cannot assign to immutable/,
-    // ],
-    // [
-    //     "assign to const optional",
-    //     "const x = no int;x = some 1;",
-    //     /Cannot assign to immutable/,
-    // ],
-    // [
-    //     "assign to const field",
-    //     "struct S {x: int} const s = S(1);s.x = 2;",
-    //     /Cannot assign to immutable/,
-    // ],
-    // ["assign bad type", "let x=1;x=true;", /Cannot assign a boolean to a int/],
-    // ["assign bad array type", "let x=1;x=[true];", /Cannot assign a \[boolean\] to a int/],
-    // ["assign bad optional type", "let x=1;x=some 2;", /Cannot assign a int\? to a int/],
-    // ["break outside loop", "break;", /Break can only appear in a loop/],
-    // [
-    //     "break inside function",
-    //     "while true {function f() {break;}}",
-    //     /Break can only appear in a loop/,
-    // ],
-    // ["return outside function", "return;", /Return can only appear in a function/],
-    // [
-    //     "return value from void function",
-    //     "function f() {return 1;}",
-    //     /Cannot return a value/,
-    // ],
-    // ["return nothing from non-void", "function f(): int {return;}", /should be returned/],
-    // ["return type mismatch", "function f(): int {return false;}", /boolean to a int/],
-    // ["non-boolean short if test", "if 1 {}", /Expected a boolean/],
-    // ["non-boolean if test", "if 1 {} else {}", /Expected a boolean/],
-    // ["non-boolean while test", "while 1 {}", /Expected a boolean/],
-    // ["non-integer repeat", 'repeat "1" {}', /Expected an integer/],
-    // ["non-integer low range", "for i in true...2 {}", /Expected an integer/],
-    // ["non-integer high range", "for i in 1..<no int {}", /Expected an integer/],
-    // ["non-array in for", "for i in 100 {}", /Expected an array/],
-    // ["non-boolean conditional test", "print(1?2:3);", /Expected a boolean/],
-    // ["diff types in conditional arms", "print(true?1:true);", /not have the same type/],
-    // ["unwrap non-optional", "print(1??2);", /Expected an optional/],
-    // ["bad types for ||", "print(false||1);", /Expected a boolean/],
-    // ["bad types for &&", "print(false&&1);", /Expected a boolean/],
-    // ["bad types for ==", "print(false==1);", /Operands do not have the same type/],
-    // ["bad types for !=", "print(false==1);", /Operands do not have the same type/],
-    // ["bad types for +", "print(false+1);", /Expected a number or string/],
-    // ["bad types for -", "print(false-1);", /Expected a number/],
-    // ["bad types for *", "print(false*1);", /Expected a number/],
-    // ["bad types for /", "print(false/1);", /Expected a number/],
-    // ["bad types for **", "print(false**1);", /Expected a number/],
-    // ["bad types for <", "print(false<1);", /Expected a number or string/],
-    // ["bad types for <=", "print(false<=1);", /Expected a number or string/],
-    // ["bad types for >", "print(false>1);", /Expected a number or string/],
-    // ["bad types for >=", "print(false>=1);", /Expected a number or string/],
-    // ["bad types for ==", "print(2==2.0);", /not have the same type/],
-    // ["bad types for !=", "print(false!=1);", /not have the same type/],
-    // ["bad types for negation", "print(-true);", /Expected a number/],
-    // ["bad types for length", "print(#false);", /Expected an array/],
-    // ["bad types for not", 'print(!"hello");', /Expected a boolean/],
-    // ["bad types for random", "print(random 3);", /Expected an array/],
-    // ["non-integer index", "let a=[1];print(a[false]);", /Expected an integer/],
-    // ["no such field", "struct S{} let x=S(); print(x.y);", /No such field/],
-    // ["diff type array elements", "print([3,3.0]);", /Not all elements have the same type/],
-    // ["shadowing", "let x = 1;\nwhile true {let x = 1;}", /Identifier x already declared/],
-    // ["call of uncallable", "let x = 1;\nprint(x());", /Call of non-function/],
-    // [
-    //     "Too many args",
-    //     "function f(x: int) {}\nf(1,2);",
-    //     /1 argument\(s\) required but 2 passed/,
-    // ],
-    // [
-    //     "Too few args",
-    //     "function f(x: int) {}\nf();",
-    //     /1 argument\(s\) required but 0 passed/,
-    // ],
-    // [
-    //     "Parameter type mismatch",
-    //     "function f(x: int) {}\nf(false);",
-    //     /Cannot assign a boolean to a int/,
-    // ],
-    // [
-    //     "function type mismatch",
-    //     `function f(x: int, y: (boolean)->void): int { return 1; }
-    //  function g(z: boolean): int { return 5; }
-    //  f(2, g);`,
-    //     /Cannot assign a \(boolean\)->int to a \(boolean\)->void/,
-    // ],
-    // ["bad param type in fn assign", "function f(x: int) {} function g(y: float) {} f = g;"],
-    // [
-    //     "bad return type in fn assign",
-    //     `function f(x: int): int {return 1;}
-    // function g(y: int): string {return "uh-oh";}
-    // let h = f; h = g;`,
-    //     /Cannot assign a \(int\)->string to a \(int\)->int/,
-    // ],
-    // ["type error call to sin()", "print(sin(true));", /Cannot assign a boolean to a float/],
-    // [
-    //     "type error call to sqrt()",
-    //     "print(sqrt(true));",
-    //     /Cannot assign a boolean to a float/,
-    // ],
-    // ["type error call to cos()", "print(cos(true));", /Cannot assign a boolean to a float/],
-    // [
-    //     "type error call to hypot()",
-    //     'print(hypot("dog", 3.3));',
-    //     /Cannot assign a string to a float/,
-    // ],
-    // [
-    //     "too many arguments to hypot()",
-    //     "print(hypot(1, 2, 3));",
-    //     /2 argument\(s\) required but 3 passed/,
-    // ],
-    // ["Non-type in param", "let x=1;function f(y:x){}", /Type expected/],
-    // ["Non-type in return type", "let x=1;function f():x{return 1;}", /Type expected/],
-    // ["Non-type in field type", "let x=1;struct S {y:x}", /Type expected/],
+    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /Class members must be distinct/],
+
+    ["undeclared id", "letMeLearnYouSomething(x)!", /Identifier x not declared/],
+
+    ["redeclared id", "handful x: 1! handful x: 1!", /Identifier x already declared/],
+
+    ["recursive struct", "doohickey S { slapTogether() { S me.x: S()! } }", /must not be self-containing/],
+
+    ["assign bad type", "handful x: 1! x: youBetcha!", /Cannot assign a boolean to a int/],
+
+    ["assign bad array type", "handful: x: 1! x: [youBetcha]!", /Cannot assign a \[boolean\] to a int/],
+
+    ["break outside loop", "letsBlowThisPopsicleStand!", /Break can only appear in a loop/],
+
+    ["break inside function", "gitErDone f(): handful { letsBlowThisPopsicleStand! betterGetGoin 0! }", /Break can only appear in a loop/],
+
+    ["return outside function", "betterGetGoin!", /Return can only appear in a function/],
+
+    ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", /should be returned/],
+
+    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", /boolean to a int/],
+
+    ["non-boolean short if test", "ope 1 {}", /Expected a boolean/],
+
+    ["non-boolean if test", "ope 1 {} welp {}", /Expected a boolean/],
+
+    ["non-boolean while test", "holdMyBeer 1 {}", /Expected a boolean/],
+
+    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: youBetcha, i < 10, i: i + 1 {}", /Expected an integer/],
+
+    ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", /Expected a boolean/],
+
+    ["bad types for &&", "letMeLearnYouSomething(thinkAgainPal && 1)!", /Expected a boolean/],
+
+    ["bad types for ==", "letMeLearnYouSomething(thinkAgainPal == 1)!", /Operands do not have the same type/],
+
+    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal == 1)!", /Operands do not have the same type/],
+
+    ["bad types for +", "letMeLearnYouSomething(thinkAgainPal + 1)!", /Expected a number or string/],
+
+    ["bad types for -", "letMeLearnYouSomething(thinkAgainPal - 1)!", /Expected a number/],
+
+    ["bad types for *", "letMeLearnYouSomething(thinkAgainPal * 1)!", /Expected a number/],
+
+    ["bad types for /", "letMeLearnYouSomething(thinkAgainPal / 1)!", /Expected a number/],
+
+    ["bad types for **", "letMeLearnYouSomething(thinkAgainPal ** 1)!", /Expected a number/],
+
+    ["bad types for <", "letMeLearnYouSomething(thinkAgainPal < 1)!", /Expected a number or string/],
+
+    ["bad types for <=", "letMeLearnYouSomething(thinkAgainPal <= 1)!", /Expected a number or string/],
+
+    ["bad types for >", "letMeLearnYouSomething(thinkAgainPal > 1)!", /Expected a number or string/],
+
+    ["bad types for >=", "letMeLearnYouSomething(thinkAgainPal >= 1)!", /Expected a number or string/],
+
+    ["bad types for ==", 'letMeLearnYouSomething("hello" == 2.0)!', /not have the same type/],
+
+    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal != 1)!", /not have the same type/],
+
+    ["bad types for negation", "letMeLearnYouSomething(-youBetcha)!", /Expected a number/],
+
+    ["bad types for not", 'letMeLearnYouSomething(nah "hello")!', /Expected a boolean/],
+
+    ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", /Expected an integer/],
+
+    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /No such member/],
+
+    ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", /Identifier x already declared/],
+
+    ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", /Call of non-function/],
+
+    ["Too many args", "gitErDone f(handful x) {}\nf(1, 2)!", /1 argument required but 2 passed/],
+
+    ["Too few args", "gitErDone f(handful x) {}\nf()!", /1 arguments required but 0 passed/],
+
+    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", /Cannot assign a boolean to a int/],
+
+    ["Non-type in param", "gitErDone f(handful x, y) {}", /Type expected/],
+
+    ["No return type", "gitErDone f() { betterGetGoin 1! }", /Type expected/],
 ]
 
 describe("The analyzer", () => {
@@ -223,11 +175,11 @@ describe("The analyzer", () => {
     }
     it("produces the expected representation for a trivial program", () => {
         assert.deepEqual(
-            analyze(parse("let x = π + 2.2;")),
+            analyze(parse("handful x: 1 + 2.2!")),
             program([
                 variableDeclaration(
-                    variable("x", true, floatType),
-                    binary("+", variable("π", false, floatType), 2.2, floatType)
+                    variable("x", true, numberType),
+                    binaryExpression("+", 1, 2.2, numberType)
                 ),
             ])
         )
