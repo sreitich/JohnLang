@@ -6,8 +6,8 @@ export function variableDeclaration(variable, initializer) {
     return { kind: "VariableDeclaration", variable, initializer, };
 }
 
-export function variable(name, mutable, type) {
-    return { kind: "Variable", name, mutable, type, };
+export function variable(name, type) {
+    return { kind: "Variable", name, type, };
 }
 
 export function typeDeclaration(type) {
