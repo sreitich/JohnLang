@@ -17,9 +17,11 @@ export function typeDeclaration(type) {
 export const booleanType = "switcheroo";
 export const numberType = "handful";
 export const stringType = "chitchat";
+export const voidType = "void";
+export const anyType = "any";
 
-export function classType(name, constructor, fields, methods) {
-    return { kind: "Class", name, constructor, methods };
+export function classType(name, constructor, methods) {
+    return { kind: "ClassType", name, constructor, methods };
 }
 
 export function functionDeclaration(fun) {
@@ -42,7 +44,7 @@ export function functionType(paramTypes, returnType) {
     return { kind: "FunctionType", paramTypes, returnType, };
 }
 
-export function assignment(source, target) {
+export function assignmentStatement(source, target) {
     return { kind: "AssignmentStatement", source, target, };
 }
 
@@ -143,6 +145,12 @@ export function memberCall(object, member) {
 export function functionCall(callee, args) {
     return { kind: "FunctionCall", callee, args, };
 }
+
+export const standardLibrary = Object.freeze({
+    number: numberType,
+    boolean: booleanType,
+    string: stringType
+})
 
 Boolean.prototype.type = booleanType;
 Number.prototype.type = numberType;
