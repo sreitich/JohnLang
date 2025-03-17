@@ -28,7 +28,7 @@ export function functionDeclaration(fun) {
     return { kind: "FunctionDeclaration", fun, };
 }
 
-export function func(name, parameters, body, returnType) {
+export function fun(name, parameters, body, returnType) {
     return { kind: "Function", name, parameters, body, returnType, }
 }
 

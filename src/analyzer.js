@@ -1,6 +1,8 @@
 import * as core from "./core.js";
 import parse from "./parser.js";
 import {assignmentStatement, unaryExpression} from "./core.js";
+import * as messages from "./messages.js";
+import {notInLoopError} from "./messages.js";
 
 // A context for tracking scope and control flow
 class Context {
@@ -46,57 +48,55 @@ export default function analyze(match) {
 
     // Throws if the given entity is already declared.
     function checkNotAlreadyDeclared(name, parseTreeNode) {
-        // "Buster" is short for "Buster Brown."
-        check(!context.lookup(name), `Whoa buster, I think I've seen this ${name} thing before.`, parseTreeNode);
+        check(!context.lookup(name), messages.alreadyDeclaredError(name), parseTreeNode);
     }
 
     // Throws if the entity cannot be found.
     function checkIsDeclared(entity, name, parseTreeNode) {
-        // Currently holding the absolute shit out of our horses.
-        check(entity, `Hold your horses, pal! I'm not sure what yer talking bout with this ${name} thing.`, parseTreeNode);
+        check(entity, messages.notDeclaredError(name), parseTreeNode);
     }
 
     function checkIsNumericType(e, parseTreeNode) {
-        check(e.type === core.numberType, "We were expectin' a handful!", parseTreeNode);
+        check(e.type === core.numberType, messages.notNumericError(), parseTreeNode);
     }
 
     function checkIsNumbericOrStringType(e, parseTreeNode) {
         const expectedTypes = [core.numberType, core.stringType];
-        check(expectedTypes.includes(e.type), "We were expectin' a handful or chitchat!", parseTreeNode);
+        check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
     }
 
     function checkIsBooleanType(e, parseTreeNode) {
-        check(e.type === core.booleanType, "We were expectin' an ol' switcheroo!", parseTreeNode);
+        check(e.type === core.booleanType, messages.notBooleanError(), parseTreeNode);
     }
 
     function checkHasArrayType(e, parseTreeNode) {
-        check(e.type?.kind === "ArrayType", "We were expectin' a todo!", parseTreeNode);
+        check(e.type?.kind === "ArrayType", messages.notArrayError(), parseTreeNode);
     }
 
     function checkIsArrayType(e, parseTreeNode) {
-        check(e?.kind === "ArrayType", "We were expectin' a todo!", parseTreeNode);
+        check(e?.kind === "ArrayType", messages.notArrayError(), parseTreeNode);
     }
 
     function checkHasMapType(e, parseTreeNode) {
-        check(e.type?.kind === "MapType", "We were expectin' an almanac!", parseTreeNode);
+        check(e.type?.kind === "MapType", messages.notMapError(), parseTreeNode);
     }
 
     function checkIsMapType(e, parseTreeNode) {
-        check(e?.kind === "MapType", "We were expectin' an almanac!", parseTreeNode);
+        check(e?.kind === "MapType", messages.notMapError(), parseTreeNode);
     }
 
     function checkIsClassType(e, parseTreeNode) {
-        check(e.type?.kind === "ClassType", "We were expectin' a doohickey!", parseTreeNode);
+        check(e.type?.kind === "ClassType", messages.notClassError(), parseTreeNode);
     }
 
     function checkBothHaveSameType(e1, e2, parseTreeNode) {
-        check(equivalent(e1.type, e2.type), "Hey, these are two different types of thingamabobs!", parseTreeNode);
+        check(equivalent(e1.type, e2.type), messages.twoDifferentTypesError(), parseTreeNode);
     }
 
     function checkAllHaveSameType(expressions, parseTreeNode) {
         check(
             expressions.slice(1).every(e => equivalent(e.type, expressions[0].type)),
-            "Hey, some of these whatchamacallits are different types of thingamajigs!",
+            messages.manyDifferentTypesError(),
             parseTreeNode
         )
     }
@@ -104,7 +104,7 @@ export default function analyze(match) {
     function checkIsAType(e, parseTreeNode) {
         const isPrimitiveType = /number|boolean|string|void|any/.test(e);
         const isCompositeType = /ArrayType|MapType|ClassType|FunctionType/.test(e?.kind);
-        check(isPrimitiveType || isCompositeType, "This here doodad doesn't have a type!", parseTreeNode);
+        check(isPrimitiveType || isCompositeType, messages.noTypeError(), parseTreeNode);
     }
 
     function equivalent(t1, t2) {
@@ -131,7 +131,7 @@ export default function analyze(match) {
     function checkIsAssignable(e, { toType: type }, parseTreeNode) {
         const source = typeDescription(e.type);
         const target = typeDescription(e.type);
-        const message = `You can't make a ${source} into a ${target}, dontcha know.`
+        const message = messages.notAssignableError(source, target);
         check(assignable(e.type, type), message, parseTreeNode);
     }
 
@@ -143,7 +143,7 @@ export default function analyze(match) {
     }
 
     function checkIsMutable(e, parseTreeNode) {
-        check(isMutable(e), `Hey now, don't go about trying to change ${e.name}.`)
+        check(isMutable(e), messages.notMutableError(e.name));
     }
 
     function checkMemberDeclared({ in: inClass }, member, parseTreeNode) {
@@ -151,7 +151,7 @@ export default function analyze(match) {
             inClass.constructor.body
                 .map((f) => f.variable.value.name)
                 .includes(member),
-            `I can't find any sorta ${member} in here that doohickey!`,
+            messages.memberNotDeclaredError(name),
             parseTreeNode
         );
     }
@@ -159,22 +159,22 @@ export default function analyze(match) {
     function checkMethodDeclared({ in: inClassMethods }, method, parseTreeNode) {
         check(
             inClassMethods.map((f) => f.name).includes(method),
-            `I can't find any sorta ${method} in here that doohickey!`,
+            messages.methodNotDeclaredError(method),
             parseTreeNode
         )
     }
 
     function checkInLoop(parseTreeNode) {
-        check(context.inLoop, "There's no popsicle stand to blow!");
+        check(context.inLoop, notInLoopError());
     }
 
     function checkInFunction(parseTreeNode) {
-        check(context.function, "We can't get goin', 'cause we never even got there!");
+        check(context.function, messages.notInFunctionError());
     }
 
     function checkIsCallable(e, parseTreeNode) {
         const callable = e?.kind === "ClassType" || e.type?.kind === "FunctionType";
-        check(callable, "Can't go about calling someone without a phone!", parseTreeNode)
+        check(callable, messages.notCallableError(), parseTreeNode)
     }
 
     // Throws if the given function cannot return the given entity's type.
@@ -183,62 +183,7 @@ export default function analyze(match) {
     }
 
     function checkCorrectArgumentCount(argCount, paramCount, parseTreeNode) {
-        let expected;
-        let received;
-
-        if (paramCount === 0)
-        {
-            expected = "We weren't expecting any arguments, ";
-        }
-        else if (paramCount === 1)
-        {
-            expected = "We were looking for 1 argument, ";
-        }
-        else
-        {
-            expected = `We were looking for ${paramCount} arguments, `;
-        }
-
-        if (argCount === 0)
-        {
-            if (paramCount === 1)
-            {
-                received = "but we didn't get one!"
-            }
-            else
-            {
-                received = "but we didn't get any!";
-            }
-        }
-        else if (argCount === 1)
-        {
-            if (paramCount === 0)
-            {
-                received = "but we still got one!";
-            }
-            else
-            {
-                received = "but we only got 1!";
-            }
-        }
-        else
-        {
-            if (paramCount === 0)
-            {
-                received = "but we still got some!";
-            }
-            else if (argCount < paramCount)
-            {
-                received = `but we only got ${argCount}!`;
-            }
-            else
-            {
-                received = `but we got ${argCount}!`;
-            }
-        }
-
-        const message = expected + received;
-        check(argCount === paramCount, message, parseTreeNode);
+        check(argCount === paramCount, messages.argumentCountError(argCount, paramCount), parseTreeNode);
     }
 
 /**
@@ -254,25 +199,31 @@ export default function analyze(match) {
 
         // Statements
 
-        Statement_break(_break, _excl) {
-            return core.breakStatement();
-        },
-
         VarDec(type, id, _col, exp, _excl) {
             checkNotAlreadyDeclared(id.sourceString, id);
             const initializer = exp.analyze();
-            const variable = core.variable(id.sourceString, type.analyze(), true);
-            context.locals.set(id.sourceString, variable);
-            return core.variable(variable, initializer);
+            const variable = core.variable(id.sourceString, type.analyze());
+            context.add(id.sourceString, variable);
+            return core.variableDeclaration(variable, initializer);
         },
 
         FunDec(_function, id, params, _col, type, block) {
             checkNotAlreadyDeclared(id.sourceString, id);
-            const parameters = params.analyze();
-            const body = block.analyze();
-            const fun = core.func(id.sourceString, parameters, body.type);
-            context.locals.set(id.sourceString, fun);
-            return core.functionDeclaration(fun, body);
+
+            const fun = core.fun(id.sourceString);
+            context.add(id.sourceString, fun);
+
+            context = context.newChildContext({ inLoop: false, function: fun });
+            fun.params = params.analyze();
+
+            const paramTypes = fun.params.map(param => param.type);
+            const returnType = type.children?.[0]?.analyze();
+            fun.type = core.functionType(paramTypes, returnType);
+
+            fun.body = block.analyze();
+
+            context = context.parent;
+            return core.functionDeclaration(fun);
         },
 
         Params(_open, params, _close) {
@@ -300,7 +251,16 @@ export default function analyze(match) {
             return core.printStatement(argument);
         },
 
-        IfStmt(_if, if_exp, if_block, _elseif, elseif_exp, elseif_block, _else, else_block) {
+        IfStmt_long(_if, exp, if_block, _else, else_block) {
+
+        },
+
+        IfStmt_elseif(_if, exp, block, _else, trailing_if) {
+
+        },
+
+        IfStmt_short(_if, exp, block)
+        {
 
         },
 
@@ -311,13 +271,49 @@ export default function analyze(match) {
             return core.whileStatement(test, body);
         },
 
+        Call(id, _open, exp, _close) {
+
+        },
+
+        DotExp(exp, _dot, id) {
+
+        },
+
+        DotCall(exp, _dot, id) {
+
+        },
+
         Block(_open, statements, _close) {
             return statements.children.map((s) => s.analyze());
+        },
+
+        ClassDec(_class, id, _open, constructor, methods, _close) {
+
+        },
+
+        ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
+
+        },
+
+        Field(type, _this, _dot, id, _col, exp, _excl) {
+
+        },
+
+        MethodDec(_function, id, _open, params, _close, _col, type, block) {
+
+        },
+
+        ObjectDec(_new, id, _open, params, _close) {
+
         },
 
         Return(_ret, exp, _excl) {
             const x = exp.analyze();
             return core.returnStatement(x);
+        },
+
+        Statement_break(_break, _excl) {
+            return core.breakStatement();
         },
 
         // Expressions
@@ -427,7 +423,19 @@ export default function analyze(match) {
 
         false(_) {
             return false;
-        }
+        },
+
+        ArrayLit(_open, params, _close) {
+
+        },
+
+        MapLit(_open, entries, _close) {
+
+        },
+
+        MapLitEntry(key, _col, val) {
+
+        },
     });
 
     return analyzer(match).analyze();
