@@ -139,17 +139,23 @@ export function memberExpression(object, op, field) {
 
 export function memberCall(object, member) {
     // Aka dot call
-    return { kind: "MemberCall", object, member, };
+    return { kind: "MemberCall", object, member };
 }
 
 export function functionCall(callee, args) {
-    return { kind: "FunctionCall", callee, args, };
+    return { kind: "FunctionCall", callee, args, type: callee.type.returnType };
+}
+
+export function constructorCall(callee, args) {
+    return { kind: "ConstructorCall", callee, args };
 }
 
 export const standardLibrary = Object.freeze({
-    number: numberType,
-    boolean: booleanType,
-    string: stringType
+    handful: numberType,
+    switcheroo: booleanType,
+    chitchat: stringType,
+    todo: arrayType(),
+    almanac: mapType(),
 })
 
 Boolean.prototype.type = booleanType;

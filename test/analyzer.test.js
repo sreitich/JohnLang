@@ -15,7 +15,7 @@ const semanticChecks = [
 
     ["class declarations", "doohickey Square { slapTogether(handful l) { handful me.length: l! } }"],
 
-    ["assigning arrays", "todo a: []! let b: [1]! a: b! b: a!"],
+    ["assigning arrays", "todo a: []! todo b: [1]! a: b! b: a!"],
 
     ["assigning to array elements", "todo a: [1, 2, 3]! a[1]: 100!"],
 
@@ -82,17 +82,15 @@ const semanticChecks = [
 
 // Programs that are syntactically correct but have semantic errors.
 const semanticErrors = [
-    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /Class members must be distinct/],
+    ["undeclared id", "letMeLearnYouSomething(x)!", messages.notDeclaredError("x")],
 
-    ["undeclared id", "letMeLearnYouSomething(x)!", /Identifier x not declared/],
-
-    ["redeclared id", "handful x: 1! handful x: 1!", /Identifier x already declared/],
+    ["redeclared id", "handful x: 1! handful x: 1!", messages.alreadyDeclaredError("x")],
 
     ["recursive struct", "doohickey S { slapTogether() { S me.x: S()! } }", /must not be self-containing/],
 
     ["assign bad type", "handful x: 1! x: youBetcha!", /Cannot assign a boolean to a int/],
 
-    ["assign bad array type", "handful: x: 1! x: [youBetcha]!", /Cannot assign a \[boolean\] to a int/],
+    ["assign bad array type", "handful x: 1! x: [youBetcha]!", /Cannot assign a \[boolean\] to a int/],
 
     ["break outside loop", "letsBlowThisPopsicleStand!", /Break can only appear in a loop/],
 
@@ -149,6 +147,8 @@ const semanticErrors = [
     ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", /Expected an integer/],
 
     ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /No such member/],
+
+    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /Class members must be distinct/],
 
     ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", /Identifier x already declared/],
 

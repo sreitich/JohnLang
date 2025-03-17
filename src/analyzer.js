@@ -271,8 +271,21 @@ export default function analyze(match) {
             return core.whileStatement(test, body);
         },
 
-        Call(id, _open, exp, _close) {
-
+        Call(id, open, expList, _close) {
+            const callee = id.analyze();
+            checkIsCallable(callee, id);
+            const exps = expList.AsIteration().children;
+            const targetTypes =
+                callee?.kind === "ClassType"
+                ? callee.fields.map(f => f.type)
+                : callee.type.paramTypes;
+            checkCorrectArgumentCount(exps.length, targetTypes.length, open);
+            const args = exps.map((exp, i) => {
+                const arg = exp.analyze();
+                checkIsAssignable(arg, { toType: targetTypes[i] }, exp);
+                return arg;
+            });
+            return callee?.kind === "ClassType" ? core.constructorCall(callee, args) : core.functionCall(callee, args);
         },
 
         DotExp(exp, _dot, id) {
@@ -399,7 +412,7 @@ export default function analyze(match) {
 
         id(_first, _rest) {
             const entity = context.lookup(this.sourceString);
-            checkIsDeclared(this.sourceString, this);
+            checkIsDeclared(entity, this.sourceString, this);
             return entity;
         },
 
