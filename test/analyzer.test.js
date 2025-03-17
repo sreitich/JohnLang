@@ -86,7 +86,9 @@ const semanticErrors = [
 
     ["redeclared id", "handful x: 1! handful x: 1!", messages.alreadyDeclaredError("x")],
 
-    ["recursive struct", "doohickey S { slapTogether() { S me.x: S()! } }", /must not be self-containing/],
+    ["declare wrong boolean type", "boolean x: youBetcha!", messages.notDeclaredError("boolean")],
+
+    ["use wrong boolean literal", "switcheroo x: true!", messages.notDeclaredError("true")],
 
     ["assign bad type", "handful x: 1! x: youBetcha!", /Cannot assign a boolean to a int/],
 

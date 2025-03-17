@@ -261,7 +261,8 @@ export default function analyze(match) {
 
         IfStmt_short(_if, exp, block)
         {
-
+            const test = exp.analyze();
+            checkIsBooleanType(test, exp);
         },
 
         LoopStmt_while(_while, exp, block) {

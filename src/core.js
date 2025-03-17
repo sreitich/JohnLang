@@ -14,9 +14,9 @@ export function typeDeclaration(type) {
     return { kind: "TypeDeclaration", type };
 }
 
-export const booleanType = "switcheroo";
-export const numberType = "handful";
-export const stringType = "chitchat";
+export const booleanType = "boolean";
+export const numberType = "number";
+export const stringType = "string";
 export const voidType = "void";
 export const anyType = "any";
 
