@@ -167,9 +167,9 @@ const syntaxChecks = [
         }
     `],
 
-    ["For loop with array", `
-        tilTheCowsComeHome handful x: 0, x < a.len(), x: x + 1 {
-            letMeLearnYouSomething(a[x])!
+    ["For each loop", `
+        tilTheCowsComeHome x in a {
+            letMeLearnYouSomething(x)!
         }
     `],
 

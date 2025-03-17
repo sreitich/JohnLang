@@ -25,15 +25,16 @@ JohnLang {
 
     Print       = print "(" Exp ")" "!"
 
-    IfStmt      = if Exp Block (elseif Exp Block)* (else Block)?
+    IfStmtOld   = if Exp Block (elseif Exp Block)* (else Block)?
 
-    IfStmtOld   = if Exp Block else Block                       --long
+    IfStmt      = if Exp Block else Block                       --long
                 | if Exp Block else IfStmt                      --elseif
                 | if Exp Block                                  --short
 
     LoopStmt    = while Exp Block                                               --while
                 | for (Type id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block      --for
                 | for id "," (Exp) "," (Exp6 ":" Exp) Block                     --forWithDeclaredIter
+                | for id in Exp Block                                           --forEach
 
     Call        = id "(" ListOf<Exp, ","> ")"
 
@@ -101,6 +102,7 @@ JohnLang {
     elseif      = "ope welp" ~idchar
     else        = "welp" ~idchar
     for         = "tilTheCowsComeHome" ~idchar
+    in          = "in" ~idchar
     while       = "holdMyBeer" ~idchar
     class       = "doohickey" ~idchar
     this        = "me" ~idchar
