@@ -3,6 +3,7 @@ import assert from "node:assert/strict"
 import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
+import * as messages from "../src/messages.js";
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -26,13 +27,15 @@ const semanticChecks = [
 
     ["return", "gitErDone f(): handful { betterGetGoin 0! }"],
 
-    ["return in nested if", "gitErDone f(): handful { welp youBetcha { betterGetGoin 0! } }"],
+    ["return in nested if", "gitErDone f(): handful { ope youBetcha { betterGetGoin 0! } }"],
 
-    ["break in nested if", "holdMyBeer youBetcha { welp youBetcha { letsBlowThisPopsicleStand! } }"],
+    ["break in nested if", "holdMyBeer youBetcha { ope youBetcha { letsBlowThisPopsicleStand! } }"],
 
-    ["long if", "welp youBetcha { letMeLearnYouSomething(1)! } ope { letMeLearnYouSomething(3)! }"],
+    ["long if", "ope youBetcha { letMeLearnYouSomething(1)! } welp { letMeLearnYouSomething(3)! }"],
 
-    ["else if", "welp youBetcha { letMeLearnYouSomething(1)! } ope welp youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
+    ["else if", "ope youBetcha { letMeLearnYouSomething(1)! } ope welp youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
+
+    ["chaining else ifs", "ope youBetcha { letMeLearnYouSomething(1)! } ope welp youBetcha { letMeLearnYouSomething(0)! } ope welp youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
 
     ["for loop", "tilTheCowsComeHome handful x = 0, x < 10, x++ { letMeLearnYouSomething(0)! }"],
 
