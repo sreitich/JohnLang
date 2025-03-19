@@ -122,7 +122,7 @@ const syntaxChecks = [
         ope youBetcha {
             letMeLearnYouSomething(1)!
         }
-        ope welp thinkAgainPal {
+        welp ope thinkAgainPal {
             letMeLearnYouSomething(1)!
         }
         welp {
@@ -134,10 +134,10 @@ const syntaxChecks = [
         ope youBetcha {
             letMeLearnYouSomething(1)!
         }
-        ope welp thinkAgainPal {
+        welp ope thinkAgainPal {
             letMeLearnYouSomething(1)!
         }
-        ope welp thinkAgainPal {
+        welp ope thinkAgainPal {
             letMeLearnYouSomething(1)!
         }
         welp {

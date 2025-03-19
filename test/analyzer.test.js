@@ -33,9 +33,9 @@ const semanticChecks = [
 
     ["long if", "ope youBetcha { letMeLearnYouSomething(1)! } welp { letMeLearnYouSomething(3)! }"],
 
-    ["else if", "ope youBetcha { letMeLearnYouSomething(1)! } ope welp youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
+    ["else if", "ope youBetcha { letMeLearnYouSomething(1)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
 
-    ["chaining else ifs", "ope youBetcha { letMeLearnYouSomething(1)! } ope welp youBetcha { letMeLearnYouSomething(0)! } ope welp youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
+    ["chaining else ifs", "ope youBetcha { letMeLearnYouSomething(1)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
 
     ["for loop", "tilTheCowsComeHome handful x = 0, x < 10, x++ { letMeLearnYouSomething(0)! }"],
 
