@@ -37,7 +37,7 @@ const semanticChecks = [
 
     ["chaining else ifs", "ope youBetcha { letMeLearnYouSomething(1)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
 
-    ["for loop", "tilTheCowsComeHome handful x = 0, x < 10, x++ { letMeLearnYouSomething(0)! }"],
+    ["for loop", "tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 { letMeLearnYouSomething(0)! }"],
 
     ["||", "letMeLearnYouSomething(youBetcha || 1 < 2 || thinkAgainPal || nah youBetcha)!"],
 
@@ -58,8 +58,6 @@ const semanticChecks = [
     ["variables", "todo x: [[[[1]]]]! letMeLearnYouSomething(x[0][0][0][0] + 2)!"],
 
     ["pseudo recursive class", "doohickey Rectangle { slapTogether(Rectangle r) { Rectangle me.rect: r! } }"],
-
-    ["nested classes", "doohickey T { slapTogether(handful num) { handful me.number: num! } } doohickey S { slapTogether(T myClass) { T me.class: myClass! } } S x: S(T(1))! letMeLearnYouSomething(x.class.number)!"],
 
     ["member exp", "doohickey T { slapTogether(handful num) { handful me.number: num! } } T x: T(1)! letMeLearnYouSomething(x.number)!"],
 
@@ -151,6 +149,8 @@ const semanticErrors = [
     ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /No such member/],
 
     ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /Class members must be distinct/],
+
+    ["self-referencing classes", "doohickey T { slapTogether(handful num) { handful me.number: num! } } doohickey S { slapTogether(T myClass) { T me.class: myClass! } } S x: S(T(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
 
     ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", /Identifier x already declared/],
 

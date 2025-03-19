@@ -2,7 +2,6 @@ import * as core from "./core.js";
 import parse from "./parser.js";
 import {assignmentStatement, unaryExpression} from "./core.js";
 import * as messages from "./messages.js";
-import {notInLoopError} from "./messages.js";
 
 // A context for tracking scope and control flow
 class Context {
@@ -270,6 +269,20 @@ export default function analyze(match) {
             checkIsBooleanType(test, exp);
             const body = block.analyze();
             return core.whileStatement(test, body);
+        },
+
+        // For loop that declares its own iterator.
+        LoopStmt_for(_for, type, id, _col1, dec_exp, _comma1, test, _comma2, iterator, _col2, iter_exp, block) {
+
+        },
+
+        // For loop that uses a pre-declared iterator.
+        LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterator, _col, iter_exp, block) {
+
+        },
+
+        LoopStmt_forEach(_for, id, _in, exp, block) {
+
         },
 
         Call(id, open, expList, _close) {
