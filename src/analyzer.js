@@ -84,6 +84,10 @@ export default function analyze(match) {
         check(e?.kind === "MapType", messages.notMapError(), parseTreeNode);
     }
 
+    function checkHasCollectionType(e, parseTreeNode) {
+        check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType", messages.notCollectionTypeError(), parseTreeNode);
+    }
+
     function checkIsClassType(e, parseTreeNode) {
         check(e.type?.kind === "ClassType", messages.notClassError(), parseTreeNode);
     }
@@ -286,6 +290,7 @@ export default function analyze(match) {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
             const body = block.analyze();
+            context = context.parent;
             return core.whileStatement(test, body);
         },
 
@@ -296,10 +301,6 @@ export default function analyze(match) {
 
         // For loop that uses a pre-declared iterator.
         LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterator, _col, iter_exp, block) {
-
-        },
-
-        LoopStmt_forEach(_for, id, _in, exp, block) {
 
         },
 
@@ -415,6 +416,11 @@ export default function analyze(match) {
             checkIsNumericType(x, left);
             checkIsNumericType(y, right);
             return core.binaryExpression("**", x, y, "number");
+        },
+
+        Exp5_size(_op, exp) {
+            const operand = exp.analyze();
+            checkIsCollectionType();
         },
 
         Exp5_neg(_op, operand) {

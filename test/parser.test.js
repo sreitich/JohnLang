@@ -168,7 +168,7 @@ const syntaxChecks = [
     `],
 
     ["For each loop", `
-        tilTheCowsComeHome x in a {
+        tilTheCowsComeHome handful x: 0, x < #a, x: x + 1 {
             letMeLearnYouSomething(x)!
         }
     `],
@@ -220,6 +220,11 @@ const syntaxChecks = [
 
     ["Non-empty array literal", `
         letMeLearnYouSomething([1, 2, 3])!
+    `],
+
+    ["size", `
+        letMeLearnYouSomething(#[1,2,3])!
+        letMeLearnYouSomething(#{1: 2, 3: 4})!
     `],
 
     ["Empty map literal", `
@@ -326,14 +331,6 @@ const syntaxErrors = [
     ["Negation before exponentiation",
         "letMeLearnYouSomething(-2**2)!",
             /Line 1, col 27:/],
-
-    /**
-     * NOTE: Currently, JohnLang allows JavaScript-like mixing of ands and ors. If we decide
-     * to change this feature, uncomment this test case.
-     */
-    // ["Mixing ors and ands",
-    //     "letMeLearnYouSomething(1 || 2 && 3)!",
-    //         /Line 1, col 31:/],
 
     ["Associating relational operators",
         "letMeLearnYouSomething(1 < 2 < 3)!",

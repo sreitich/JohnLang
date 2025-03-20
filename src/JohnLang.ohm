@@ -34,7 +34,6 @@ JohnLang {
     LoopStmt    = while Exp Block                                               --while
                 | for (Type id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block      --for
                 | for id "," (Exp) "," (Exp6 ":" Exp) Block                     --forWithDeclaredIter
-                | for id in Exp Block                                           --forEach
 
     Call        = id "(" ListOf<Exp, ","> ")"
 
@@ -62,6 +61,7 @@ JohnLang {
     Exp4        = Exp4 ("*"| "/" | "%") Exp5                    --multiply
                 | Exp5
     Exp5        = Exp6 "**" Exp5                                --power
+                | "#" Exp6                                      --size
                 | "-" Exp6                                      --neg
                 | not Exp6                                      --inv
                 | Exp6

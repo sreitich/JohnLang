@@ -32,6 +32,7 @@ export function fun(name, parameters, body, returnType) {
     return { kind: "Function", name, parameters, body, returnType, }
 }
 
+// Remember: collections are typeless. That's just how John Language rolls, pal.
 export function arrayType(baseType) {
     return { kind: "Array", baseType, };
 }

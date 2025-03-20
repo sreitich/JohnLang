@@ -28,6 +28,10 @@ export function notMapError() {
     return `We were expectin' an almanac!`;
 }
 
+export function notCollectionTypeError() {
+    return `We were expectin' a todo or an almanac!`;
+}
+
 export function notClassError() {
     return `We were expectin' a doohickey!`;
 }
