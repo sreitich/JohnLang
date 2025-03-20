@@ -48,7 +48,7 @@ const semanticChecks = [
 
     ["&&", "letMeLearnYouSomething(youBetcha && 1 < 2 && thinkAgainPal && nah youBetcha)!"],
 
-    ["relations", 'letMeLearnYouSomething(1 <= 2 && "x" > "y" && 3.5 < 1.2)!'],
+    ["relations", 'letMeLearnYouSomething(1 <= 2 && 3.5 < 1.2)!'],
 
     ["ok to == arrays", "letMeLearnYouSomething([1] == [5,8])!"],
 
@@ -93,19 +93,19 @@ const semanticErrors = [
 
     ["use wrong boolean literal", "switcheroo x: true!", messages.notDeclaredError("true")],
 
-    ["assign bad type", "handful x: 1! x: youBetcha!", /Cannot assign a boolean to a int/],
+    ["assign bad type", "handful x: 1! x: youBetcha!", messages.notAssignableError("switcheroo", "handful")],
 
-    ["assign bad array type", "handful x: 1! x: [youBetcha]!", /Cannot assign a \[boolean\] to a int/],
+    ["assign bad array type", "handful x: 1! x: [youBetcha]!", messages.notAssignableError("todo", "handful")],
 
-    ["break outside loop", "letsBlowThisPopsicleStand!", /Break can only appear in a loop/],
+    ["break outside loop", "letsBlowThisPopsicleStand!", messages.notInLoopError()],
 
-    ["break inside function", "gitErDone f(): handful { letsBlowThisPopsicleStand! betterGetGoin 0! }", /Break can only appear in a loop/],
+    ["break inside function", "gitErDone f(): handful { letsBlowThisPopsicleStand! betterGetGoin 0! }", messages.notInLoopError()],
 
-    ["return outside function", "betterGetGoin!", /Return can only appear in a function/],
+    ["return outside function", "betterGetGoin!", messages.notInFunctionError()],
 
-    ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", /should be returned/],
+    ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", /TODO: WRITE MESSAGE (should be returned)/],
 
-    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", /boolean to a int/],
+    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", /TODO: WRITE MESSAGE (boolean to a int)/],
 
     ["non-boolean short if test", "ope 1 {}", messages.notBooleanError()],
 
@@ -115,63 +115,63 @@ const semanticErrors = [
 
     ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: youBetcha, i < 10, i: i + 1 {}", messages.notNumericError()],
 
-    ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", /Expected a boolean/],
+    ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", messages.notBooleanError()],
 
-    ["bad types for &&", "letMeLearnYouSomething(thinkAgainPal && 1)!", /Expected a boolean/],
+    ["bad types for &&", "letMeLearnYouSomething(thinkAgainPal && 1)!", messages.notBooleanError()],
 
-    ["bad types for ==", "letMeLearnYouSomething(thinkAgainPal == 1)!", /Operands do not have the same type/],
+    ["bad types for ==", "letMeLearnYouSomething(thinkAgainPal == 1)!", messages.twoDifferentTypesError()],
 
-    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal == 1)!", /Operands do not have the same type/],
+    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal == 1)!", messages.twoDifferentTypesError()],
 
-    ["bad types for +", "letMeLearnYouSomething(thinkAgainPal + 1)!", /Expected a number or string/],
+    ["bad types for +", "letMeLearnYouSomething(thinkAgainPal + 1)!", messages.notNumericOrStringError()],
 
-    ["bad types for -", "letMeLearnYouSomething(thinkAgainPal - 1)!", /Expected a number/],
+    ["bad types for -", "letMeLearnYouSomething(thinkAgainPal - 1)!", messages.notNumericError()],
 
-    ["bad types for *", "letMeLearnYouSomething(thinkAgainPal * 1)!", /Expected a number/],
+    ["bad types for *", "letMeLearnYouSomething(thinkAgainPal * 1)!", messages.notNumericError()],
 
-    ["bad types for /", "letMeLearnYouSomething(thinkAgainPal / 1)!", /Expected a number/],
+    ["bad types for /", "letMeLearnYouSomething(thinkAgainPal / 1)!", messages.notNumericError()],
 
-    ["bad types for **", "letMeLearnYouSomething(thinkAgainPal ** 1)!", /Expected a number/],
+    ["bad types for **", "letMeLearnYouSomething(thinkAgainPal ** 1)!", messages.notNumericError()],
 
-    ["bad types for <", "letMeLearnYouSomething(thinkAgainPal < 1)!", /Expected a number or string/],
+    ["bad types for <", "letMeLearnYouSomething(thinkAgainPal < 1)!", messages.notNumericError()],
 
-    ["bad types for <=", "letMeLearnYouSomething(thinkAgainPal <= 1)!", /Expected a number or string/],
+    ["bad types for <=", "letMeLearnYouSomething(thinkAgainPal <= 1)!", messages.notNumericError()],
 
-    ["bad types for >", "letMeLearnYouSomething(thinkAgainPal > 1)!", /Expected a number or string/],
+    ["bad types for >", "letMeLearnYouSomething(thinkAgainPal > 1)!", messages.notNumericError()],
 
-    ["bad types for >=", "letMeLearnYouSomething(thinkAgainPal >= 1)!", /Expected a number or string/],
+    ["bad types for >=", "letMeLearnYouSomething(thinkAgainPal >= 1)!", messages.notNumericError()],
 
-    ["bad types for ==", 'letMeLearnYouSomething("hello" == 2.0)!', /not have the same type/],
+    ["bad types for ==", 'letMeLearnYouSomething("hello" == 2.0)!', messages.twoDifferentTypesError()],
 
-    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal != 1)!", /not have the same type/],
+    ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal != 1)!", messages.twoDifferentTypesError()],
 
     ["bad types for #", "letMeLearnYouSomething(#youBetcha)!", messages.notCollectionTypeError()],
 
-    ["bad types for negation", "letMeLearnYouSomething(-youBetcha)!", /Expected a number/],
+    ["bad types for negation", "letMeLearnYouSomething(-youBetcha)!", messages.notNumericError()],
 
-    ["bad types for not", 'letMeLearnYouSomething(nah "hello")!', /Expected a boolean/],
+    ["bad types for not", 'letMeLearnYouSomething(nah "hello")!', messages.notBooleanError()],
 
-    ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", /Expected an integer/],
+    ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", messages.notNumericError()],
 
-    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /No such member/],
+    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /TODO: WRITE MESSAGE (No such member)/],
 
-    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /Class members must be distinct/],
+    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /TODO: WRITE MESSAGE (Class members must be distinct)/],
 
     ["self-referencing classes", "doohickey T { slapTogether(handful num) { handful me.number: num! } } doohickey S { slapTogether(T myClass) { T me.class: myClass! } } S x: S(T(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
 
-    ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", /Identifier x already declared/],
+    ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", messages.alreadyDeclaredError("x")],
 
     ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", /Call of non-function/],
 
-    ["Too many args", "gitErDone f(handful x) {}\nf(1, 2)!", /1 argument required but 2 passed/],
+    ["Too many args", "gitErDone f(handful x) {}\nf(1, 2)!", messages.argumentCountError(1, 2)],
 
-    ["Too few args", "gitErDone f(handful x) {}\nf()!", /1 arguments required but 0 passed/],
+    ["Too few args", "gitErDone f(handful x) {}\nf()!", messages.argumentCountError(1, 0)],
 
-    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", /Cannot assign a boolean to a int/],
+    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", /TODO: WRITE MESSAGE (Cannot assign a boolean to a int)/],
 
-    ["Non-type in param", "gitErDone f(handful x, y) {}", /Type expected/],
+    ["Non-type in param", "gitErDone f(handful x, y) {}", messages.noTypeError()],
 
-    ["No return type", "gitErDone f() { betterGetGoin 1! }", /Type expected/],
+    ["No return type", "gitErDone f() { betterGetGoin 1! }", messages.noTypeError()],
 ]
 
 describe("The analyzer", () => {
