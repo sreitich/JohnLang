@@ -4,6 +4,7 @@ import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 import * as messages from "../src/messages.js";
+import {notBooleanError} from "../src/messages.js";
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -102,13 +103,13 @@ const semanticErrors = [
 
     ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", /boolean to a int/],
 
-    ["non-boolean short if test", "ope 1 {}", /Expected a boolean/],
+    ["non-boolean short if test", "ope 1 {}", messages.notBooleanError()],
 
-    ["non-boolean if test", "ope 1 {} welp {}", /Expected a boolean/],
+    ["non-boolean if test", "ope 1 {} welp {}", messages.notBooleanError()],
 
-    ["non-boolean while test", "holdMyBeer 1 {}", /Expected a boolean/],
+    ["non-boolean while test", "holdMyBeer 1 {}", messages.notBooleanError()],
 
-    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: youBetcha, i < 10, i: i + 1 {}", /Expected an integer/],
+    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: youBetcha, i < 10, i: i + 1 {}", messages.notNumericError()],
 
     ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", /Expected a boolean/],
 

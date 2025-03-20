@@ -251,17 +251,35 @@ export default function analyze(match) {
         },
 
         IfStmt_long(_if, exp, if_block, _else, else_block) {
-
+            const test = exp.analyze();
+            checkIsBooleanType(test, exp);
+            context = context.newChildContext();
+            const consequent = if_block.analyze()
+            context = context.parent;
+            context = context.newChildContext();
+            const alternate = else_block.analyze();
+            context = context.parent;
+            return core.ifStatement(test, consequent, alternate)
         },
 
         IfStmt_elseif(_if, exp, block, _else, trailing_if) {
-
+            const test = exp.analyze();
+            checkIsBooleanType(test, exp);
+            context = context.newChildContext();
+            const consequent = block.analyze();
+            context = context.parent;
+            const alternate = trailing_if.analyze();
+            return core.ifStatement(test, consequent, alternate);
         },
 
         IfStmt_short(_if, exp, block)
         {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
+            context = context.newChildContext();
+            const consequent = block.analyze();
+            context = context.parent;
+            return core.shortIfStatement(test, consequent);
         },
 
         LoopStmt_while(_while, exp, block) {
