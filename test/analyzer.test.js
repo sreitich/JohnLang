@@ -103,9 +103,9 @@ const semanticErrors = [
 
     ["return outside function", "betterGetGoin!", messages.notInFunctionError()],
 
-    ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", /TODO: WRITE MESSAGE (should be returned)/],
+    ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", messages.returnsNothingError()],
 
-    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", /TODO: WRITE MESSAGE (boolean to a int)/],
+    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", messages.returnTypeMismatchError()],
 
     ["non-boolean short if test", "ope 1 {}", messages.notBooleanError()],
 
@@ -153,21 +153,21 @@ const semanticErrors = [
 
     ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", messages.notNumericError()],
 
-    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", /TODO: WRITE MESSAGE (No such member)/],
+    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", messages.noMemberError()],
 
-    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", /TODO: WRITE MESSAGE (Class members must be distinct)/],
+    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", messages.nonDistinctMembersError()],
 
     ["self-referencing classes", "doohickey T { slapTogether(handful num) { handful me.number: num! } } doohickey S { slapTogether(T myClass) { T me.class: myClass! } } S x: S(T(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
 
     ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", messages.alreadyDeclaredError("x")],
 
-    ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", /Call of non-function/],
+    ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", messages.functionCallOnNonFunctionError()],
 
     ["Too many args", "gitErDone f(handful x) {}\nf(1, 2)!", messages.argumentCountError(1, 2)],
 
     ["Too few args", "gitErDone f(handful x) {}\nf()!", messages.argumentCountError(1, 0)],
 
-    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", /TODO: WRITE MESSAGE (Cannot assign a boolean to a int)/],
+    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", messages.parameterTypeMismatchError()],
 
     ["Non-type in param", "gitErDone f(handful x, y) {}", messages.noTypeError()],
 

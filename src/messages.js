@@ -76,6 +76,31 @@ export function notCallableError() {
     return `Can't go about calling someone without a phone!`
 }
 
+//Make output better
+export function returnTypeMismatchError(){
+    return 'Hey now, make sure you are returning the right type'
+}
+
+export function returnsNothingError(){
+    return 'Woah now, dont go returning nothing'
+}
+
+export function noMemberError() {
+    return "Ain't no member on this object"
+}
+
+export function nonDistinctMembersError() {
+    return "Can't have the same members"
+}
+
+export function functionCallOnNonFunctionError() {
+    return "That ain't a function"
+}
+
+export function parameterTypeMismatchError() {
+    return "Woah buddy, you are the type of your parameters are wack"
+}
+
 export function argumentCountError(argCount, paramCount) {
     let expected;
     let received;
