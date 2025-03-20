@@ -26,6 +26,8 @@ const semanticChecks = [
 
     ["assigning to map elements", "almanac a: {1: 2, 4: 8}! a[1]: 4!"],
 
+    ["size operator", "todo a: []! letMeLearnYouSomething(#a)!"],
+
     ["return", "gitErDone f(): handful { betterGetGoin 0! }"],
 
     ["return in nested if", "gitErDone f(): handful { ope youBetcha { betterGetGoin 0! } }"],
@@ -39,6 +41,8 @@ const semanticChecks = [
     ["chaining else ifs", "ope youBetcha { letMeLearnYouSomething(1)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp ope youBetcha { letMeLearnYouSomething(0)! } welp { letMeLearnYouSomething(3)! }"],
 
     ["for loop", "tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 { letMeLearnYouSomething(0)! }"],
+
+    ["for each loop", "todo a: []! tilTheCowsComeHome handful x: 0, x < #a, x: x + 1 { letMeLearnYouSomething(0)! }"],
 
     ["||", "letMeLearnYouSomething(youBetcha || 1 < 2 || thinkAgainPal || nah youBetcha)!"],
 
@@ -140,6 +144,8 @@ const semanticErrors = [
     ["bad types for ==", 'letMeLearnYouSomething("hello" == 2.0)!', /not have the same type/],
 
     ["bad types for !=", "letMeLearnYouSomething(thinkAgainPal != 1)!", /not have the same type/],
+
+    ["bad types for #", "letMeLearnYouSomething(#youBetcha)!", messages.notCollectionTypeError()],
 
     ["bad types for negation", "letMeLearnYouSomething(-youBetcha)!", /Expected a number/],
 

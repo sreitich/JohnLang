@@ -420,7 +420,8 @@ export default function analyze(match) {
 
         Exp5_size(_op, exp) {
             const operand = exp.analyze();
-            checkIsCollectionType();
+            checkHasCollectionType(operand, exp);
+            return core.unaryExpression("#", operand, core.numberType);
         },
 
         Exp5_neg(_op, operand) {

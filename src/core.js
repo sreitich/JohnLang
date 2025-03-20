@@ -33,12 +33,12 @@ export function fun(name, parameters, body, returnType) {
 }
 
 // Remember: collections are typeless. That's just how John Language rolls, pal.
-export function arrayType(baseType) {
-    return { kind: "Array", baseType, };
+export function arrayType() {
+    return { kind: "ArrayType", };
 }
 
-export function mapType(keyType, valueType) {
-    return { kind: "Map", keyType, valueType, };
+export function mapType() {
+    return { kind: "MapType", };
 }
 
 export function functionType(paramTypes, returnType) {
