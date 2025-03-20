@@ -364,32 +364,44 @@ export default function analyze(match) {
 
         // Expressions
 
-        Exp_or(left, _op, right) {
-            const x = left.analyze();
-            const y = right.analyze();
-            checkIsBooleanType(x, left);
-            checkIsBooleanType(y, right);
-            return core.binaryExpression("||", x, y, "boolean");
-        },
+        Exp_or(exp, _op, exps) {
+            let left = exp.analyze();
+            checkIsBooleanType(left, exp);
 
-        Exp_and(left, _op, right) {
-            const x = left.analyze();
-            const y = right.analyze();
-            checkIsBooleanType(x, left);
-            checkIsBooleanType(y, right);
-            return core.binaryExpression("&&", x, y, "boolean");
-        },
-
-        Exp2_compare(left, op, right) {
-            const x = left.analyze();
-            const y = right.analyze();
-            if (op.sourceString === "==" || op.sourceString === "!=") {
-                check(x.type === y.type, `Those ain't the same type, pal.`, op);
-            } else {
-                checkIsNumericType(x, left);
-                checkIsNumericType(y, right);
+            // Account for chaining.
+            for (let e of exps.children) {
+                let right = e.analyze();
+                checkIsBooleanType(right, e);
+                left = core.binaryExpression("||", left, right, core.booleanType);
             }
-            return core.binaryExpression(op.sourceString, x, y, "boolean");
+
+            return left;
+        },
+
+        Exp_and(exp, _op, exps) {
+            let left = exp.analyze();
+            checkIsBooleanType(left, exp);
+
+            // Account for chaining.
+            for (let e of exps.children) {
+                let right = e.analyze();
+                checkIsBooleanType(right, e);
+                left = core.binaryExpression("&&", left, right, core.booleanType);
+            }
+
+            return left;
+        },
+
+        Exp2_compare(exp1, op, exp2) {
+            const left = exp1.analyze();
+            const right = exp2.analyze();
+            if (op.sourceString === "==" || op.sourceString === "!=") {
+                check(left.type === right.type, `Those ain't the same type, pal.`, op);
+            } else {
+                checkIsNumericType(left, exp1);
+                checkIsNumericType(right, exp2);
+            }
+            return core.binaryExpression(op.sourceString, left, right, "boolean");
         },
 
         // TODO: Allow string concatenation
