@@ -14,7 +14,8 @@ As optimistic as he was, the great John Language™️ was not the inventive typ
 
 ## Features
 
-* Statically typed!
+* Static typing!
+* Typeless todos and almanacs!
 * Real simple syntax. John Language is a simple man. Just git er done!
   * No silly parentheses around conditionals!
   * Assignment using colons!
