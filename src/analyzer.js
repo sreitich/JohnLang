@@ -240,8 +240,9 @@ export default function analyze(match) {
             return param;
         },
 
-        /* TODO: left_exp is an Exp6 because assignments use the same syntax as maps (e.g. assignment: "handful x: 1!", map: "{1: true}").
-         * I believe we've since added a different grammar rule for maps, so we should fix Assignment. */
+        // TODO: left is an Exp6 because assignments use the same syntax as maps (e.g. assignment: "handful x: 1!",
+        //  map: "{1: true}"). I think we've added a different grammar rule for maps since then, so we should fix
+        //  Assignment.
         Assignment(left, _col, right, _excl) {
             const source = right.analyze();
             const target = left.analyze();
