@@ -308,7 +308,7 @@ export default function analyze(match) {
         Call(id, open, expList, _close) {
             const callee = id.analyze();
             checkIsCallable(callee, id);
-            const exps = expList.AsIteration().children;
+            const exps = expList.asIteration().children;
             const targetTypes =
                 callee?.kind === "ClassType"
                 ? callee.fields.map(f => f.type)
@@ -322,12 +322,22 @@ export default function analyze(match) {
             return callee?.kind === "ClassType" ? core.constructorCall(callee, args) : core.functionCall(callee, args);
         },
 
-        DotExp(exp, _dot, id) {
 
+        // DotExp and DotCall may be wrong. Fix later if needed
+        DotExp(exp, _dot, id) {
+            const object = exp.analyze();
+            if (!object.type || object.type.kind !== "ClassType") {
+                throw new Error(messages.noMemberError());
+            }
+            const field = object.type.fields.find(f => f.name === id.sourceString);
+            if (!field) throw new Error(messages.noMemberError());
+            return core.memberExpression(object, id.sourceString, field.type);
         },
 
-        DotCall(exp, _dot, id) {
-
+        DotCall(exp, _dot, call) {
+            const receiver = exp.analyze();
+            const methodCall = call.analyze();
+            return core.memberCall(receiver, methodCall);
         },
 
         Block(_open, statements, _close) {
