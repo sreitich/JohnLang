@@ -491,15 +491,21 @@ export default function analyze(match) {
         },
 
         ArrayLit(_open, params, _close) {
-
+            const elements = params.asIteration().children.map(child => child.analyze());
+            const arrExpr = core.arrayExpression(elements);
+            arrExpr.type = core.standardLibrary.todo; 
+            return arrExpr;
         },
 
         MapLit(_open, entries, _close) {
-
+            const mapEntries = entries.asIteration().children.map(child => child.analyze());
+            const mapExpr = core.mapExpression(mapEntries);
+            mapExpr.type = core.standardLibrary.almanac; 
+            return mapExpr;
         },
 
         MapLitEntry(key, _col, val) {
-
+            return core.mapEntry(key.analyze(), val.analyze());
         },
     });
 
