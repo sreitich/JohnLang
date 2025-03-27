@@ -131,6 +131,10 @@ export default function analyze(match) {
         return typeof type;
     }
 
+    function assignable(src, target) {
+        return equivalent(src, target);
+      }
+
     function checkIsAssignable(e, { toType: type }, parseTreeNode) {
         const source = typeDescription(e.type);
         const target = typeDescription(e.type);
@@ -168,7 +172,7 @@ export default function analyze(match) {
     }
 
     function checkInLoop(parseTreeNode) {
-        check(context.inLoop, notInLoopError());
+        check(context.inLoop, messages.notInLoopError(), parseTreeNode);
     }
 
     function checkInFunction(parseTreeNode) {
@@ -204,8 +208,10 @@ export default function analyze(match) {
 
         VarDec(type, id, _col, exp, _excl) {
             checkNotAlreadyDeclared(id.sourceString, id);
+
             const initializer = exp.analyze();
             const variable = core.variable(id.sourceString, type.analyze());
+
             context.add(id.sourceString, variable);
             return core.variableDeclaration(variable, initializer);
         },
@@ -235,7 +241,8 @@ export default function analyze(match) {
 
         Param(type, id) {
             checkNotAlreadyDeclared(id.sourceString, id);
-            const param = core.variable(id.sourceString, type.sourceString, false);
+
+            const param = core.variable(id.sourceString, type.analyze(), false);
             context.locals.set(id.sourceString, param);
             return param;
         },
@@ -246,7 +253,8 @@ export default function analyze(match) {
         Assignment(left, _col, right, _excl) {
             const source = right.analyze();
             const target = left.analyze();
-            checkBothHaveSameType(source, target, left);
+
+            checkIsAssignable(source, { toType: target.type }, left);
             return core.assignmentStatement(source, target);
         },
 
@@ -258,86 +266,133 @@ export default function analyze(match) {
         IfStmt_long(_if, exp, if_block, _else, else_block) {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
+
             context = context.newChildContext();
             const consequent = if_block.analyze()
             context = context.parent;
+
             context = context.newChildContext();
             const alternate = else_block.analyze();
             context = context.parent;
+
             return core.ifStatement(test, consequent, alternate)
         },
 
         IfStmt_elseif(_if, exp, block, _else, trailing_if) {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
+
             context = context.newChildContext();
             const consequent = block.analyze();
             context = context.parent;
+
             const alternate = trailing_if.analyze();
             return core.ifStatement(test, consequent, alternate);
         },
 
-        IfStmt_short(_if, exp, block)
-        {
+        IfStmt_short(_if, exp, block) {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
+
             context = context.newChildContext();
             const consequent = block.analyze();
             context = context.parent;
+
             return core.shortIfStatement(test, consequent);
         },
 
         LoopStmt_while(_while, exp, block) {
             const test = exp.analyze();
             checkIsBooleanType(test, exp);
+
             const body = block.analyze();
             context = context.parent;
             return core.whileStatement(test, body);
         },
 
         // For loop that declares its own iterator.
-        LoopStmt_for(_for, type, id, _col1, dec_exp, _comma1, test, _comma2, iterator, _col2, iter_exp, block) {
+        LoopStmt_for(_for, type, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col2, iterExp, block) {
+            checkNotAlreadyDeclared(id.sourceString, id);
+            const iterator = core.variable(id.sourceString, type.analyze());
 
+            context = context.newChildContext({ inLoop: true });
+            context.add(id.sourceString, iterator);
+
+            const init = initExp.analyze();
+            checkIsAssignable(init, { toType: iterator.type }, id);
+
+            const testExp = test.analyze();
+            checkIsBooleanType(testExp, test);
+
+            const iterTarget = iterationVar.analyze();
+            checkIsMutable(iterTarget, iterationVar);
+
+            const iterValue = iterExp.analyze();
+            checkIsAssignable(iterValue, { toType: iterTarget.type }, iterationVar);
+
+            const body = block.analyze();
+            context = context.parent;
+
+            return core.forStatement(iterator, testExp, iterValue, body);
         },
 
         // For loop that uses a pre-declared iterator.
-        LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterator, _col, iter_exp, block) {
+        LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterationVar, _col, iterExp, block) {
+            const iterator = id.analyze();
+            const testExp = test.analyze();
+            checkIsBooleanType(testExp, test);
+            checkIsMutable(iterator, id);
 
-        },
+            const iterTarget = iterationVar.analyze();
+            const iterValue = iterExp.analyze();
+            checkIsAssignable(iterValue, { toType: iterator.type }, iterationVar);
+
+            context = context.newChildContext({ inLoop: true });
+            const body = block.analyze();
+            context = context.parent;
+
+            return core.forStatement(iterator, testExp, iterValue, body);
+          },
 
         Call(id, open, expList, _close) {
             const callee = id.analyze();
             checkIsCallable(callee, id);
-            const exps = expList.asIteration().children;
+
+            const exps = expList.AsIteration().children;
             const targetTypes =
                 callee?.kind === "ClassType"
                 ? callee.fields.map(f => f.type)
                 : callee.type.paramTypes;
+
             checkCorrectArgumentCount(exps.length, targetTypes.length, open);
+
             const args = exps.map((exp, i) => {
                 const arg = exp.analyze();
                 checkIsAssignable(arg, { toType: targetTypes[i] }, exp);
                 return arg;
             });
+
             return callee?.kind === "ClassType" ? core.constructorCall(callee, args) : core.functionCall(callee, args);
         },
 
-
-        // DotExp and DotCall may be wrong. Fix later if needed
         DotExp(exp, _dot, id) {
             const object = exp.analyze();
-            if (!object.type || object.type.kind !== "ClassType") {
-                throw new Error(messages.noMemberError());
+
+            if (object.type && object.type.kind === "ClassType") {
+              const member = (object.type.members || []).find(m => m.name === id.sourceString);
+              check(member, messages.noMemberError(), id);
+              return core.memberExpression(object, ".", member);
             }
-            const field = object.type.fields.find(f => f.name === id.sourceString);
-            if (!field) throw new Error(messages.noMemberError());
-            return core.memberExpression(object, id.sourceString, field.type);
+
+            throw new Error("DotExp not implemented for non-class types");
         },
 
         DotCall(exp, _dot, call) {
-            const receiver = exp.analyze();
-            const methodCall = call.analyze();
-            return core.memberCall(receiver, methodCall);
+            const object = exp.analyze();
+            checkIsClassType(object, exp);
+
+            const memberCall = call.analyze();
+            return core.memberCall(object, memberCall);
         },
 
         Block(_open, statements, _close) {
@@ -345,31 +400,78 @@ export default function analyze(match) {
         },
 
         ClassDec(_class, id, _open, constructor, methods, _close) {
+            checkNotAlreadyDeclared(id.sourceString, id);
+            const classTypeObj = core.classType(id.sourceString, null, []);
+            context.add(id.sourceString, classTypeObj);
 
+            context = context.newChildContext({ inClass: classTypeObj });
+            const cons = constructor.analyze();
+            classTypeObj.constructor = cons;
+
+            const meths = methods.asIteration().children.map(m => m.analyze());
+            classTypeObj.members = [];
+            if (cons.fields) {
+              classTypeObj.members.push(...cons.fields);
+            }
+
+            classTypeObj.methods = meths;
+
+            context = context.parent;
+            return classTypeObj;
         },
 
         ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
+            const parameters = params.asIteration().children.map(p => p.analyze());
 
+            context = context.newChildContext({ function: null });
+            parameters.forEach(p => context.add(p.name, p));
+
+            const fieldDecls = fields.asIteration().children.map(f => f.analyze());
+            context = context.parent;
+
+            return core.constructorDeclaration(parameters, fieldDecls);
         },
 
         Field(type, _this, _dot, id, _col, exp, _excl) {
+            const fieldType = type.analyze();
+            const initializer = exp.analyze();
+            checkIsAssignable(initializer, { toType: fieldType }, id);
 
+            return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
         },
 
         MethodDec(_function, id, _open, params, _close, _col, type, block) {
+            checkNotAlreadyDeclared(id.sourceString, id);
+            const parameters = params.asIteration().children.map(p => p.analyze());
 
+            context = context.newChildContext({ function: id.sourceString });
+            parameters.forEach(p => context.add(p.name, p));
+
+            const returnType = type.analyze();
+            const body = block.analyze();
+            context = context.parent;
+
+            return core.methodDeclaration(id.sourceString, parameters, body, returnType);
         },
 
         ObjectDec(_new, id, _open, params, _close) {
+            const classEntity = id.analyze();
+            checkIsClassType(classEntity, id);
 
+            const args = params.asIteration().children.map(p => p.analyze());
+            return core.constructorCall(classEntity, args);
         },
 
         Return(_ret, exp, _excl) {
-            const x = exp.analyze();
-            return core.returnStatement(x);
+            checkInFunction(this);
+            const retVal = exp.analyze();
+
+            checkIsReturnable(retVal, { from: context.function }, exp);
+            return core.returnStatement(retVal);
         },
 
         Statement_break(_break, _excl) {
+            checkInLoop(this);
             return core.breakStatement();
         },
 
@@ -406,12 +508,14 @@ export default function analyze(match) {
         Exp2_compare(exp1, op, exp2) {
             const left = exp1.analyze();
             const right = exp2.analyze();
+
             if (op.sourceString === "==" || op.sourceString === "!=") {
                 check(left.type === right.type, `Those ain't the same type, pal.`, op);
             } else {
                 checkIsNumericType(left, exp1);
                 checkIsNumericType(right, exp2);
             }
+
             return core.binaryExpression(op.sourceString, left, right, "boolean");
         },
 
@@ -419,25 +523,32 @@ export default function analyze(match) {
         Exp3_add(left, op, right) {
             const x = left.analyze();
             const y = right.analyze();
+
             checkIsNumericType(x, left);
             checkIsNumericType(y, right);
+
             return core.binaryExpression(op.sourceString, x, y, "number");
         },
 
         Exp4_multiply(left, op, right) {
             const x = left.analyze();
             const y = right.analyze();
+
             console.log(left);
+
             checkIsNumericType(x, left);
             checkIsNumericType(y, right);
+
             return core.binaryExpression(op.sourceString, x, y, "number");
         },
 
         Exp5_power(left, _op, right) {
             const x = left.analyze();
             const y = right.analyze();
+
             checkIsNumericType(x, left);
             checkIsNumericType(y, right);
+
             return core.binaryExpression("**", x, y, "number");
         },
 
@@ -460,11 +571,11 @@ export default function analyze(match) {
         },
 
         Exp6_subscript(array, _open, index, _close) {
-            return core.subscriptExpression(
-                array.analyze(),
-                index.analyze(),
-                "number"
-            );
+            const arrExpr = array.analyze();
+            const idx = index.analyze();
+            
+            checkIsNumericType(idx, index);
+            return core.subscriptExpression(arrExpr, idx, "number");
         },
 
         Exp6_parens(_open, exp, _close) {
@@ -501,17 +612,14 @@ export default function analyze(match) {
         },
 
         ArrayLit(_open, params, _close) {
-            const elements = params.asIteration().children.map(child => child.analyze());
-            const arrExpr = core.arrayExpression(elements);
-            arrExpr.type = core.standardLibrary.todo; 
-            return arrExpr;
+            const elements = params.asIteration().children.map(c => c.analyze());
+            return core.arrayExpression(elements);
+
         },
 
         MapLit(_open, entries, _close) {
-            const mapEntries = entries.asIteration().children.map(child => child.analyze());
-            const mapExpr = core.mapExpression(mapEntries);
-            mapExpr.type = core.standardLibrary.almanac; 
-            return mapExpr;
+            const elements = entries.asIteration().children.map(entry => entry.analyze());
+            return core.mapExpression(elements);
         },
 
         MapLitEntry(key, _col, val) {
