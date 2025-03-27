@@ -25,99 +25,101 @@
 
     <div class="contents">
       <h2>Hello World!</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="helloworld.png" alt="Hello World Example" />
+        <div class="code-block">
+          <pre><code>letMeLearnYouSomething("Hello, world")!</code></pre>
         </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jshelloworld.png" alt="Hello World Example" />
-        </div>
-      </div>
 
       <h2>Variable Declarations</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="variables.png" alt="Hello World Example" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsvariables.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>switcheroo x: youBetcha!
+handful y: 2!
+switcheroo isPositive: y >= 0!
+chitchat message: "Eat the rich"!</code></pre>
       </div>
+      
 
       <h2>Function Declarations</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="functions.png" alt="Hello World Example" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsfunction.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>gitErDone isEven(handful x): switcheroo {      
+          betterGetGoin x % 2 == 0!
+}</code></pre>
       </div>
 
       <h2>Conditionals</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="if.png" alt="Hello World Example" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsconditional.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>ope x > 50 {
+  betterGetGoin 2!      
+} ope welp x > 25 {
+  betterGetGoin 1!
+} welp {
+  betterGetGoin 0!
+}</code></pre>
       </div>
 
       <h2>Loops</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="forloop.png" alt="Hello World Example" />
-          <img src="whileloop.png" alt="" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsforloop.png" alt="Hello World Example" />
-          <img src="jswhileloop.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>tilTheCowsComeHome handful x = 0, x < 10, x++ {      
+  letMeLearnYouSomething(x)!
+}</code></pre>
       </div>
 
       <h2>Classes</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="class.png" alt="Hello World Example" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsclassdef.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>doohickey Rectangle {
+  slapTogether(handful h, handful w) {      
+    handful me.height: h!
+    handful me.width: w!
+  }
+}
+
+Rectangle r: whipUp Rectangle(4.0, 8.0)!
+letMeLearnYouSomething(r.width)!
+r.width: 5!</code></pre>
       </div>
 
       <h2>Data Structures</h2>
-      <div class="images">
-        <div class="image-container">
-          <p>John Lang</p>
-          <img src="datastructures.png" alt="Hello World Example" />
-        </div>
-        <div class="image-container">
-          <p>Javascript</p>
-          <img src="jsdatastruct.png" alt="Hello World Example" />
-        </div>
+      <div class="code-block">
+        <pre><code>todo fruits: ["apple", "banana"]!
+almanac fruitPrices: { "apple": 2, "banana": 1 }! </code></pre>
       </div>
+
       <h2>Example Programs</h2>
+      <div class="code-block">
+        <pre><code>hi</code></pre>
+      </div>
+     
     </div>
   </body>
 </html>
 
 <!-- CSS -->
 <style>
+
+  .code-block {
+    display: flex;
+    justify-content: center;
+    /* display: flex; */
+    background-color: #1e1e1e;
+    color: #dcdcdc;
+    padding: 1em;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    overflow-x: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: left;
+  }
+
+  .code-block code {
+    white-space: pre-wrap;
+    display: block;
+    text-align: left;
+    line-height: 1.5;
+
+
+  }
   body {
-    font-family: "Courier New", Courier, monospace;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   }
 
   .title {
