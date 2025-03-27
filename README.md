@@ -1,4 +1,4 @@
-![](./docs/JohnLangIconAlt2.png)
+<img src="./docs/john-lang-icon-500x.png" alt="John Language Himself" width="250"/>
 
 # John Lang
 
