@@ -25,11 +25,13 @@
 
     <div class="contents">
       <h2>Hello World!</h2>
+      <h3>Every language has their own version of "Hello World", never gets old.</h3>
         <div class="code-block">
           <pre><code>letMeLearnYouSomething("Hello, world")!</code></pre>
         </div>
 
       <h2>Variable Declarations</h2>
+      <h3>Below is an example on how to declare many types of variables. John himself has whimsical names for each type. (switcheroo = bool, handful = int, chitchat = string)</h3>
       <div class="code-block">
         <pre><code>switcheroo x: youBetcha!
 handful y: 2!
@@ -39,13 +41,15 @@ chitchat message: "Eat the rich"!</code></pre>
       
 
       <h2>Function Declarations</h2>
+      <h3>John persists that his functions require type declarations for arguments, as well as the return value.</h3>
       <div class="code-block">
         <pre><code>gitErDone isEven(handful x): switcheroo {      
-          betterGetGoin x % 2 == 0!
+    betterGetGoin x % 2 == 0!
 }</code></pre>
       </div>
 
       <h2>Conditionals</h2>
+      <h3>Ope! Almost forgot conditionals! John LOVES his conditionals.<br> (ope = if, welp = else)</h3>
       <div class="code-block">
         <pre><code>ope x > 50 {
   betterGetGoin 2!      
@@ -57,13 +61,21 @@ chitchat message: "Eat the rich"!</code></pre>
       </div>
 
       <h2>Loops</h2>
+      <h3>Hold my beer, loops are here! John provided many ways to loop. <br>(1st example is a for loop, 2nd example is a while loop)</h3>
       <div class="code-block">
         <pre><code>tilTheCowsComeHome handful x = 0, x < 10, x++ {      
   letMeLearnYouSomething(x)!
 }</code></pre>
       </div>
 
+      <div class="code-block">
+        <pre><code>holdMyBeer x < 10 {      
+  x = x + 1!
+}</code></pre>
+      </div>
+
       <h2>Classes</h2>
+      <h3>John was a crafty individual, creating objects with his own hands- I mean language. <br>(slapTogether = constructor)</h3>
       <div class="code-block">
         <pre><code>doohickey Rectangle {
   slapTogether(handful h, handful w) {      
@@ -78,12 +90,24 @@ r.width: 5!</code></pre>
       </div>
 
       <h2>Data Structures</h2>
+      <h3>John was always a tidy man, keeping things organized in todo lists, as well as storing things in his almanac.</h3>
       <div class="code-block">
         <pre><code>todo fruits: ["apple", "banana"]!
 almanac fruitPrices: { "apple": 2, "banana": 1 }! </code></pre>
       </div>
 
       <h2>Example Programs</h2>
+      <h3>Example program 1</h3>
+      <div class="code-block">
+        <pre><code>hi</code></pre>
+      </div>
+
+      <h3>Example program 2</h3>
+      <div class="code-block">
+        <pre><code>hi</code></pre>
+      </div>
+
+      <h3>Example program 3</h3>
       <div class="code-block">
         <pre><code>hi</code></pre>
       </div>
@@ -102,7 +126,7 @@ almanac fruitPrices: { "apple": 2, "banana": 1 }! </code></pre>
     background-color: #1e1e1e;
     color: #dcdcdc;
     padding: 1em;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
     overflow-x: auto;
@@ -178,6 +202,14 @@ almanac fruitPrices: { "apple": 2, "banana": 1 }! </code></pre>
     text-align: center;
     font-size: 35px;
     text-decoration: underline;
+  }
+
+  .contents h3 {
+    text-align: center;
+    font-size: 25px;
+    text-decoration: none;
+    margin-top: 0px;
+    line-height: 1.5;
   }
 
   .contents img {
