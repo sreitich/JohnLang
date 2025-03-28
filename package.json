@@ -7,6 +7,11 @@
   "scripts": {
     "test": "c8 node --test test/*.test.js"
   },
+  "c8": {
+    "exclude": [
+      "src/messages.js"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sreitich/JohnLang.git"

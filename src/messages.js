@@ -1,5 +1,11 @@
+/**
+ * This file acts as a library for storing error messages. Because John Lang uses silly custom error messages, we put
+ * them here to make it easier to maintain consistency between code and tests, which have to match exactly.
+ *
+ * Because this file is essentially just a library of strings, it is intentionally excluded from test coverage.
+ */
+
 export function alreadyDeclaredError(name) {
-    // "Buster" is short for "Buster Brown."
     return `Whoa buster, I think I've seen this ${name} thing before.`
 }
 
