@@ -157,7 +157,7 @@ const semanticErrors = [
 
     ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", messages.nonDistinctMembersError()],
 
-    ["self-referencing classes", "doohickey T { slapTogether(handful num) { handful me.number: num! } } doohickey S { slapTogether(T myClass) { T me.class: myClass! } } S x: S(T(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
+    ["self-referencing classes", "doohickey S { slapTogether(S myClass) { S me.class: myClass! } } S x: S(S(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
 
     ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", messages.alreadyDeclaredError("x")],
 
@@ -190,7 +190,7 @@ describe("The analyzer", () => {
             analyze(parse("handful x: 1 + 2.2!")),
             program([
                 variableDeclaration(
-                    variable("x", true, numberType),
+                    variable("x", numberType, true),
                     binaryExpression("+", 1, 2.2, numberType)
                 ),
             ])

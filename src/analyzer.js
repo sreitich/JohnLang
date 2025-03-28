@@ -52,7 +52,8 @@ export default function analyze(match) {
   }
 
   function checkIsNumericType(e, parseTreeNode) {
-    check(e.type === core.numberType, messages.notNumericError(), parseTreeNode);
+    const eType = (typeof e === "number") ? core.numberType : e.type;
+    check(eType === core.numberType, messages.notNumericError(), parseTreeNode);
   }
 
   function checkIsNumbericOrStringType(e, parseTreeNode) {
@@ -61,7 +62,8 @@ export default function analyze(match) {
   }
 
   function checkIsBooleanType(e, parseTreeNode) {
-    check(e.type === core.booleanType, messages.notBooleanError(), parseTreeNode);
+    const eType = (typeof e === "boolean") ? core.booleanType : e.type;
+    check(eType === core.booleanType, messages.notBooleanError(), parseTreeNode);
   }
 
   function checkHasArrayType(e, parseTreeNode) {
@@ -107,9 +109,9 @@ export default function analyze(match) {
   }
 
   function equivalent(t1, t2) {
-    return t1 === t2 || 
-           (t1 && t2 && t1.kind === t2.kind && t1.name === t2.name) ||
-           (t1 && t2 && t1.type && t2.type && t1.type.kind === t2.type.kind);
+    if (t2 === core.anyType) return true;
+    return t1 === t2 ||
+           (t1 && t2 && t1.kind === t2.kind && t1.name === t2.name);
   }
 
   function typeDescription(type) {
@@ -126,38 +128,56 @@ export default function analyze(match) {
     return typeof type;
   }
   
-  
-
   function assignable(src, target) {
     return equivalent(src, target);
   }
 
-  function checkIsAssignable(e, { toType: type }, parseTreeNode) {
-    console.log("DEBUG: In checkIsAssignable, e =", e, "and e.type =", e ? e.type : undefined);
+  function wrapLiteral(e) {
+    if (typeof e === "number") return { value: e, type: core.numberType };
+    if (typeof e === "boolean") return { value: e, type: core.booleanType };
+    if (typeof e === "string") return { value: e, type: core.stringType };
+    return e;
+  }
 
+  function checkIsAssignable(e, { toType: type }, parseTreeNode) {
+    if (typeof e !== "object" || e === null || !("type" in e)) {
+      e = wrapLiteral(e);
+    }
+  
     if (e && e.kind === "FieldDeclaration" && e.type === null) {
       return;
     }
-    if (e && e.kind && (e.kind === "ArrayExpression" || e.kind === "MapExpression") &&
-        type && type.kind && (type.kind === "ArrayType" || type.kind === "MapType")) {
+    if (
+      e &&
+      e.kind &&
+      (e.kind === "ArrayExpression" || e.kind === "MapExpression") &&
+      type &&
+      type.kind &&
+      (type.kind === "ArrayType" || type.kind === "MapType")
+    ) {
       return;
     }
     if (!e || !("type" in e)) {
       throw new Error("Node missing type property.");
     }
-    if (e.kind && ["primitive", "ClassType", "ArrayType", "MapType", "FunctionType"].includes(e.kind)) {
+    if (
+      e.kind &&
+      ["primitive", "ClassType", "ArrayType", "MapType", "FunctionType"].includes(e.kind)
+    ) {
       if (assignable(e, type)) {
         return;
       } else {
-        const message = messages.notAssignableError(typeDescription(e), typeDescription(type));
+        const message = messages.notAssignableError(
+          typeDescription(e),
+          typeDescription(type)
+        );
         throw new Error(message);
       }
     }
-
+  
     const source = typeDescription(e.type);
     const targetDesc = typeDescription(type);
     const message = messages.notAssignableError(source, targetDesc);
-
     check(assignable(e.type, type), message, parseTreeNode);
   }
 
@@ -263,9 +283,11 @@ export default function analyze(match) {
     Assignment(left, _col, right, _excl) {
         const source = right.analyze();
         const target = left.analyze();
+
         if (target.kind === "MemberExpression" && target.field.type === null) {
           target.field.type = source.type;
         }
+
         checkIsAssignable(source, { toType: target.type }, left);
         return core.assignmentStatement(source, target);
     },
@@ -368,32 +390,29 @@ export default function analyze(match) {
       return core.forStatement(iterator, testExp, iterValue, body);
     },
 
-    // Updated Call: for ClassTypes use constructor parameters.
     Call(id, open, expList, _close) {
-      const callee = id.analyze();
-      checkIsCallable(callee, id);
+        const callee = id.analyze();
+        checkIsCallable(callee, id);
 
-      const exps = expList.children;
-      let targetTypes;
-
-      if (callee.kind === "ClassType") {
-        targetTypes = (callee.constructor && callee.constructor.parameters)
-          ? callee.constructor.parameters.map(p => p.type)
-          : [];
-      } else {
-        targetTypes = callee.type.paramTypes;
-      }
-
-      checkCorrectArgumentCount(exps.length, targetTypes.length, open);
-      const args = exps.map((exp, i) => {
-        const arg = exp.analyze();
-        checkIsAssignable(arg, { toType: targetTypes[i] }, exp);
-        return arg;
-      });
-
-      return callee.kind === "ClassType"
-        ? core.constructorCall(callee, args)
-        : core.functionCall(callee, args);
+        const args = expList.analyze();
+      
+        let targetTypes;
+        if (callee.kind === "ClassType") {
+          targetTypes = (callee.constructor && callee.constructor.parameters)
+            ? callee.constructor.parameters.map(p => p.type)
+            : [];
+        } else {
+          targetTypes = callee.type.paramTypes;
+        }
+      
+        checkCorrectArgumentCount(args.length, targetTypes.length, open);
+        args.forEach((arg, i) => {
+          checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
+        });
+      
+        return callee.kind === "ClassType"
+          ? core.constructorCall(callee, args)
+          : core.functionCall(callee, args);
     },
 
     DotExp(exp, _dot, id) {
@@ -414,9 +433,8 @@ export default function analyze(match) {
           return core.memberExpression(object, ".", member);
         }
         throw new Error("DotExp not implemented for non-class types");
-      },
+    },
   
-
     DotCall(exp, _dot, call) {
       const object = exp.analyze();
       checkIsClassType(object, exp);
@@ -429,47 +447,54 @@ export default function analyze(match) {
     },
 
     ClassDec(_class, id, _open, constructor, methods, _close) {
-      checkNotAlreadyDeclared(id.sourceString, id);
-      const classTypeObj = core.classType(id.sourceString, null, []);
-
-      context.add(id.sourceString, classTypeObj);
-      context = context.newChildContext({ inClass: classTypeObj });
-      const cons = constructor.analyze();
-
-      classTypeObj.constructor = cons;
-      const fields = cons.fields || [];
-      const seen = new Set();
-
-      for (const field of fields) {
-        if (seen.has(field.name)) {
-          throw new Error("Duplicate class member: " + messages.nonDistinctMembersError());
+        checkNotAlreadyDeclared(id.sourceString, id);
+        const classTypeObj = core.classType(id.sourceString, null, []);
+      
+        context.add(id.sourceString, classTypeObj);
+        context = context.newChildContext({ inClass: classTypeObj });
+        context.locals.delete(id.sourceString);
+      
+        const cons = constructor.analyze();
+        classTypeObj.constructor = cons;
+        const fields = cons.fields || [];
+        const seen = new Set();
+      
+        for (const field of fields) {
+          if (seen.has(field.name)) {
+            throw new Error("Duplicate class member: " + messages.nonDistinctMembersError());
+          }
+          seen.add(field.name);
         }
-        seen.add(field.name);
-      }
-
-      classTypeObj.members = [...fields];
-      const meths = methods.children.map(m => m.analyze());
-      classTypeObj.methods = meths;
-
-      context = context.parent;
-      return classTypeObj;
+      
+        classTypeObj.members = [...fields];
+        const meths = methods.children.map(m => m.analyze());
+        classTypeObj.methods = meths;
+      
+        context = context.parent;
+        return classTypeObj;
     },
 
     ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
-      const parameters = params.children.map(p => p.analyze());
-      context = context.newChildContext({ function: null });
-      parameters.forEach(p => context.add(p.name, p));
+        const parameters = params.analyze();
+        context = context.newChildContext({ function: null });
 
-      const fieldDecls = fields.children.map(f => f.analyze());
-      context = context.parent;
-      return { ...core.constructorDeclaration(parameters, fieldDecls), fields: fieldDecls };
+        parameters.forEach(p => context.add(p.name, p));
+        const fieldDecls = fields.children.map(f => f.analyze());
+        context = context.parent;
+
+        return { ...core.constructorDeclaration(parameters, fieldDecls), fields: fieldDecls };
     },
 
     Field(type, _this, _dot, id, _col, exp, _excl) {
-      const fieldType = type.analyze();
-      const initializer = exp.analyze();
-      checkIsAssignable(initializer, { toType: fieldType }, id);
-      return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
+        const fieldType = type.analyze();
+        if (context.inClass && fieldType === context.inClass) {
+          throw new Error(messages.notDeclaredError(context.inClass.name));
+        }
+
+        const initializer = exp.analyze();
+        checkIsAssignable(initializer, { toType: fieldType }, id);
+
+        return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
     },
 
     MethodDec(_function, id, _open, params, _close, _col, type, block) {
@@ -487,13 +512,13 @@ export default function analyze(match) {
 
         context = context.parent;
         return core.methodDeclaration(id.sourceString, parameters, body, returnType);
-      },
+    },
 
     ObjectDec(_new, id, _open, params, _close) {
-      const classEntity = id.analyze();
-      checkIsClassType(classEntity, id);
-      const args = params.children.map(p => p.analyze());
-      return core.constructorCall(classEntity, args);
+        const classEntity = id.analyze();
+        checkIsClassType(classEntity, id);
+        const args = params.analyze();
+        return core.constructorCall(classEntity, args);
     },
 
     Return(_ret, exp, _excl) {
@@ -598,10 +623,24 @@ export default function analyze(match) {
       return core.unaryExpression("", x, x.type);
     },
 
+    Type(id) {
+        let t = context.lookup(id.sourceString);
+
+        if (!t || typeof t !== "object" || !("kind" in t)) {
+          t = core.standardLibrary[id.sourceString];
+        }
+
+        check(t, messages.notDeclaredError(id.sourceString), id);
+        return t;
+      },
+
     id(_first, _rest) {
         const entity = context.lookup(this.sourceString);
         checkIsDeclared(entity, this.sourceString, this);
 
+        if (entity && entity.kind === "primitive") {
+          return entity;
+        }
         if (typeof entity !== "object" || !("type" in entity)) {
           if (typeof entity === "number") {
             return { value: entity, type: core.numberType };
@@ -616,28 +655,27 @@ export default function analyze(match) {
         }
         return entity;
     },
-    
-
+      
     // Literals
+    intlit(_digits) {
+        return Number(this.sourceString)
+    },
+
     floatlit(_digits, _dot, _fractional, _e, _sign, _exponent) {
-        return { value: Number(this.sourceString), type: core.numberType };
-      },
-      
-      intlit(_digits) {
-        return { value: Number(this.sourceString), type: core.numberType };
-      },
-      
-      stringlit(_open, chars, close) {
-        return { value: chars.sourceString, type: core.stringType };
-      },
-      
-      true(_) {
-        return { value: true, type: core.booleanType };
-      },
-      
-      false(_) {
-        return { value: false, type: core.booleanType };
-      },
+        return Number(this.sourceString)
+    },
+
+    stringlit(_open, chars, close) {
+        return chars.sourceString
+    },
+
+    true(_) {
+        return true
+    },
+
+    false(_) {
+        return false
+    },
 
     ArrayLit(_open, params, _close) {
       const elements = params.children.map(c => c.analyze());
@@ -668,8 +706,8 @@ export default function analyze(match) {
     },
 
     EmptyListOf() {
-        return core.arrayExpression([]);
-    },
+        return [];
+      },
 
     _terminal() {
       return this.sourceString;
@@ -680,6 +718,3 @@ export default function analyze(match) {
   return analyzer(match).analyze();
 }
 
-Number.prototype.type = "number";
-Boolean.prototype.type = "boolean";
-String.prototype.type = "string";

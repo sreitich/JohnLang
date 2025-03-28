@@ -14,11 +14,11 @@ export function typeDeclaration(type) {
     return { kind: "TypeDeclaration", type };
 }
 
-export const booleanType = { kind: "primitive", name: "boolean" };
-export const numberType  = { kind: "primitive", name: "number" };
-export const stringType  = { kind: "primitive", name: "string" };
-export const voidType = "void";
-export const anyType = "any";
+export const booleanType = { kind: "primitive", name: "switcheroo" };
+export const numberType  = { kind: "primitive", name: "handful" };
+export const stringType  = { kind: "primitive", name: "chitchat" };
+export const voidType = { kind: "primitive", name: "void" };
+export const anyType = { kind: "primitive", name: "any" };
 
 export function classType(name, constructor, methods) {
     return { kind: "ClassType", name, constructor, methods };
@@ -162,7 +162,8 @@ export const standardLibrary = Object.freeze({
     chitchat: stringType,
     todo: arrayType(),
     almanac: mapType(),
-})
+    print: functionType([anyType], voidType)
+});
 
 Boolean.prototype.type = booleanType;
 Number.prototype.type = numberType;
