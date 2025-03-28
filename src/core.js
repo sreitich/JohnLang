@@ -7,16 +7,16 @@ export function variableDeclaration(variable, initializer) {
 }
 
 export function variable(name, type) {
-    return { kind: "Variable", name, type, };
+    return { kind: "Variable", name, type, mutability: true};
 }
 
 export function typeDeclaration(type) {
     return { kind: "TypeDeclaration", type };
 }
 
-export const booleanType = "boolean";
-export const numberType = "number";
-export const stringType = "string";
+export const booleanType = { kind: "primitive", name: "boolean" };
+export const numberType  = { kind: "primitive", name: "number" };
+export const stringType  = { kind: "primitive", name: "string" };
 export const voidType = "void";
 export const anyType = "any";
 
@@ -109,12 +109,17 @@ export function unaryExpression(op, operand, type) {
     return { kind: "UnaryExpression", op, operand, type, };
 }
 
-export function subscriptExpression(array, index) {
-    return { kind: "SubscriptExpression", array, index, };
-}
+export function subscriptExpression(arrayExpr, indexExpr, resultType) {
+    return {
+      kind: "SubscriptExpression",
+      array: arrayExpr,
+      index: indexExpr,
+      type: resultType, 
+    };
+  }
 
 export function arrayExpression(elements) {
-    return { kind: "ArrayExpression", elements, }
+    return { kind: "ArrayExpression", elements, type: arrayType() };
 }
 
 export function emptyArray(baseType) {
@@ -122,7 +127,7 @@ export function emptyArray(baseType) {
 }
 
 export function mapExpression(elements) {
-    return { kind: "MapExpression", elements, }
+    return { kind: "MapExpression", elements, type: mapType() };
 }
 
 export function mapEntry(key, value) {
@@ -148,7 +153,7 @@ export function functionCall(callee, args) {
 }
 
 export function constructorCall(callee, args) {
-    return { kind: "ConstructorCall", callee, args };
+    return { kind: "ConstructorCall", callee, args, type: callee };
 }
 
 export const standardLibrary = Object.freeze({
