@@ -1,6 +1,6 @@
 <img src="./docs/john-lang-icon-500x.png" alt="John Language Himself" width="250"/>
 
-# John Lang
+# [John Lang](https://sreitich.github.io/JohnLang/)
 
 Millenia ago, there was a man. He awoke, unexpectantly, from an ancient slumber. His first words in this mysterious world in which he materialized: "Hello, World!" (he was quite the optimist). His name was John Language. And the first thing he did was create the world's first programming language: John Language.[^1 ] The second thing he did was create the Midwest.
 
