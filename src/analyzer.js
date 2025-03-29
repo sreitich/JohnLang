@@ -56,16 +56,17 @@ export default function analyze(match) {
     check(eType === core.numberType, messages.notNumericError(), parseTreeNode);
   }
 
+/*
   function checkIsNumbericOrStringType(e, parseTreeNode) {
     const expectedTypes = [core.numberType, core.stringType];
     check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
   }
-
+*/
   function checkIsBooleanType(e, parseTreeNode) {
     const eType = (typeof e === "boolean") ? core.booleanType : e.type;
     check(eType === core.booleanType, messages.notBooleanError(), parseTreeNode);
   }
-
+/*
   function checkHasArrayType(e, parseTreeNode) {
     check(e.type?.kind === "ArrayType", messages.notArrayError(), parseTreeNode);
   }
@@ -81,7 +82,7 @@ export default function analyze(match) {
   function checkIsMapType(e, parseTreeNode) {
     check(e?.kind === "MapType", messages.notMapError(), parseTreeNode);
   }
-
+*/
   function checkHasCollectionType(e, parseTreeNode) {
     check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType", messages.notCollectionTypeError(), parseTreeNode);
   }
@@ -89,7 +90,7 @@ export default function analyze(match) {
   function checkIsClassType(e, parseTreeNode) {
     check(e.type?.kind === "ClassType", messages.notClassError(), parseTreeNode);
   }
-
+/*
   function checkBothHaveSameType(e1, e2, parseTreeNode) {
     check(equivalent(e1.type, e2.type), messages.twoDifferentTypesError(), parseTreeNode);
   }
@@ -107,7 +108,7 @@ export default function analyze(match) {
     const isCompositeType = /ArrayType|MapType|ClassType|FunctionType/.test(e?.kind);
     check(isPrimitiveType || isCompositeType, messages.noTypeError(), parseTreeNode);
   }
-
+*/
   function equivalent(t1, t2) {
     if (t2 === core.anyType) return true;
     return t1 === t2 ||
@@ -191,7 +192,7 @@ export default function analyze(match) {
   function checkIsMutable(e, parseTreeNode) {
     check(isMutable(e), messages.notMutableError(e.name));
   }
-
+/*
   function checkMemberDeclared({ in: inClass }, member, parseTreeNode) {
     check(
       inClass.constructor.body
@@ -209,7 +210,7 @@ export default function analyze(match) {
       parseTreeNode
     );
   }
-
+*/
   function checkInLoop(parseTreeNode) {
     check(context.inLoop, messages.notInLoopError(), parseTreeNode);
   }
