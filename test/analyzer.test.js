@@ -58,6 +58,8 @@ const semanticChecks = [
 
     ["ok to != maps", "letMeLearnYouSomething({1: 2} != {1: 2, 2: 4})!"],
 
+    ["append strings", `letMeLearnYouSomething("Hello" + ", world")!`],
+
     ["arithmetic", "handful x: 1! letMeLearnYouSomething(2 * 3 + 5 ** -3 / 2 - 5 % 8)!"],
 
     ["variables", "todo x: [[[[1]]]]! letMeLearnYouSomething(x[0][0][0][0] + 2)!"],
@@ -66,7 +68,13 @@ const semanticChecks = [
 
     ["member exp", "doohickey T { slapTogether(handful num) { handful me.number: num! } } T x: T(1)! letMeLearnYouSomething(x.number)!"],
 
-    ["subscript exp", "todo a: [1,2]! letMeLearnYouSomething(a[0])!"],
+    ["subscript array", "todo a: [1,2]! letMeLearnYouSomething(a[0])!"],
+
+    ["subscript map", `almanac a: {"hello": 1}! letMeLearnYouSomething(a["hello"])!`],
+
+    ["subscript assign array", "todo a: [1,2]! a[0]: 2!"],
+
+    ["subscript assign map", `almanac a: {"hello": 1}! a["hello"]: 2!`],
 
     ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
 
@@ -93,9 +101,6 @@ const semanticChecks = [
     ["assign valid primitive", "handful x: 1! x: 2!"],
 
     ["call class with no args", "doohickey C { slapTogether() {} } letMeLearnYouSomething(C())!"]
-
-
-
 ]
 
 // Programs that are syntactically correct but have semantic errors.
@@ -166,6 +171,10 @@ const semanticErrors = [
 
     ["bad types for not", 'letMeLearnYouSomething(nah "hello")!', messages.notBooleanError()],
 
+    ["bad types for subscript", 'letMeLearnYouSomething(1[0])!', messages.notArrayError()],
+
+    ["subscripting array like map", 'todo a: [1, 2]! letMeLearnYouSomething(a["hello"])!', messages.notNumericError()],
+
     ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", messages.notNumericError()],
 
     ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", messages.noMemberError()],
@@ -188,8 +197,7 @@ const semanticErrors = [
 
     ["No return type", "gitErDone f() { betterGetGoin 1! }", messages.noTypeError()],
 
-    ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],    
-    
+    ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
 ]
 
 describe("The analyzer", () => {

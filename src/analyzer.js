@@ -56,12 +56,11 @@ export default function analyze(match) {
     check(eType === core.numberType, messages.notNumericError(), parseTreeNode);
   }
 
-/*
   function checkIsNumbericOrStringType(e, parseTreeNode) {
     const expectedTypes = [core.numberType, core.stringType];
     check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
   }
-*/
+
   function checkIsBooleanType(e, parseTreeNode) {
     const eType = (typeof e === "boolean") ? core.booleanType : e.type;
     check(eType === core.booleanType, messages.notBooleanError(), parseTreeNode);
@@ -574,8 +573,8 @@ export default function analyze(match) {
     Exp3_add(left, op, right) {
       const x = left.analyze();
       const y = right.analyze();
-      checkIsNumericType(x, left);
-      checkIsNumericType(y, right);
+      checkIsNumbericOrStringType(x, left);
+      checkIsNumbericOrStringType(y, right);
       return core.binaryExpression(op.sourceString, x, y, core.numberType);
     },
 
