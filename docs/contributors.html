@@ -24,14 +24,24 @@
     </div>
 
     <div class="contents">
-      <p>
-        Millenia ago, there was a man. He awoke, unexpectantly, from an ancient
-        slumber. His first words in this mysterious world in which he
-        materialized: "Hello, World!" (he was quite the optimist). His name was
-        John Language. And the first thing he did was create the world's first
-        programming language: John Language. The second thing he did was create
-        the Midwest.
-      </p>
+    </div>
+    <div class= columns> 
+      <div class= "pictureleftcol">
+        <img src= "AdiRoitburg.jpg" alt= "Adi Roitburg" width= 500 height= 600>
+        <h1>Adi Roitburg</h1>
+        <img src= "SamReitich.jpg" alt= "Sam Reitich" width= 500 height= 600>
+        <h1>Sam Reitich</h1>
+        <img src= "JDElia.jpg" alt= "JD Elia" width= 500 height= 600>
+        <h1>JD Elia</h1>
+      </div>
+      <div class= "picturerightcol">
+        <img src= "AllenBoyce.jpg" alt=" Allen Boyce" width= 500 height= 600>
+        <h1>Allen Boyce</h1>
+        <img src= "KyleMatton.jpg" alt= "Kyle Matton" width = 500 height= 600>
+        <h1>Kyle Matton</h1>
+        <img src= "JacobMendoza.jpg" alt= "Jacob Mendoza" width = 500 height= 600>
+        <h1>Jacob Mendoza</h1>
+      </div>
     </div>
   </body>
 </html>
@@ -53,10 +63,9 @@
     display: flex;
     flex-direction: column;
     justify-content: center; /* Centers horizontally */
-
     margin-left: 100px;
     margin-right: 100px;
-    margin-top: 20px;
+    margin-top: 30px;
   }
 
   .contents p {
@@ -92,4 +101,25 @@
     background-color: lightgray;
     border-radius: 5px;
   }
+
+  .columns {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .pictureleftcol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  .picturerightcol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
 </style>
