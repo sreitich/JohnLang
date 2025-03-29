@@ -72,15 +72,30 @@ const semanticChecks = [
 
     ["class of arrays and maps", "doohickey S { slapTogether() { todo me.x: []! almanac me.y: {}! } }"],
 
-    [
-        "function return types",
-        `gitErDone square(handful x): handful { betterGetGoin x * x! }
-         gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`,
-    ],
+    ["function return types", `gitErDone square(handful x): handful { betterGetGoin x * x! } gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`],
 
     ["array parameters", "gitErDone f(todo x): handful { betterGetGoin 0! }"],
 
     ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
+
+    ["self-referencing field", "doohickey C { slapTogether(C c) { C me.c: c! } }"],
+
+    ["object declaration", "doohickey C { slapTogether() {} } C c: whipUp C()! letMeLearnYouSomething(c)!"],
+
+    ["id numeric", "handful x: 1! letMeLearnYouSomething(x)!"],
+
+    ["id boolean", "switcheroo b: youBetcha! letMeLearnYouSomething(b)!"],
+
+    ["id string", "chitchat s: \"hello\"! letMeLearnYouSomething(s)!" ],
+
+    ["for loop with declared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 2, x: x + 1 { letMeLearnYouSomething(1)! }"],
+
+    ["assign valid primitive", "handful x: 1! x: 2!"],
+
+    ["call class with no args", "doohickey C { slapTogether() {} } letMeLearnYouSomething(C())!"]
+
+
+
 ]
 
 // Programs that are syntactically correct but have semantic errors.
@@ -172,6 +187,9 @@ const semanticErrors = [
     ["Non-type in param", "gitErDone f(handful x, y) {}", messages.noTypeError()],
 
     ["No return type", "gitErDone f() { betterGetGoin 1! }", messages.noTypeError()],
+
+    ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],    
+    
 ]
 
 describe("The analyzer", () => {

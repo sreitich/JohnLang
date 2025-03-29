@@ -88,7 +88,9 @@ export default function analyze(match) {
   }
 
   function checkIsClassType(e, parseTreeNode) {
-    check(e.type?.kind === "ClassType", messages.notClassError(), parseTreeNode);
+    // If e has a type property, use that; otherwise, use e itself.
+    const classKind = e.type ? e.type.kind : e.kind;
+    check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
   }
 /*
   function checkBothHaveSameType(e1, e2, parseTreeNode) {
