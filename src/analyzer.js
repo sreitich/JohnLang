@@ -75,6 +75,11 @@ export default function analyze(match) {
     check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
   }
 
+  function checkHasClassType(e, parseTreeNode) {
+    const classKind = e?.type?.kind;
+    check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
+  }
+
   function equivalent(t1, t2) {
     if (t2 === core.anyType) return true;
     return t1 === t2 ||
@@ -316,7 +321,7 @@ export default function analyze(match) {
         if (callee.kind === "ClassType") {
           targetTypes = callee.constructor.parameters.map(p => p.type);
         }
-        
+
         checkCorrectArgumentCount(args.length, targetTypes.length, open);
         args.forEach((arg, i) => {
           checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
@@ -339,7 +344,7 @@ export default function analyze(match) {
   
   DotCall(exp, _dot, call) {
     const object = exp.analyze();
-    checkIsClassType(object, exp);
+    checkHasClassType(object, exp);
     const memberCall = call.analyze();
     return core.memberCall(object, memberCall);
   },
