@@ -124,12 +124,38 @@ const semanticChecks = [
             gitErDone add(handful a, handful b): handful { \
                 betterGetGoin a + b! \
             } \
+            gitErDone subtract(handful a, handful b): handful { \
+                betterGetGoin me.add(a, -b)! \
+            } \
+        } \
+        Calculator calc: whipUp Calculator()! \
+        letMeLearnYouSomething(calc.subtract(3, 2))!"
+    ],
+
+    [
+    "method calling outer functions",
+        "gitErDone add(handful a, handful b): handful {\
+            betterGetGoin a + b! \
+        }\
+        doohickey Calculator { \
+        slapTogether() {} \
             gitErDone subtract(handful a, handful b): handful {\
                 betterGetGoin add(a, -b)!\
             }\
         } \
         Calculator calc: whipUp Calculator()! \
         letMeLearnYouSomething(calc.subtract(3, 2))!"
+    ],
+
+    [
+    "functions calling other functions",
+        "gitErDone add(handful a, handful b): handful {\
+            betterGetGoin a + b! \
+        }\
+        gitErDone subtract(handful a, handful b): handful {\
+            betterGetGoin add(a, -b)! \
+        }\
+        letMeLearnYouSomething(subtract(3, 2))!"
     ]
 ]
 
@@ -229,6 +255,15 @@ const semanticErrors = [
 
     ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
 
+    ["assign function",
+        "gitErDone add(handful a, handful b): handful {\
+            betterGetGoin a + b! \
+        }\
+        gitErDone subtract(handful a, handful b): handful {\
+            betterGetGoin a - b! \
+        }\
+        add: subtract!",
+    ""],
 ]
 
 describe("The analyzer", () => {
