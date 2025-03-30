@@ -24,20 +24,89 @@
     </div>
 
     <div class="contents">
-      <p>
-        Millenia ago, there was a man. He awoke, unexpectantly, from an ancient
-        slumber. His first words in this mysterious world in which he
-        materialized: "Hello, World!" (he was quite the optimist). His name was
-        John Language. And the first thing he did was create the world's first
-        programming language: John Language. The second thing he did was create
-        the Midwest.
-      </p>
+    </div>
+
+    <div class="gallery">
+      <div class="item">
+        <img src="AdiRoitburg.jpg" alt="hi">
+        <div class="caption">Adi "John Piano" Roitburg <p>Adi, who is a very funny guy (self proclaimed), plays a lot of piano and even more Destiny. He hopes to one day found his own game studio, RoiTech Studio.</p></div>
+      </div>
+
+      <div class="item">
+        <img src="JDElia.jpg" alt="hi">
+        <div class="caption">James "John Youtube" David <p>JD's a pretty swag guy, he never bottom frags in Siege and stands at 5'13". He too can be seen studying women's literature.</p></div>
+      </div>
+
+      <div class="item">
+        <img src="KyleMatton.jpg" alt="hi">
+        <div class="caption">Kyle "John Florida" Matton <p>Kyle is a true Floridian in the sense that he prefers to wear slides in the snow (real fact). He is currently awaiting the release of Hollow Knight Silksong (poor soul).</p></div>
+      </div>
+
+      <div class="item">
+        <img src="JacobMendoza.jpg" alt="hi">
+        <div class="caption">Jacob "John Volleyball" Mendoza <p>Chronically burntout and sick of writing these temp bios, Jacob is an avid volleyball player and enjoys food and gaming (particularly tuna and Assassin's Creed).</p></div>
+      </div>
+
+      <div class="item">
+        <img src="SamReitich.jpg" alt="hi">
+        <div class="caption">Sam "Feminist" Reitich <p>Sam's a pretty swag guy, he never bottom frags in Overwatch and stands at 5'14" (much to JD's sadness) and can be seen studing women's literature.</p></div>
+      </div>
+
+      <div class="item">
+        <img src="AllenBoyce.jpg" alt="hi">
+        <div class="caption">Allen "John Theater" Boyce <p>Allen's a talented actor with a wide variety of interesting hobbies. Including but not limited to: Pokemon Card collecting, Playing the guitar, scaring Jacob when he's not looking, etc.</p></div>
+      </div>
     </div>
   </body>
 </html>
 
 <!-- CSS -->
 <style>
+  .gallery {
+    display: grid;
+    /* grid-template-columns: repeat(2, 1fr); exactly 2 images per row */
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 50px; /* controls space between them */
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+
+    .item {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      max-width: 600px; /* sets max width */
+      margin: 0 auto;   /* centers items inside the grid cell */
+      margin-bottom: 55px;
+    }
+
+    .item p{
+      font-size: 18px;
+    }
+
+    .item img {
+      width: 100%;
+      /* height: 600px; */
+      aspect-ratio: 2 / 2; /* keeps a nice image ratio */
+      object-fit: cover;
+      display: block;
+
+    }
+
+    .caption {
+      padding: 10px;
+      /* font-size: 50px; */
+      font-size: 2.8rem;
+      color: #333;
+      text-align: center;
+    }
+
+
+
+
   body {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   }
@@ -52,11 +121,10 @@
   .contents {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centers horizontally */
-
+    justify-content: center; 
     margin-left: 100px;
     margin-right: 100px;
-    margin-top: 20px;
+    margin-top: 30px;
   }
 
   .contents p {
@@ -67,21 +135,27 @@
 
   .navbar {
     display: flex;
-    justify-content: space-around; /* Spreads items evenly */
+    flex-wrap: wrap;
+    justify-content: space-around; 
     align-items: center;
     border: 2px solid black;
     height: 80px;
     width: 50%;
     margin: 0 auto;
     padding: 0 20px;
+    max-width: 700px;
   }
 
   .navbar a {
     text-decoration: none;
     color: black;
-    font-size: 25px;
-    padding: 10px 15px;
-  }
+    font-size: 1.5rem;
+    padding: 10px 50px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    flex-shrink: 0;
+  } 
 
   .navbar a:hover {
     background-color: rgb(225, 224, 224);
@@ -92,4 +166,78 @@
     background-color: lightgray;
     border-radius: 5px;
   }
+
+  .columns {
+    gap: 5%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .pictureleftcol {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-left: 25%;
+  }
+
+  .pictureleftcol img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5/6;
+    object-fit: cover;
+  }
+  
+  .pictureleftcol h2 {
+    text-align: center;
+  }
+
+  .pictureleftcol p {
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .picturerightcol {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-right: 25%;
+  }
+
+  .picturerightcol img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5/6;
+    object-fit: cover;
+  }
+
+  .picturerightcol h2 {
+    text-align: center;
+  }
+
+  .picturerightcol p {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  @media (max-width: 1000px) {
+    .navbar {
+      flex-direction: column;
+      height: auto;
+      padding: 10px 0;
+    }
+
+    .navbar a {
+      padding: 8px 0px;
+      font-size: 1.2rem;
+      width: 100%;
+    }
+}
 </style>
