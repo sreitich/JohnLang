@@ -9,12 +9,6 @@ export function variableDeclaration(variable, initializer) {
 export function variable(name, type) {
     return { kind: "Variable", name, type, mutability: true};
 }
-/*
-export function typeDeclaration(type) {
-    return { kind: "TypeDeclaration", type };
-}
-
-*/
 
 export const booleanType = { kind: "primitive", name: "switcheroo" };
 export const numberType  = { kind: "primitive", name: "handful" };
@@ -78,31 +72,11 @@ export function forStatement(variable, test, iteration, body) {
 export function printStatement(argument) {
     return { kind: "PrintStatement", argument, };
 }
-/*
-export function objectDeclaration(name, type, args) {
-    return { kind: "ObjectDeclaration", name, type, args, };
-}
-*/
+
 export function constructorDeclaration(parameters, body) {
     return { kind: "ConstructorDeclaration", parameters, body, };
 }
-/*
-export function parameter(type, name) {
-    return { kind: "Parameter", type, name, };
-}
 
-export function methodDeclaration(name, parameters, body, returnType) {
-    return { kind: "MethodDeclaration", name, parameters, body, returnType, };
-}
-
-export function thisExpression() {
-    return { kind: "ThisExpression", };
-}
-
-export function conditional(test, consequent, alternate, type) {
-    return { kind: "Conditional", test, consequent, alternate, type, };
-}
-*/
 export function binaryExpression(op, left, right, type) {
     return { kind: "BinaryExpression", op, left, right, type, };
 }
@@ -123,11 +97,6 @@ export function subscriptExpression(arrayExpr, indexExpr, resultType) {
 export function arrayExpression(elements) {
     return { kind: "ArrayExpression", elements, type: arrayType() };
 }
-/*
-export function emptyArray(baseType) {
-    return { kind: "EmptyArray", baseType, };
-}
-*/
 
 export function mapExpression(elements) {
     return { kind: "MapExpression", elements, type: mapType() };
@@ -136,25 +105,12 @@ export function mapExpression(elements) {
 export function mapEntry(key, value) {
     return { kind: "MapEntry", key, value, };
 }
-/*
-export function emptyMap(keyType, valueType) {
-    return { kind: "EmptyMap", keyType, valueType, };
-}
-*/
+
 export function memberExpression(object, op, field) {
     // Aka dot expression
     return { kind: "MemberExpression", object, op, field, type: field.type };
 }
-/*
-export function memberCall(object, member) {
-    // Aka dot call
-    return { kind: "MemberCall", object, member };
-}
 
-export function functionCall(callee, args) {
-    return { kind: "FunctionCall", callee, args, type: callee.type.returnType };
-}
-*/
 export function constructorCall(callee, args) {
     return { kind: "ConstructorCall", callee, args, type: callee };
 }
