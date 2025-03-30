@@ -65,51 +65,16 @@ export default function analyze(match) {
     const eType = (typeof e === "boolean") ? core.booleanType : e.type;
     check(eType === core.booleanType, messages.notBooleanError(), parseTreeNode);
   }
-/*
-  function checkHasArrayType(e, parseTreeNode) {
-    check(e.type?.kind === "ArrayType", messages.notArrayError(), parseTreeNode);
-  }
 
-  function checkIsArrayType(e, parseTreeNode) {
-    check(e?.kind === "ArrayType", messages.notArrayError(), parseTreeNode);
-  }
-
-  function checkHasMapType(e, parseTreeNode) {
-    check(e.type?.kind === "MapType", messages.notMapError(), parseTreeNode);
-  }
-
-  function checkIsMapType(e, parseTreeNode) {
-    check(e?.kind === "MapType", messages.notMapError(), parseTreeNode);
-  }
-*/
   function checkHasCollectionType(e, parseTreeNode) {
     check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType", messages.notCollectionTypeError(), parseTreeNode);
   }
 
   function checkIsClassType(e, parseTreeNode) {
-    // If e has a type property, use that; otherwise, use e itself.
-    const classKind = e.type ? e.type.kind : e.kind;
+    const classKind = e.kind;
     check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
   }
-/*
-  function checkBothHaveSameType(e1, e2, parseTreeNode) {
-    check(equivalent(e1.type, e2.type), messages.twoDifferentTypesError(), parseTreeNode);
-  }
 
-  function checkAllHaveSameType(expressions, parseTreeNode) {
-    check(
-      expressions.slice(1).every(e => equivalent(e.type, expressions[0].type)),
-      messages.manyDifferentTypesError(),
-      parseTreeNode
-    );
-  }
-
-  function checkIsAType(e, parseTreeNode) {
-    const isPrimitiveType = /number|boolean|string|void|any/.test(e);
-    const isCompositeType = /ArrayType|MapType|ClassType|FunctionType/.test(e?.kind);
-    check(isPrimitiveType || isCompositeType, messages.noTypeError(), parseTreeNode);
-  }
-*/
   function equivalent(t1, t2) {
     if (t2 === core.anyType) return true;
     return t1 === t2 ||
@@ -117,17 +82,10 @@ export default function analyze(match) {
   }
 
   function typeDescription(type) {
-    if (!type) return "undefined";
     if (type.kind === "primitive") return type.name;
     if (type.kind === "ClassType") return type.name;
-    if (type.kind === "FunctionType") {
-      const paramTypes = type.paramTypes.map(typeDescription).join(", ");
-      const returnType = typeDescription(type.returnType);
-      return `(${paramTypes})->${returnType}`;
-    }
     if (type.kind === "ArrayType") return type.kind;
     if (type.kind === "MapType") return type.kind;
-    return typeof type;
   }
   
   function assignable(src, target) {
@@ -138,7 +96,6 @@ export default function analyze(match) {
     if (typeof e === "number") return { value: e, type: core.numberType };
     if (typeof e === "boolean") return { value: e, type: core.booleanType };
     if (typeof e === "string") return { value: e, type: core.stringType };
-    return e;
   }
 
   function checkIsAssignable(e, { toType: type }, parseTreeNode) {
@@ -146,9 +103,6 @@ export default function analyze(match) {
       e = wrapLiteral(e);
     }
   
-    if (e && e.kind === "FieldDeclaration" && e.type === null) {
-      return;
-    }
     if (
       e &&
       e.kind &&
@@ -159,23 +113,6 @@ export default function analyze(match) {
     ) {
       return;
     }
-    if (!e || !("type" in e)) {
-      throw new Error("Node missing type property.");
-    }
-    if (
-      e.kind &&
-      ["primitive", "ClassType", "ArrayType", "MapType", "FunctionType"].includes(e.kind)
-    ) {
-      if (assignable(e, type)) {
-        return;
-      } else {
-        const message = messages.notAssignableError(
-          typeDescription(e),
-          typeDescription(type)
-        );
-        throw new Error(message);
-      }
-    }
   
     const source = typeDescription(e.type);
     const targetDesc = typeDescription(type);
@@ -185,33 +122,14 @@ export default function analyze(match) {
 
   function isMutable(e) {
     return (
-      (e?.kind === "Variable") ||
-      (e?.kind === "MemberExpression" && isMutable(e?.object))
+      (e?.kind === "Variable")
     );
   }
 
   function checkIsMutable(e, parseTreeNode) {
     check(isMutable(e), messages.notMutableError(e.name));
   }
-/*
-  function checkMemberDeclared({ in: inClass }, member, parseTreeNode) {
-    check(
-      inClass.constructor.body
-        .map((f) => f.variable.value.name)
-        .includes(member),
-      messages.memberNotDeclaredError(name),
-      parseTreeNode
-    );
-  }
 
-  function checkMethodDeclared({ in: inClassMethods }, method, parseTreeNode) {
-    check(
-      inClassMethods.map((f) => f.name).includes(method),
-      messages.methodNotDeclaredError(method),
-      parseTreeNode
-    );
-  }
-*/
   function checkInLoop(parseTreeNode) {
     check(context.inLoop, messages.notInLoopError(), parseTreeNode);
   }
@@ -285,11 +203,6 @@ export default function analyze(match) {
     Assignment(left, _col, right, _excl) {
         const source = right.analyze();
         const target = left.analyze();
-
-        if (target.kind === "MemberExpression" && target.field.type === null) {
-          target.field.type = source.type;
-        }
-
         checkIsAssignable(source, { toType: target.type }, left);
         return core.assignmentStatement(source, target);
     },
@@ -400,49 +313,36 @@ export default function analyze(match) {
       
         let targetTypes;
         if (callee.kind === "ClassType") {
-          targetTypes = (callee.constructor && callee.constructor.parameters)
-            ? callee.constructor.parameters.map(p => p.type)
-            : [];
-        } else {
-          targetTypes = callee.type.paramTypes;
+          targetTypes = callee.constructor.parameters.map(p => p.type);
         }
-      
+        
         checkCorrectArgumentCount(args.length, targetTypes.length, open);
         args.forEach((arg, i) => {
           checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
         });
       
-        return callee.kind === "ClassType"
-          ? core.constructorCall(callee, args)
-          : core.functionCall(callee, args);
+        return core.constructorCall(callee, args)
     },
 
     DotExp(exp, _dot, id) {
-        const object = exp.analyze();
-        if (object.type && object.type.kind === "ClassType") {
-          let member = (object.type.members || []).find(m => m.name === id.sourceString);
-          if (!member && object.name === "me") {
-            member = { 
-              kind: "FieldDeclaration", 
-              name: id.sourceString, 
-              type: null,    
-              initializer: null
-            };
-            object.type.members = object.type.members || [];
-            object.type.members.push(member);
-          }
-          check(member, messages.noMemberError(), id);
-          return core.memberExpression(object, ".", member);
-        }
-        throw new Error("DotExp not implemented for non-class types");
-    },
-  
-    DotCall(exp, _dot, call) {
       const object = exp.analyze();
-      checkIsClassType(object, exp);
-      const memberCall = call.analyze();
-      return core.memberCall(object, memberCall);
-    },
+      if (object.type && object.type.kind === "ClassType") {
+        let member = (object.type.members || []).find(m => m.name === id.sourceString);
+        
+        check(member, messages.noMemberError(), id);
+        return core.memberExpression(object, ".", member);
+      }
+      throw new Error("DotExp not implemented for non-class types");
+  },
+    
+  
+  DotCall(exp, _dot, call) {
+    const object = exp.analyze();
+    checkIsClassType(object, exp);
+    const memberCall = call.analyze();
+    return core.memberCall(object, memberCall);
+  },
+  
 
     Block(_open, statements, _close) {
       return statements.children.map((s) => s.analyze());
@@ -458,7 +358,7 @@ export default function analyze(match) {
       
         const cons = constructor.analyze();
         classTypeObj.constructor = cons;
-        const fields = cons.fields || [];
+        const fields = cons.fields;
         const seen = new Set();
       
         for (const field of fields) {
@@ -489,9 +389,6 @@ export default function analyze(match) {
 
     Field(type, _this, _dot, id, _col, exp, _excl) {
         const fieldType = type.analyze();
-        if (context.inClass && fieldType === context.inClass) {
-          throw new Error(messages.notDeclaredError(context.inClass.name));
-        }
 
         const initializer = exp.analyze();
         checkIsAssignable(initializer, { toType: fieldType }, id);
@@ -499,22 +396,21 @@ export default function analyze(match) {
         return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
     },
 
+    
     MethodDec(_function, id, _open, params, _close, _col, type, block) {
-        checkNotAlreadyDeclared(id.sourceString, id);
-        const parameters = params.children.map(p => p.analyze());
-        context = context.newChildContext({ function: id.sourceString });
+      checkNotAlreadyDeclared(id.sourceString, id);
 
-        if (context.inClass) {
-          context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
-        }
+      context = context.newChildContext({ function: id.sourceString });
+      context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
 
-        parameters.forEach(p => context.add(p.name, p));
-        const returnType = type.analyze();
-        const body = block.analyze();
-
-        context = context.parent;
-        return core.methodDeclaration(id.sourceString, parameters, body, returnType);
-    },
+      const parameters = params.children.map(p => p.analyze());
+      parameters.forEach(p => context.add(p.name, p));
+  
+      const returnType = type.analyze();
+      const body = block.analyze();
+      context = context.parent;
+      return core.methodDeclaration(id.sourceString, parameters, body, returnType);
+  },
 
     ObjectDec(_new, id, _open, params, _close) {
         const classEntity = id.analyze();
@@ -617,14 +513,6 @@ export default function analyze(match) {
       let baseExpr = base.analyze();
       const idx = index.analyze();
       
-      if (baseExpr && baseExpr.kind === "Variable" && baseExpr.value !== undefined) {
-        baseExpr = baseExpr.value;
-      }
-      
-      if (baseExpr.kind === "ArrayExpression" || baseExpr.kind === "MapExpression") {
-        checkHasCollectionType(baseExpr, base);
-      }
-      
       if (baseExpr.type?.kind === "MapType") {
         return core.subscriptExpression(baseExpr, idx, core.anyType);
       }
@@ -657,15 +545,6 @@ export default function analyze(match) {
           return entity;
         }
         if (typeof entity !== "object" || !("type" in entity)) {
-          if (typeof entity === "number") {
-            return { value: entity, type: core.numberType };
-          }
-          if (typeof entity === "boolean") {
-            return { value: entity, type: core.booleanType };
-          }
-          if (typeof entity === "string") {
-            return { value: entity, type: core.stringType };
-          }
           return entity;
         }
         return entity;

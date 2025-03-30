@@ -6,6 +6,7 @@ import {program, variableDeclaration, variable, numberType, binaryExpression, } 
 import * as messages from "../src/messages.js";
 import {notBooleanError} from "../src/messages.js";
 
+
 // Programs expected to be semantically correct.
 const semanticChecks = [
     ["variable declarations", 'handful x: 1! chitchat y: "false"!'],
@@ -100,7 +101,19 @@ const semanticChecks = [
 
     ["assign valid primitive", "handful x: 1! x: 2!"],
 
-    ["call class with no args", "doohickey C { slapTogether() {} } letMeLearnYouSomething(C())!"]
+    ["call class with no args", "doohickey C { slapTogether() {} } letMeLearnYouSomething(C())!"],
+
+    ["raw string assignment", 'chitchat s: "hello"! s: "world"!'],
+
+    [
+        "dot call on object using DotCall",
+        "doohickey Calculator { \
+           slapTogether() {} \
+           gitErDone add(handful a,handful b): handful { betterGetGoin a + b! } \
+         } \
+         Calculator calc: whipUp Calculator()! \
+         letMeLearnYouSomething(calc.add(2, 3))!"
+      ]
 ]
 
 // Programs that are syntactically correct but have semantic errors.
@@ -198,6 +211,7 @@ const semanticErrors = [
     ["No return type", "gitErDone f() { betterGetGoin 1! }", messages.noTypeError()],
 
     ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
+
 ]
 
 describe("The analyzer", () => {
@@ -223,3 +237,4 @@ describe("The analyzer", () => {
         )
     })
 })
+
