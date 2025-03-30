@@ -369,8 +369,7 @@ export default function analyze(match) {
         }
       
         classTypeObj.members = [...fields];
-        const meths = methods.children.map(m => m.analyze());
-        classTypeObj.methods = meths;
+        classTypeObj.methods = methods.children.map(m => m.analyze());
       
         context = context.parent;
         return classTypeObj;
@@ -378,6 +377,7 @@ export default function analyze(match) {
 
     ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
         const parameters = params.analyze();
+        // const parameters = params.asIteration().children.map(p => p.analyze());
         context = context.newChildContext({ function: null });
 
         parameters.forEach(p => context.add(p.name, p));
@@ -396,21 +396,27 @@ export default function analyze(match) {
         return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
     },
 
-    
     MethodDec(_function, id, _open, params, _close, _col, type, block) {
       checkNotAlreadyDeclared(id.sourceString, id);
 
-      context = context.newChildContext({ function: id.sourceString });
-      context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
+        // Add the method to the class's context so the class's other methods can call it.
+        const fun = core.fun(id.sourceString);
+        context.add(id.sourceString, fun);
 
-      const parameters = params.children.map(p => p.analyze());
-      parameters.forEach(p => context.add(p.name, p));
-  
-      const returnType = type.analyze();
-      const body = block.analyze();
-      context = context.parent;
-      return core.methodDeclaration(id.sourceString, parameters, body, returnType);
-  },
+        // TODO: the "me" variable should be in the class's context, not the method's. I think we could do this in the constructor, before creating the constructor's new context.
+        context = context.newChildContext({ function: id.sourceString });
+        context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
+
+        fun.params = params.asIteration().children.map((p) => p.analyze());
+        const paramTypes = fun.params.map(param => param.type);
+        const returnType = type.children?.[0]?.analyze();
+        // const returnType = type.analyze();
+        fun.type = core.functionType(paramTypes, returnType);
+        fun.body = block.analyze();
+
+        context = context.parent;
+        return core.methodDeclaration(fun);
+    },
 
     ObjectDec(_new, id, _open, params, _close) {
         const classEntity = id.analyze();
@@ -606,7 +612,6 @@ export default function analyze(match) {
     _terminal() {
       return this.sourceString;
     }
-    
   });
 
   return analyzer(match).analyze();

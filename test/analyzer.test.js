@@ -108,12 +108,29 @@ const semanticChecks = [
     [
         "dot call on object using DotCall",
         "doohickey Calculator { \
-           slapTogether() {} \
-           gitErDone add(handful a,handful b): handful { betterGetGoin a + b! } \
-         } \
-         Calculator calc: whipUp Calculator()! \
-         letMeLearnYouSomething(calc.add(2, 3))!"
-      ]
+        slapTogether() {} \
+            gitErDone add(handful a, handful b): handful { \
+                betterGetGoin a + b! \
+            } \
+        } \
+        Calculator calc: whipUp Calculator()! \
+        letMeLearnYouSomething(calc.add(2, 3))!"
+    ],
+
+    [
+    "class calling its own methods",
+        "doohickey Calculator { \
+        slapTogether() {} \
+            gitErDone add(handful a, handful b): handful { \
+                betterGetGoin a + b! \
+            } \
+            gitErDone subtract(handful a, handful b): handful {\
+                betterGetGoin add(a, -b)!\
+            }\
+        } \
+        Calculator calc: whipUp Calculator()! \
+        letMeLearnYouSomething(calc.subtract(3, 2))!"
+    ]
 ]
 
 // Programs that are syntactically correct but have semantic errors.

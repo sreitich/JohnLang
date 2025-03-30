@@ -77,6 +77,10 @@ export function constructorDeclaration(parameters, body) {
     return { kind: "ConstructorDeclaration", parameters, body, };
 }
 
+export function methodDeclaration(fun) {
+    return { kind: "MethodDeclaration", fun, };
+}
+
 export function binaryExpression(op, left, right, type) {
     return { kind: "BinaryExpression", op, left, right, type, };
 }
