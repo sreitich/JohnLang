@@ -16,7 +16,38 @@ class Context {
 
   // Look up an entity in this scope
   lookup(name) {
-    return this.locals.get(name) || this.parent?.lookup(name);
+    let retObj;
+
+    if (this.locals.get(name))
+    {
+      retObj = this.locals.get(name);
+    }
+    else
+    {
+      this.locals.forEach((value, _) => {
+        if (value?.kind === "ClassType") {
+          value?.methods.forEach((method) => {
+            if (method.fun.name === name) {
+              retObj = method;
+            }
+          });
+          value?.constructor?.fields.forEach((member) => {
+            if (member.name === name) {
+              retObj = member;
+            }
+          });
+        }
+      })
+    }
+
+    if (retObj)
+    {
+      return retObj;
+    }
+    else
+    {
+      return this.parent?.lookup(name);
+    }
   }
 
   // Root context of the program
@@ -47,8 +78,8 @@ export default function analyze(match) {
     check(!context.lookup(name), messages.alreadyDeclaredError(name), parseTreeNode);
   }
 
-  function checkIsDeclared(entity, name, parseTreeNode) {
-    check(entity, messages.notDeclaredError(name), parseTreeNode);
+  function checkIsDeclared(name, parseTreeNode) {
+    check(context.lookup(name), messages.notDeclaredError(name), parseTreeNode);
   }
 
   function checkIsNumericType(e, parseTreeNode) {
@@ -98,9 +129,9 @@ export default function analyze(match) {
   }
 
   function wrapLiteral(e) {
-    if (typeof e === "number") return { value: e, type: core.numberType };
-    if (typeof e === "boolean") return { value: e, type: core.booleanType };
-    if (typeof e === "string") return { value: e, type: core.stringType };
+    if (typeof e === "number") return { value: e, name: e, kind: core.numberType, type: core.numberType };
+    if (typeof e === "boolean") return { value: e, name: e, kind: core.booleanType, type: core.booleanType };
+    if (typeof e === "string") return { value: e, name: e, kind: core.stringType, type: core.stringType };
   }
 
   function checkIsAssignable(e, { toType: type }, parseTreeNode) {
@@ -119,10 +150,19 @@ export default function analyze(match) {
     ) {
       return;
     }
-  
+
+    if (e.type.kind === "Function") {
+      e.type = e.type.type.returnType;
+    }
+
+    if (type.kind === "Function") {
+      type = type.type.returnType.name;
+    }
+
     const source = typeDescription(e.type);
-    const targetDesc = typeDescription(type);
-    const message = messages.notAssignableError(source, targetDesc);
+    const target = typeDescription(type);
+    console.log(e.type, type);
+    const message = messages.notAssignableError(source, target);
     check(assignable(e.type, type), message, parseTreeNode);
   }
 
@@ -145,13 +185,12 @@ export default function analyze(match) {
   }
 
   function checkIsCallable(e, parseTreeNode) {
-    const callable = e?.kind === "ClassType" || e.type?.kind === "FunctionType";
+    const callable = e?.kind === "ClassType" || e.type?.kind === "FunctionType" || e?.kind === "MethodDeclaration";
     check(callable, messages.notCallableError(), parseTreeNode);
   }
 
   function checkMethodDeclared(classType, methodName, parseTreeNode) {
     const method = (classType.methods).find(m => m.fun.name === methodName);
-    console.log(classType, methodName);
     check(method, messages.methodNotDeclaredError(methodName), parseTreeNode);
     return method;
   }
@@ -325,11 +364,16 @@ export default function analyze(match) {
         const args = expList.asIteration().children.map(e => e.analyze());
 
         let targetTypes;
-        if (callee.kind === "ClassType") {
+        if (callee?.kind === "ClassType") {
           targetTypes = callee.constructor.parameters.map(p => p.type);
         }
+        else if (callee?.kind === "Function") {
+          targetTypes = callee?.type?.paramTypes;
+        }
+        else if (callee?.kind === "MethodDeclaration") {
+          targetTypes = callee?.fun?.type?.paramTypes;
+        }
 
-        console.log("args: ", args, "     target types: ")
         checkCorrectArgumentCount(args.length, targetTypes.length, open);
         args.forEach((arg, i) => {
           checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
@@ -498,7 +542,6 @@ export default function analyze(match) {
     Exp4_multiply(left, op, right) {
       const x = left.analyze();
       const y = right.analyze();
-      console.log(left);
       checkIsNumericType(x, left);
       checkIsNumericType(y, right);
       return core.binaryExpression(op.sourceString, x, y, core.numberType);
@@ -559,8 +602,8 @@ export default function analyze(match) {
       },
 
     id(_first, _rest) {
+        checkIsDeclared(this.sourceString, this);
         const entity = context.lookup(this.sourceString);
-        checkIsDeclared(entity, this.sourceString, this);
 
         if (entity && entity.kind === "primitive") {
           return entity;
@@ -593,42 +636,19 @@ export default function analyze(match) {
     },
 
     ArrayLit(_open, params, _close) {
-      const elements = params.children.map(c => c.analyze());
+      const elements = params.asIteration().children.map(c => c.analyze());
       return core.arrayExpression(elements);
     },
 
     MapLit(_open, entries, _close) {
-      const elements = entries.children.map(entry => entry.analyze());
+      const elements = entries.asIteration().children.map(entry => entry.analyze());
       return core.mapExpression(elements);
     },
 
     MapLitEntry(key, _col, val) {
       return core.mapEntry(key.analyze(), val.analyze());
     },
-
-    // NonemptyListOf(first, _sep, tail) {
-    //   const tailElements = (tail && tail.children && tail.children.length > 0)
-    //     ? tail.children
-    //         .map(pair => {
-    //           if (pair.children && pair.children.length >= 2 && typeof pair.children[1].analyze === 'function') {
-    //             return pair.children[1].analyze();
-    //           }
-    //           return null;
-    //         })
-    //         .filter(x => x !== null)
-    //     : [];
-    //   return [ first.analyze(), ...tailElements ];
-    // },
-    //
-    // EmptyListOf() {
-    //     return [];
-    //   },
-    //
-    // _terminal() {
-    //   return this.sourceString;
-    // }
   });
 
   return analyzer(match).analyze();
 }
-
