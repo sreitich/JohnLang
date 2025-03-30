@@ -149,6 +149,13 @@ export default function analyze(match) {
     check(callable, messages.notCallableError(), parseTreeNode);
   }
 
+  function checkMethodDeclared(classType, methodName, parseTreeNode) {
+    const method = (classType.methods).find(m => m.fun.name === methodName);
+    console.log(classType, methodName);
+    check(method, messages.methodNotDeclaredError(methodName), parseTreeNode);
+    return method;
+  }
+
   function checkIsReturnable(e, { from: f }, parseTreeNode) {
     checkIsAssignable(e, { toType: f.type.returnType }, parseTreeNode);
   }
@@ -345,6 +352,7 @@ export default function analyze(match) {
   DotCall(exp, _dot, call) {
     const object = exp.analyze();
     checkHasClassType(object, exp);
+    checkMethodDeclared(object.type, call.children[0].sourceString, call.children[0])
     const memberCall = call.analyze();
     return core.memberCall(object, memberCall);
   },

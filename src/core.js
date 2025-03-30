@@ -110,9 +110,14 @@ export function mapEntry(key, value) {
     return { kind: "MapEntry", key, value, };
 }
 
+// Aka dot expression
 export function memberExpression(object, op, field) {
-    // Aka dot expression
     return { kind: "MemberExpression", object, op, field, type: field.type };
+}
+
+// Aka dot call
+export function memberCall(object, member) {
+    return { kind: "MemberCall", object, member };
 }
 
 export function constructorCall(callee, args) {
