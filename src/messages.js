@@ -5,6 +5,22 @@
  * Because this file is essentially just a library of strings, it is intentionally excluded from test coverage.
  */
 
+/*
+Some more John sayings we can add:
+
+    - News flash pal
+    - No more mister nice guy
+    - You're on thin ice pal
+    - Get a load of this guy
+    - Let's skedaddle
+    - Wise guy
+    - For crying out loud
+    - for pete's sake
+    - cup of joe
+    - yellow?
+    - that's it buddy
+ */
+
 export function alreadyDeclaredError(name) {
     return `Whoa buster, I think I've seen this ${name} thing before.`
 }
