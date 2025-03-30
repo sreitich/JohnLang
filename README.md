@@ -1,4 +1,4 @@
-<img src="./docs/john-lang-icon-500x.png" alt="John Language Himself" width="250"/>
+<img src="./docs/john-lang-icon-t-500x.png" alt="John Language Himself" width="250"/>
 
 # [John Lang](https://sreitich.github.io/JohnLang/)
 
