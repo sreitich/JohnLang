@@ -225,6 +225,7 @@ letMeLearnYouSomething(x)!</code></pre>
 
   .navbar {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around; 
     align-items: center;
     border: 2px solid black;
@@ -232,14 +233,19 @@ letMeLearnYouSomething(x)!</code></pre>
     width: 50%;
     margin: 0 auto;
     padding: 0 20px;
+    max-width: 700px;
   }
 
   .navbar a {
     text-decoration: none;
     color: black;
-    font-size: 25px;
-    padding: 10px 15px;
-  }
+    font-size: 1.5rem;
+    padding: 10px 50px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    flex-shrink: 0;
+  } 
 
   .navbar a:hover {
     background-color: rgb(225, 224, 224);
@@ -250,4 +256,18 @@ letMeLearnYouSomething(x)!</code></pre>
     background-color: lightgray;
     border-radius: 5px;
   }
+
+  @media (max-width: 1000px) {
+    .navbar {
+      flex-direction: column;
+      height: auto;
+      padding: 10px 0;
+    }
+
+    .navbar a {
+      padding: 8px 0px;
+      font-size: 1.2rem;
+      width: 100%;
+    }
+}
 </style>
