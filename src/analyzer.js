@@ -102,7 +102,8 @@ export default function analyze(match) {
     if (typeof e !== "object" || e === null || !("type" in e)) {
       e = wrapLiteral(e);
     }
-  
+
+    // TODO: Rewrite ?. and force array-array and map-map
     if (
       e &&
       e.kind &&
@@ -404,7 +405,7 @@ export default function analyze(match) {
         context.add(id.sourceString, fun);
 
         // TODO: the "me" variable should be in the class's context, not the method's. I think we could do this in the constructor, before creating the constructor's new context.
-        context = context.newChildContext({ function: id.sourceString });
+        context = context.newChildContext({ function: fun });
         context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
 
         fun.params = params.asIteration().children.map((p) => p.analyze());
