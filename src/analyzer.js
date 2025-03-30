@@ -203,7 +203,7 @@ export default function analyze(match) {
     },
 
     Params(_open, params, _close) {
-      return params.children.map((p) => p.analyze());
+      return params.asIteration().children.map(p => p.analyze());
     },
 
     Param(type, id) {
@@ -322,13 +322,14 @@ export default function analyze(match) {
         const callee = id.analyze();
         checkIsCallable(callee, id);
 
-        const args = expList.analyze();
-      
+        const args = expList.asIteration().children.map(e => e.analyze());
+
         let targetTypes;
         if (callee.kind === "ClassType") {
           targetTypes = callee.constructor.parameters.map(p => p.type);
         }
 
+        console.log("args: ", args, "     target types: ")
         checkCorrectArgumentCount(args.length, targetTypes.length, open);
         args.forEach((arg, i) => {
           checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
@@ -390,8 +391,8 @@ export default function analyze(match) {
     },
 
     ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
-        const parameters = params.analyze();
-        // const parameters = params.asIteration().children.map(p => p.analyze());
+        // const parameters = params.analyze();
+        const parameters = params.asIteration().children.map(p => p.analyze());
         context = context.newChildContext({ function: null });
 
         parameters.forEach(p => context.add(p.name, p));
@@ -435,7 +436,7 @@ export default function analyze(match) {
     ObjectDec(_new, id, _open, params, _close) {
         const classEntity = id.analyze();
         checkIsClassType(classEntity, id);
-        const args = params.analyze();
+        const args = params.asIteration().children.map(e => e.analyze());
         return core.constructorCall(classEntity, args);
     },
 
@@ -605,27 +606,27 @@ export default function analyze(match) {
       return core.mapEntry(key.analyze(), val.analyze());
     },
 
-    NonemptyListOf(first, _sep, tail) {
-      const tailElements = (tail && tail.children && tail.children.length > 0)
-        ? tail.children
-            .map(pair => {
-              if (pair.children && pair.children.length >= 2 && typeof pair.children[1].analyze === 'function') {
-                return pair.children[1].analyze();
-              }
-              return null;
-            })
-            .filter(x => x !== null)
-        : [];
-      return [ first.analyze(), ...tailElements ];
-    },
-
-    EmptyListOf() {
-        return [];
-      },
-
-    _terminal() {
-      return this.sourceString;
-    }
+    // NonemptyListOf(first, _sep, tail) {
+    //   const tailElements = (tail && tail.children && tail.children.length > 0)
+    //     ? tail.children
+    //         .map(pair => {
+    //           if (pair.children && pair.children.length >= 2 && typeof pair.children[1].analyze === 'function') {
+    //             return pair.children[1].analyze();
+    //           }
+    //           return null;
+    //         })
+    //         .filter(x => x !== null)
+    //     : [];
+    //   return [ first.analyze(), ...tailElements ];
+    // },
+    //
+    // EmptyListOf() {
+    //     return [];
+    //   },
+    //
+    // _terminal() {
+    //   return this.sourceString;
+    // }
   });
 
   return analyzer(match).analyze();
