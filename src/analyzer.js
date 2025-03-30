@@ -613,11 +613,24 @@ export default function analyze(match) {
       return unaryExpression("!", x, core.booleanType);
     },
 
-    Exp6_subscript(array, _open, index, _close) {
-      const arrExpr = array.analyze();
+    Exp6_subscript(base, _open, index, _close) {
+      let baseExpr = base.analyze();
       const idx = index.analyze();
+      
+      if (baseExpr && baseExpr.kind === "Variable" && baseExpr.value !== undefined) {
+        baseExpr = baseExpr.value;
+      }
+      
+      if (baseExpr.kind === "ArrayExpression" || baseExpr.kind === "MapExpression") {
+        checkHasCollectionType(baseExpr, base);
+      }
+      
+      if (baseExpr.type?.kind === "MapType") {
+        return core.subscriptExpression(baseExpr, idx, core.anyType);
+      }
+      
       checkIsNumericType(idx, index);
-      return core.subscriptExpression(arrExpr, idx, core.numberType);
+      return core.subscriptExpression(baseExpr, idx, core.numberType);
     },
 
     Exp6_parens(_open, exp, _close) {
