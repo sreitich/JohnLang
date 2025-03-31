@@ -161,7 +161,6 @@ export default function analyze(match) {
 
     const source = typeDescription(e.type);
     const target = typeDescription(type);
-    console.log(e.type, type);
     const message = messages.notAssignableError(source, target);
     check(assignable(e.type, type), message, parseTreeNode);
   }
@@ -409,34 +408,36 @@ export default function analyze(match) {
 
     ClassDec(_class, id, _open, constructor, methods, _close) {
         checkNotAlreadyDeclared(id.sourceString, id);
+
         const classTypeObj = core.classType(id.sourceString, null, []);
-      
+
         context.add(id.sourceString, classTypeObj);
-        context = context.newChildContext({ inClass: classTypeObj });
+        context = context.newChildContext();
+        context.inClass = classTypeObj;
         context.locals.delete(id.sourceString);
-      
+
         const cons = constructor.analyze();
         classTypeObj.constructor = cons;
         const fields = cons.fields;
         const seen = new Set();
-      
+
         for (const field of fields) {
           if (seen.has(field.name)) {
             throw new Error("Duplicate class member: " + messages.nonDistinctMembersError());
           }
           seen.add(field.name);
         }
-      
+
         classTypeObj.members = [...fields];
         classTypeObj.methods = methods.children.map(m => m.analyze());
-      
+
         context = context.parent;
         return classTypeObj;
     },
 
     ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
-        // const parameters = params.analyze();
         const parameters = params.asIteration().children.map(p => p.analyze());
+        context.add("me", core.variable("me", context.inClass));
         context = context.newChildContext({ function: null });
 
         parameters.forEach(p => context.add(p.name, p));
@@ -461,11 +462,7 @@ export default function analyze(match) {
         // Add the method to the class's context so the class's other methods can call it.
         const fun = core.fun(id.sourceString);
         context.add(id.sourceString, fun);
-
-        // TODO: the "me" variable should be in the class's context, not the method's. I think we could do this in the constructor, before creating the constructor's new context.
         context = context.newChildContext({ function: fun });
-        context.add("me", { kind: "Variable", name: "me", type: context.inClass, mutability: false });
-
         fun.params = params.asIteration().children.map((p) => p.analyze());
         const paramTypes = fun.params.map(param => param.type);
         const returnType = type.children?.[0]?.analyze();
@@ -648,6 +645,18 @@ export default function analyze(match) {
     MapLitEntry(key, _col, val) {
       return core.mapEntry(key.analyze(), val.analyze());
     },
+
+    this(_this) {
+      checkIsDeclared(this.sourceString, this);
+      const entity = context.lookup(this.sourceString);
+
+      if (entity && entity.kind === "primitive") {
+        return entity;
+      }
+      if (typeof entity !== "object" || !("type" in entity)) {
+        return entity;
+      }
+    }
   });
 
   return analyzer(match).analyze();

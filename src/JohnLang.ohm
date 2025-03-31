@@ -37,7 +37,8 @@ JohnLang {
 
     Call        = id "(" ListOf<Exp, ","> ")"
 
-    DotCall     = Exp6 "." Call
+    DotCall     = this "." Call
+                | Exp6 "." Call
     DotExp      = this "." id
                 | Exp6 "." id
 

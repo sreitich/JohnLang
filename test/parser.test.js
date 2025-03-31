@@ -273,6 +273,18 @@ const syntaxChecks = [
         letMeLearnYouSomething(0)! //
         letMeLearnYouSomething(1)! //
     `],
+
+    ["class calling its own methods",
+        "doohickey Calculator { \
+            slapTogether() {} \
+            gitErDone add(handful a, handful b): handful { \
+                betterGetGoin a + b! \
+            } \
+            gitErDone subtract(handful a, handful b): handful { \
+                betterGetGoin me.add(a, -b)! \
+            } \
+        }"
+    ],
 ]
 
 // Programs with syntax errors that the parser will detect
