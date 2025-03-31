@@ -120,9 +120,8 @@ export default function analyze(match) {
   function typeDescription(type) {
     if (type.kind === "primitive") return type.name;
     if (type.kind === "ClassType") return type.name;
-    if (type.kind === "ArrayType") return type.kind;
-    if (type.kind === "MapType") return type.kind;
-    if (type.kind === "FunctionType") return type.name;
+    if (type.kind === "ArrayType") return "todo";
+    if (type.kind === "MapType") return "almanac";
   }
   
   function assignable(src, target) {
