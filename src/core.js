@@ -7,7 +7,7 @@ export function variableDeclaration(variable, initializer) {
 }
 
 export function variable(name, type) {
-    return { kind: "Variable", name, type, mutability: true};
+    return { kind: "Variable", name, type, mutable: true};
 }
 
 export const booleanType = { kind: "primitive", name: "switcheroo" };
@@ -94,7 +94,8 @@ export function subscriptExpression(arrayExpr, indexExpr, resultType) {
       kind: "SubscriptExpression",
       array: arrayExpr,
       index: indexExpr,
-      type: resultType, 
+      type: resultType,
+      mutable: true,
     };
   }
 

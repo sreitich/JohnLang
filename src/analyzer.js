@@ -166,9 +166,7 @@ export default function analyze(match) {
   }
 
   function isMutable(e) {
-    return (
-      (e?.kind === "Variable")
-    );
+    return e.mutable;
   }
 
   function checkIsMutable(e, parseTreeNode) {
@@ -254,6 +252,7 @@ export default function analyze(match) {
     Assignment(left, _col, right, _excl) {
         const source = right.analyze();
         const target = left.analyze();
+        checkIsMutable(target, left);
         checkIsAssignable(source, { toType: target.type }, left);
         return core.assignmentStatement(source, target);
     },
@@ -459,7 +458,7 @@ export default function analyze(match) {
         const initializer = exp.analyze();
         checkIsAssignable(initializer, { toType: fieldType }, id);
 
-        return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer };
+        return { kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer, mutable: true };
     },
 
     MethodDec(_function, id, _open, params, _close, _col, type, block) {
