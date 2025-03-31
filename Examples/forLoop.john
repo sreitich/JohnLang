@@ -1,7 +1,0 @@
-handful sum: 0!
-
-tilTheCowsComeHome handful x: 0, x < 5, x++ {
-    sum: sum + x!
-}
-
-letMeLearnYouSomething(sum)!
