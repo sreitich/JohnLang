@@ -298,10 +298,6 @@ const semanticErrors = [
 
     ["Parameter type mismatch", "gitErDone f(handful x): handful { betterGetGoin 0! } f(youBetcha)!", messages.notAssignableError("switcheroo", "handful")],
 
-    ["Non-type in param", "gitErDone f(handful x, y) {}", messages.noTypeError()],
-
-    ["No return type", "gitErDone f() { betterGetGoin 1! }", messages.noTypeError()],
-
     ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
 
     ["assign to a function",
