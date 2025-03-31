@@ -4,7 +4,7 @@ import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 import * as messages from "../src/messages.js";
-import {notBooleanError} from "../src/messages.js";
+import {notAssignableError, notBooleanError} from "../src/messages.js";
 
 
 // Programs expected to be semantically correct.
@@ -15,7 +15,12 @@ const semanticChecks = [
 
     ["initializing with empty array", "todo a: []!"],
 
-    ["class declarations", "doohickey Square { slapTogether(handful l) { handful me.length: l! } }"],
+    ["class declarations",
+        `doohickey Square { 
+            slapTogether(handful l) { 
+                handful length: l! 
+            }
+        }`],
 
     ["assigning arrays", "todo a: []! todo b: [1]! a: b! b: a!"],
 
@@ -67,7 +72,15 @@ const semanticChecks = [
 
     ["pseudo recursive class", "doohickey Rectangle { slapTogether(Rectangle r) { Rectangle me.rect: r! } }"],
 
-    ["member exp", "doohickey T { slapTogether(handful num) { handful me.number: num! } } T x: T(1)! letMeLearnYouSomething(x.number)!"],
+    ["member exp",
+        `doohickey T { 
+            slapTogether(handful num) { 
+                handful number: num! 
+            } 
+        }
+        T x: T(1)! 
+        letMeLearnYouSomething(x.number)!
+    `],
 
     ["subscript array", "todo a: [1,2]! letMeLearnYouSomething(a[0])!"],
 
@@ -89,7 +102,13 @@ const semanticChecks = [
 
     ["self-referencing field", "doohickey C { slapTogether(C c) { C me.c: c! } }"],
 
-    ["object declaration", "doohickey C { slapTogether() {} } C c: whipUp C()! letMeLearnYouSomething(c)!"],
+    ["object declaration",
+        `doohickey C { 
+            slapTogether() {} 
+        } 
+        C c: whipUp C()!
+        letMeLearnYouSomething(c)!
+    `],
 
     ["id numeric", "handful x: 1! letMeLearnYouSomething(x)!"],
 
@@ -101,62 +120,78 @@ const semanticChecks = [
 
     ["assign valid primitive", "handful x: 1! x: 2!"],
 
-    ["call class with no args", "doohickey C { slapTogether() {} } letMeLearnYouSomething(C())!"],
+    ["call class with no args",
+        `doohickey C { 
+            slapTogether() {} 
+        } 
+        letMeLearnYouSomething(C())!
+    `],
 
     ["raw string assignment", 'chitchat s: "hello"! s: "world"!'],
 
-    [
-        "dot call on object using DotCall",
-        "doohickey Calculator { \
-        slapTogether() {} \
-            gitErDone add(handful a, handful b): handful { \
-                betterGetGoin a + b! \
-            } \
-        } \
-        Calculator calc: whipUp Calculator()! \
-        letMeLearnYouSomething(calc.add(2, 3))!"
-    ],
+    ["dot call on object",
+        `doohickey Calculator {
+            slapTogether() {}
+            gitErDone add(handful a, handful b): handful {
+                betterGetGoin a + b!
+            }
+        }
+        Calculator calc: whipUp Calculator()!
+        letMeLearnYouSomething(calc.add(2, 3))!
+    `],
 
-    [
-    "class calling its own methods",
-        "doohickey Calculator { \
-        slapTogether() {} \
-            gitErDone add(handful a, handful b): handful { \
-                betterGetGoin a + b! \
-            } \
-            gitErDone subtract(handful a, handful b): handful { \
-                betterGetGoin me.add(a, -b)! \
-            } \
-        } \
-        Calculator calc: whipUp Calculator()! \
-        letMeLearnYouSomething(calc.subtract(3, 2))!"
-    ],
+    ["class using its own members",
+        `doohickey Circle {
+            slapTogether(handful r) {
+                handful radius: r!
+                handful PI: 3.14!
+            }
+            gitErDone area(): handful {
+                betterGetGoin ((radius ** 2) * PI)!
+            }
+        }
+        Circle unitCircle: whipUp Circle(1.0)!
+        letMeLearnYouSomething(unitCircle.area())!
+    `],
 
-    [
-    "method calling outer functions",
-        "gitErDone add(handful a, handful b): handful {\
-            betterGetGoin a + b! \
-        }\
-        doohickey Calculator { \
-        slapTogether() {} \
-            gitErDone subtract(handful a, handful b): handful {\
-                betterGetGoin add(a, -b)!\
-            }\
-        } \
-        Calculator calc: whipUp Calculator()! \
-        letMeLearnYouSomething(calc.subtract(3, 2))!"
-    ],
+    ["method calling outer functions",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        doohickey Calculator {
+            slapTogether() {}
+            gitErDone subtract(handful a, handful b): handful {
+                betterGetGoin add(a, -b)!
+            }
+        }
+        Calculator calc: whipUp Calculator()!
+        letMeLearnYouSomething(calc.subtract(3, 2))!
+    `],
 
-    [
-    "functions calling other functions",
-        "gitErDone add(handful a, handful b): handful {\
-            betterGetGoin a + b! \
-        }\
-        gitErDone subtract(handful a, handful b): handful {\
-            betterGetGoin add(a, -b)! \
-        }\
-        letMeLearnYouSomething(subtract(3, 2))!"
-    ]
+    ["functions calling other functions",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        gitErDone subtract(handful a, handful b): handful {
+            betterGetGoin add(a, -b)!
+        }
+        letMeLearnYouSomething(subtract(3, 2))!
+    `],
+
+    ["using members inside and outside classes",
+        `doohickey NumberKeeper {
+            slapTogether(handful num) {
+                handful number: num!
+            }
+            gitErDone addOne(): handful {
+                number: number + 1!
+                betterGetGoin number!
+            }
+        }
+        NumberKeeper keeper: whipUp NumberKeeper(0)!
+        keeper.addOne()!
+        letMeLearnYouSomething(keeper.number)!
+    `],
 ]
 
 // Programs that are syntactically correct but have semantic errors.
@@ -255,15 +290,29 @@ const semanticErrors = [
 
     ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
 
-    ["assign function",
-        "gitErDone add(handful a, handful b): handful {\
-            betterGetGoin a + b! \
-        }\
-        gitErDone subtract(handful a, handful b): handful {\
-            betterGetGoin a - b! \
-        }\
-        add: subtract!",
-    ""],
+    ["assign to a function",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        gitErDone subtract(handful a, handful b): handful {
+            betterGetGoin a - b!
+        }
+        add: subtract!
+    `, notAssignableError("subtract", "add")],
+
+    ["using a method inside a method",
+        `doohickey Calculator {
+            slapTogether() {}
+            gitErDone add(handful a, handful b): handful {
+                betterGetGoin a + b!
+            }
+            gitErDone subtract(handful a, handful b): handful {
+                betterGetGoin add(a, -b)!
+            }
+        }
+        Calculator calc: whipUp Calculator()!
+        letMeLearnYouSomething(calc.subtract(3, 2))!
+    `, messages.notDeclaredError("add")],
 ]
 
 describe("The analyzer", () => {

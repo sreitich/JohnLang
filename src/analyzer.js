@@ -31,7 +31,7 @@ class Context {
               retObj = method;
             }
           });
-          value?.constructor?.fields.forEach((member) => {
+          value?.constructor?.fields?.forEach((member) => {
             if (member.name === name) {
               retObj = member;
             }
@@ -122,6 +122,7 @@ export default function analyze(match) {
     if (type.kind === "ClassType") return type.name;
     if (type.kind === "ArrayType") return type.kind;
     if (type.kind === "MapType") return type.kind;
+    if (type.kind === "FunctionType") return type.name;
   }
   
   function assignable(src, target) {
@@ -414,7 +415,6 @@ export default function analyze(match) {
         context.add(id.sourceString, classTypeObj);
         context = context.newChildContext();
         context.inClass = classTypeObj;
-        context.locals.delete(id.sourceString);
 
         const cons = constructor.analyze();
         classTypeObj.constructor = cons;
@@ -447,7 +447,7 @@ export default function analyze(match) {
         return { ...core.constructorDeclaration(parameters, fieldDecls), fields: fieldDecls };
     },
 
-    Field(type, _this, _dot, id, _col, exp, _excl) {
+    Field(type, id, _col, exp, _excl) {
         const fieldType = type.analyze();
 
         const initializer = exp.analyze();
