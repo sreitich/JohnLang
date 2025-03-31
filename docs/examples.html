@@ -53,7 +53,7 @@ chitchat message: "Eat the rich"!</code></pre>
       <div class="code-block">
         <pre><code>ope x > 50 {
   betterGetGoin 2!      
-} ope welp x > 25 {
+} welp ope x > 25 {
   betterGetGoin 1!
 } welp {
   betterGetGoin 0!
@@ -63,14 +63,14 @@ chitchat message: "Eat the rich"!</code></pre>
       <h2>Loops</h2>
       <h3>Even John Lang provides many ways to loop.</h3>
       <div class="code-block">
-        <pre><code>tilTheCowsComeHome handful x = 0, x < 10, x++ {      
+        <pre><code>tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 {
   letMeLearnYouSomething(x)!
 }</code></pre>
       </div>
 
       <div class="code-block">
         <pre><code>holdMyBeer x < 10 {      
-  x = x + 1!
+  x: x + 1!
 }</code></pre>
       </div>
 
@@ -79,8 +79,8 @@ chitchat message: "Eat the rich"!</code></pre>
       <div class="code-block">
         <pre><code>doohickey Rectangle {
   slapTogether(handful h, handful w) {      
-    handful me.height: h!
-    handful me.width: w!
+    handful height: h!
+    handful width: w!
   }
 }
 
