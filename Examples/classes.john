@@ -1,7 +1,7 @@
 doohickey Rectangle {
     slapTogether(handful h, handful w) {      
-		    handful me.height: h!
-		    handful me.width: w!
+		    handful height: h!
+		    handful width: w!
 	  }
 }
 

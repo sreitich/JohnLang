@@ -5,11 +5,12 @@ JohnLang {
     Statement   = VarDec
                 | FunDec
                 | Assignment
+                | Print
                 | IfStmt
                 | LoopStmt
                 | Call "!"                                      --call
+                | DotCall "!"                                   --dotCall
                 | DotExp
-                | DotCall
                 | ClassDec
                 | Return
                 | break "!"                                     --break
@@ -22,31 +23,32 @@ JohnLang {
 
     Assignment  = ~literal Exp6 ":" Exp "!"
 
-    IfStmt      = if Exp Block (elseif Exp Block)* (else Block)?
+    Print       = print "(" Exp ")" "!"
 
-    IfStmtOld   = if Exp Block else Block                       --long
+    IfStmtOld   = if Exp Block (elseif Exp Block)* (else Block)?
+
+    IfStmt      = if Exp Block else Block                       --long
                 | if Exp Block else IfStmt                      --elseif
                 | if Exp Block                                  --short
 
     LoopStmt    = while Exp Block                                               --while
-                | for (Type? id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block     --for
+                | for (Type id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block      --for
+                | for id "," (Exp) "," (Exp6 ":" Exp) Block                     --forWithDeclaredIter
 
     Call        = id "(" ListOf<Exp, ","> ")"
 
     DotCall     = Exp6 "." Call
-    DotExp      = this "." id
-                | Exp6 "." id
+    DotExp      = Exp6 "." id
 
     ClassDec            = class id "{" ConstructorDec MethodDec* "}"
     ConstructorDec      = construct "(" ListOf<Param, ","> ")" "{" Field* "}"
-    Field               = Type this "." id ":" Exp "!"
+    Field               = Type id ":" Exp "!"
     MethodDec           = function id "(" ListOf<Param, ","> ")" ":" Type Block
     ObjectDec           = new id "(" ListOf<Exp, ","> ")"
 
     Block       = "{" Statement* "}"
 
-    Return      = return Exp "!"                                --exp
-                | return "!"                                    --short
+    Return      = return Exp? "!"
 
     Exp         = Exp ("||" Exp2)+                              --or
                 | Exp ("&&" Exp2)+                              --and
@@ -58,9 +60,12 @@ JohnLang {
     Exp4        = Exp4 ("*"| "/" | "%") Exp5                    --multiply
                 | Exp5
     Exp5        = Exp6 "**" Exp5                                --power
-                | ("-" | not) Exp6                              --unary
+                | "#" Exp6                                      --size
+                | "-" Exp6                                      --neg
+                | not Exp6                                      --inv
                 | Exp6
-    Exp6        = true
+    Exp6        = Exp6 "[" Exp "]"                              --subscript
+                | true
                 | false
                 | floatlit
                 | intlit
@@ -69,7 +74,6 @@ JohnLang {
                 | DotCall
                 | DotExp
                 | ObjectDec
-                | Exp6 "[" Exp "]"                              --subscript
                 | ArrayLit
                 | stringlit
                 | id
@@ -92,13 +96,14 @@ JohnLang {
     MapLitEntry = Exp6 ":" Exp
 
     function    = "gitErDone" ~idchar
+    print       = "letMeLearnYouSomething" ~idchar
     if          = "ope" ~idchar
     elseif      = "ope welp" ~idchar
     else        = "welp" ~idchar
     for         = "tilTheCowsComeHome" ~idchar
+    in          = "in" ~idchar
     while       = "holdMyBeer" ~idchar
     class       = "doohickey" ~idchar
-    this        = "me" ~idchar
     construct   = "slapTogether" ~idchar
     new         = "whipUp" ~idchar
     return      = "betterGetGoin" ~idchar
@@ -111,7 +116,7 @@ JohnLang {
     id          = ~keyword letter idchar*
     idchar      = letter | digit | "_"
 
-    keyword     = function | if | elseif | else | for | while | class | this | construct
+    keyword     = function | if | elseif | else | for | while | class | construct
                 | new | return | break | continue | true | false | not
 
     space       += "//" (~"\n" any)*                            --comment

@@ -1,6 +1,6 @@
 handful sum: 0!
 
-tilTheCowsComeHome handful x: 0, x < 5, x++ {
+tilTheCowsComeHome handful x: 0, x < 5, x: x + 1 {
     sum: sum + x!
 }
 

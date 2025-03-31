@@ -64,11 +64,11 @@ const syntaxChecks = [
     ["Class declaration", `
         doohickey Circle {
             slapTogether(handful r) {
-                handful me.radius: r!
+                handful radius: r!
             }
             
             gitErDone diameter(): handful {
-                betterGetGoin me.radius * 2!
+                betterGetGoin radius * 2!
             }
         }
     `],
@@ -122,7 +122,22 @@ const syntaxChecks = [
         ope youBetcha {
             letMeLearnYouSomething(1)!
         }
-        ope welp thinkAgainPal {
+        welp ope thinkAgainPal {
+            letMeLearnYouSomething(1)!
+        }
+        welp {
+            letMeLearnYouSomething(1)!
+        }
+    `],
+
+    ["Long else if statement", `
+        ope youBetcha {
+            letMeLearnYouSomething(1)!
+        }
+        welp ope thinkAgainPal {
+            letMeLearnYouSomething(1)!
+        }
+        welp ope thinkAgainPal {
             letMeLearnYouSomething(1)!
         }
         welp {
@@ -152,9 +167,9 @@ const syntaxChecks = [
         }
     `],
 
-    ["For loop with array", `
-        tilTheCowsComeHome handful x: 0, x < a.len(), x: x + 1 {
-            letMeLearnYouSomething(a[x])!
+    ["For each loop", `
+        tilTheCowsComeHome handful x: 0, x < #a, x: x + 1 {
+            letMeLearnYouSomething(x)!
         }
     `],
 
@@ -207,6 +222,11 @@ const syntaxChecks = [
         letMeLearnYouSomething([1, 2, 3])!
     `],
 
+    ["size", `
+        letMeLearnYouSomething(#[1,2,3])!
+        letMeLearnYouSomething(#{1: 2, 3: 4})!
+    `],
+
     ["Empty map literal", `
         letMeLearnYouSomething({})!
     `],
@@ -252,6 +272,11 @@ const syntaxChecks = [
     ["Comments without text", `
         letMeLearnYouSomething(0)! //
         letMeLearnYouSomething(1)! //
+    `],
+
+    ["using members inside and outside classes", `
+        NumberKeeper keeper: whipUp NumberKeeper(0)!
+        keeper.addOne()!
     `],
 ]
 
@@ -312,14 +337,6 @@ const syntaxErrors = [
         "letMeLearnYouSomething(-2**2)!",
             /Line 1, col 27:/],
 
-    /**
-     * NOTE: Currently, JohnLang allows JavaScript-like mixing of ands and ors. If we decide
-     * to change this feature, uncomment this test case.
-     */
-    // ["Mixing ors and ands",
-    //     "letMeLearnYouSomething(1 || 2 && 3)!",
-    //         /Line 1, col 31:/],
-
     ["Associating relational operators",
         "letMeLearnYouSomething(1 < 2 < 3)!",
             /Line 1, col 30:/],
@@ -353,7 +370,7 @@ const syntaxErrors = [
     ["Class with constructor with return type",
         "doohickey Circle {\n" +
         "   slapTogether(handful r): handful {\n" +
-        "       handful me.radius: r!\n" +
+        "       handful radius: r!\n" +
         "   }\n" +
         "}",
         /Line 2, col 27/],
@@ -361,9 +378,9 @@ const syntaxErrors = [
     ["Class with code outside of methods",
         "doohickey Circle {\n" +
         "   slapTogether(handful r) {\n" +
-        "       handful me.radius: r!\n" +
+        "       handful radius: r!\n" +
         "   }\n" +
-        "   handful me.diameter: me.radius * 2!" +
+        "   handful diameter: radius * 2!" +
         "}",
             /Line 5, col 4/],
 
@@ -390,14 +407,6 @@ const syntaxErrors = [
     ["Assigning to num literal",
         "1: 2!",
             /Line 1, col 2/],
-
-    ["Subscripting number literals",
-        "letMeLearnYouSomething(500[x])!",
-            /Line 1, col 27/],
-
-    ["Subscripting bool literals",
-        "letMeLearnYouSomething(youBetcha[x])!",
-        /Line 1, col 33/],
 
     ["Calling number literals",
         "letMeLearnYouSomething(500(x))!",
