@@ -155,10 +155,6 @@ export default function analyze(match) {
       e.type = e.type.type.returnType;
     }
 
-    if (type.kind === "Function") {
-      type = type.type.returnType.name;
-    }
-
     const source = typeDescription(e.type);
     const target = typeDescription(type);
     const message = messages.notAssignableError(source, target);
@@ -170,7 +166,7 @@ export default function analyze(match) {
   }
 
   function checkIsMutable(e, parseTreeNode) {
-    check(isMutable(e), messages.notMutableError(e.name));
+    check(isMutable(e), messages.notMutableError(e.name), parseTreeNode);
   }
 
   function checkInLoop(parseTreeNode) {
@@ -178,7 +174,7 @@ export default function analyze(match) {
   }
 
   function checkInFunction(parseTreeNode) {
-    check(context.function, messages.notInFunctionError());
+    check(context.function, messages.notInFunctionError(), parseTreeNode);
   }
 
   function checkIsCallable(e, parseTreeNode) {
@@ -380,15 +376,15 @@ export default function analyze(match) {
         args.forEach((arg, i) => {
           checkIsAssignable(arg, { toType: targetTypes[i] }, expList);
         });
-      
+
         return core.constructorCall(callee, args)
     },
 
     DotExp(exp, _dot, id) {
       const object = exp.analyze();
       if (object.type && object.type.kind === "ClassType") {
-        let member = (object.type.members || []).find(m => m.name === id.sourceString);
-        
+        let member = (object.type.members).find(m => m.name === id.sourceString);
+
         check(member, messages.noMemberError(), id);
         return core.memberExpression(object, ".", member);
       }
@@ -398,7 +394,7 @@ export default function analyze(match) {
   Statement_dotCall(stmt, _excl) {
     return stmt.analyze();
   },
-  
+
   DotCall(exp, _dot, call) {
     const object = exp.analyze();
     checkHasClassType(object, exp);
@@ -406,7 +402,7 @@ export default function analyze(match) {
     const memberCall = call.analyze();
     return core.memberCall(object, memberCall);
   },
-  
+
 
     Block(_open, statements, _close) {
       return statements.children.map((s) => s.analyze());
@@ -465,7 +461,7 @@ export default function analyze(match) {
       checkNotAlreadyDeclared(id.sourceString, id);
 
         // Add the method to the class's context so the class's other methods can call it.
-        const fun = core.fun(id.sourceString);
+        const fun = core.fun(id.sourceString, null, null, null, true);
         context.add(id.sourceString, fun);
         context = context.newChildContext({ function: fun });
         fun.params = params.asIteration().children.map((p) => p.analyze());
@@ -582,9 +578,10 @@ export default function analyze(match) {
       if (baseExpr.type?.kind === "MapType") {
         return core.subscriptExpression(baseExpr, idx, core.anyType);
       }
-      
-      checkIsNumericType(idx, index);
-      return core.subscriptExpression(baseExpr, idx, core.numberType);
+      else {
+        checkIsNumericType(idx, index);
+        return core.subscriptExpression(baseExpr, idx, core.numberType);
+      }
     },
 
     Exp6_parens(_open, exp, _close) {
@@ -615,7 +612,7 @@ export default function analyze(match) {
         }
         return entity;
     },
-      
+
     // Literals
     intlit(_digits) {
         return Number(this.sourceString)

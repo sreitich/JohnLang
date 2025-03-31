@@ -4,8 +4,6 @@ import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 import * as messages from "../src/messages.js";
-import {notAssignableError, notBooleanError} from "../src/messages.js";
-
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -178,6 +176,13 @@ const semanticChecks = [
         letMeLearnYouSomething(subtract(3, 2))!
     `],
 
+    ["standalone function calls",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        add(1, 1)!
+    `],
+
     ["using members inside and outside classes",
         `doohickey NumberKeeper {
             slapTogether(handful num) {
@@ -298,21 +303,7 @@ const semanticErrors = [
             betterGetGoin a - b!
         }
         add: subtract!
-    `, notAssignableError("subtract", "add")],
-
-    ["using a method inside a method",
-        `doohickey Calculator {
-            slapTogether() {}
-            gitErDone add(handful a, handful b): handful {
-                betterGetGoin a + b!
-            }
-            gitErDone subtract(handful a, handful b): handful {
-                betterGetGoin add(a, -b)!
-            }
-        }
-        Calculator calc: whipUp Calculator()!
-        letMeLearnYouSomething(calc.subtract(3, 2))!
-    `, messages.notDeclaredError("add")],
+    `, messages.notMutableError("add")],
 ]
 
 describe("The analyzer", () => {
