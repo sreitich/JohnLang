@@ -408,14 +408,6 @@ const syntaxErrors = [
         "1: 2!",
             /Line 1, col 2/],
 
-    ["Subscripting number literals",
-        "letMeLearnYouSomething(500[x])!",
-            /Line 1, col 27/],
-
-    ["Subscripting bool literals",
-        "letMeLearnYouSomething(youBetcha[x])!",
-        /Line 1, col 33/],
-
     ["Calling number literals",
         "letMeLearnYouSomething(500(x))!",
             /Line 1, col 27/],

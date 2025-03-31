@@ -267,7 +267,7 @@ const semanticErrors = [
 
     ["bad types for not", 'letMeLearnYouSomething(nah "hello")!', messages.notBooleanError()],
 
-    ["bad types for subscript", 'letMeLearnYouSomething(1[0])!', messages.notArrayError()],
+    ["bad types for subscript", 'letMeLearnYouSomething(1[0])!', messages.notCollectionTypeError()],
 
     ["subscripting array like map", 'todo a: [1, 2]! letMeLearnYouSomething(a["hello"])!', messages.notNumericError()],
 

@@ -98,7 +98,7 @@ export default function analyze(match) {
   }
 
   function checkHasCollectionType(e, parseTreeNode) {
-    check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType", messages.notCollectionTypeError(), parseTreeNode);
+    check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType" || e.array, messages.notCollectionTypeError(), parseTreeNode);
   }
 
   function checkIsClassType(e, parseTreeNode) {
@@ -578,7 +578,9 @@ export default function analyze(match) {
     Exp6_subscript(base, _open, index, _close) {
       let baseExpr = base.analyze();
       const idx = index.analyze();
-      
+
+      checkHasCollectionType(baseExpr, base);
+
       if (baseExpr.type?.kind === "MapType") {
         return core.subscriptExpression(baseExpr, idx, core.anyType);
       }

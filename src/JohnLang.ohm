@@ -64,7 +64,8 @@ JohnLang {
                 | "-" Exp6                                      --neg
                 | not Exp6                                      --inv
                 | Exp6
-    Exp6        = true
+    Exp6        = Exp6 "[" Exp "]"                              --subscript
+                | true
                 | false
                 | floatlit
                 | intlit
@@ -73,7 +74,6 @@ JohnLang {
                 | DotCall
                 | DotExp
                 | ObjectDec
-                | Exp6 "[" Exp "]"                              --subscript
                 | ArrayLit
                 | stringlit
                 | id
