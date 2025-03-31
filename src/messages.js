@@ -60,6 +60,10 @@ export function notClassError() {
     return `We were expectin' a doohickey!`;
 }
 
+export function selfReferentialClassError() {
+    return `You can't construct a doohickey in a doohickey!`;
+}
+
 export function twoDifferentTypesError() {
     return `Hey, these are two different types of thingamabobs!`;
 }

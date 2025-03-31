@@ -4,6 +4,7 @@ import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 import * as messages from "../src/messages.js";
+import {selfReferentialClassError} from "../src/messages.js";
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -221,7 +222,7 @@ const semanticErrors = [
 
     ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", messages.returnsNothingError()],
 
-    ["return type mismatch", "gitErDone f(): handful { return thinkAgainPal! }", messages.returnTypeMismatchError()],
+    ["return type mismatch", "gitErDone f(): handful { betterGetGoin thinkAgainPal! }", messages.notAssignableError("switcheroo", "handful")],
 
     ["non-boolean short if test", "ope 1 {}", messages.notBooleanError()],
 
@@ -229,7 +230,7 @@ const semanticErrors = [
 
     ["non-boolean while test", "holdMyBeer 1 {}", messages.notBooleanError()],
 
-    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: youBetcha, i < 10, i: i + 1 {}", messages.notNumericError()],
+    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i, i < 10, i: i + 1 {}", messages.notNumericError()],
 
     ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", messages.notBooleanError()],
 
@@ -273,21 +274,29 @@ const semanticErrors = [
 
     ["non-integer index", "todo a: [1]! letMeLearnYouSomething(a[youBetcha])!", messages.notNumericError()],
 
-    ["no such member", "doohickey S { slapTogether() { handful me.x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", messages.noMemberError()],
+    ["no such member", "doohickey S { slapTogether() { handful x: 0! } } S s: S()! letMeLearnYouSomething(s.y)!", messages.noMemberError()],
 
-    ["non-distinct class members", "doohickey S { slapTogether() { handful me.x: 0! handful me.x: 0! } }", messages.nonDistinctMembersError()],
+    ["non-distinct class members", "doohickey S { slapTogether() { handful x: 0! handful x: 0! } }", messages.nonDistinctMembersError()],
 
-    ["self-referencing classes", "doohickey S { slapTogether(S myClass) { S me.class: myClass! } } S x: S(S(1))! letMeLearnYouSomething(x.class.number)!", messages.notDeclaredError("S")],
+    ["self-referencing classes",
+        `doohickey S {
+            slapTogether() {
+                S class: S()!
+            }
+        }
+        S x: S()!
+        letMeLearnYouSomething(x.class)!
+    `, messages.selfReferentialClassError()],
 
     ["shadowing", "handful x: 1!\nholdMyBeer youBetcha { handful x: 1! }", messages.alreadyDeclaredError("x")],
 
-    ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", messages.functionCallOnNonFunctionError()],
+    ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", messages.notCallableError()],
 
-    ["Too many args", "gitErDone f(handful x) {}\nf(1, 2)!", messages.argumentCountError(1, 2)],
+    ["Too many args", "gitErDone f(handful x, handful y): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 2)],
 
-    ["Too few args", "gitErDone f(handful x) {}\nf()!", messages.argumentCountError(1, 0)],
+    ["Too few args", "gitErDone f(): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 0)],
 
-    ["Parameter type mismatch", "gitErDone f(handful x) {}\nf(youBetcha)!", messages.parameterTypeMismatchError()],
+    ["Parameter type mismatch", "gitErDone f(handful x): handful { betterGetGoin 0! } f(youBetcha)!", messages.notAssignableError("switcheroo", "handful")],
 
     ["Non-type in param", "gitErDone f(handful x, y) {}", messages.noTypeError()],
 
@@ -314,7 +323,9 @@ describe("The analyzer", () => {
     }
     for (const [scenario, source, errorMessagePattern] of semanticErrors) {
         it(`throws on ${scenario}`, () => {
-            assert.throws(() => analyze(parse(source)), errorMessagePattern)
+            assert.throws(
+                () => analyze(parse(source)),
+                new RegExp(errorMessagePattern));
         })
     }
     it("produces the expected representation for a trivial program", () => {

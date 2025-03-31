@@ -2,6 +2,7 @@ import * as core from "./core.js";
 import parse from "./parser.js";
 import { assignmentStatement, unaryExpression } from "./core.js";
 import * as messages from "./messages.js";
+import {notDeclaredError, selfReferentialClassError} from "./messages.js";
 
 // A context for tracking scope and control flow
 class Context {
@@ -363,6 +364,7 @@ export default function analyze(match) {
 
         let targetTypes;
         if (callee?.kind === "ClassType") {
+          check(callee.constructor, messages.selfReferentialClassError(), id);
           targetTypes = callee.constructor.parameters.map(p => p.type);
         }
         else if (callee?.kind === "Function") {
@@ -388,7 +390,7 @@ export default function analyze(match) {
         check(member, messages.noMemberError(), id);
         return core.memberExpression(object, ".", member);
       }
-      throw new Error("DotExp not implemented for non-class types");
+      check(false, messages.notClassError(), exp);
   },
 
   Statement_dotCall(stmt, _excl) {
@@ -438,8 +440,10 @@ export default function analyze(match) {
 
     ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
         const parameters = params.asIteration().children.map(p => p.analyze());
-        context.add("me", core.variable("me", context.inClass));
         context = context.newChildContext({ function: null });
+
+        // Prevent classes from having themselves as members.
+        // fields.children.map(f => check(f.children[0].sourceString !== context.parent.inClass.name, notDeclaredError(context.parent.inClass.name), f));
 
         parameters.forEach(p => context.add(p.name, p));
         const fieldDecls = fields.children.map(f => f.analyze());
@@ -525,7 +529,7 @@ export default function analyze(match) {
       const left = exp1.analyze();
       const right = exp2.analyze();
       if (op.sourceString === "==" || op.sourceString === "!=") {
-        check(equivalent(left.type, right.type), `Those ain't the same type, pal.`, op);
+        check(equivalent(left.type, right.type), messages.twoDifferentTypesError(), op);
       } else {
         checkIsNumericType(left, exp1);
         checkIsNumericType(right, exp2);
@@ -536,8 +540,16 @@ export default function analyze(match) {
     Exp3_add(left, op, right) {
       const x = left.analyze();
       const y = right.analyze();
-      checkIsNumbericOrStringType(x, left);
-      checkIsNumbericOrStringType(y, right);
+      if (op.sourceString === "+")
+      {
+        checkIsNumbericOrStringType(x, left);
+        checkIsNumbericOrStringType(y, right);
+      }
+      else
+      {
+        checkIsNumericType(x, left);
+        checkIsNumericType(y, right);
+      }
       return core.binaryExpression(op.sourceString, x, y, core.numberType);
     },
 
