@@ -121,7 +121,7 @@ function isEven(x)  {
 ```
 ope x > 50 {
 	betterGetGoin 2!      
-} ope welp x > 25 {
+} welp ope x > 25 {
 	betterGetGoin 1!
 } welp {
 	betterGetGoin 0!
@@ -152,7 +152,7 @@ if (x > 50) {
 <td>
 
 ```
-tilTheCowsComeHome handful x = 0, x < 10, x++ {      
+tilTheCowsComeHome handful x = 0, x < 10, x: x + 1 {      
 	letMeLearnYouSomething(x)!
 }
 ```
@@ -176,7 +176,7 @@ for (var x = 0; x < 10; x++) {
 
 ```
 holdMyBeer x < 10 {      
-	x = x + 1!
+	x: x + 1!
 }
 ```
 
@@ -291,7 +291,7 @@ throw "Well, dontcha know, my muffler was actin' up the other day—musta been t
 | John Lang     | Acolytes |
 | ------------- | -------- |
 | ope           | if       |
-| ope welp      | else if  |
+| welp ope      | else if  |
 | welp          | else     |
 | youBetcha     | true     |
 | thinkAgainPal | false    |
