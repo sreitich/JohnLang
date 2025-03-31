@@ -202,8 +202,8 @@ while (x < 10) {
 ```
 doohickey Rectangle {
 	slapTogether(handful h, handful w) {      
-		handful me.height: h!
-		handful me.width: w!
+		handful height: h!
+		handful width: w!
 	}
 }
 Rectangle r: whipUp Rectangle(4.0, 8.0)!
