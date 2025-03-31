@@ -27,13 +27,13 @@ As optimistic as he was, the great John Language™️ was not the inventive typ
 
 ## Static Errors
 
-* Type errors
-* Declaration errors
-* Function call errors
-* Method call errors
-* Return type errors
-* Member access errors
-* Mutability errors
+* Type errors - Hold up, these types don't match!
+* Declaration errors - Hold your horses, pal! I'm not sure what yer talking bout with this variable thing.
+* Function call errors - Can't go about calling someone without a phone!
+* Method call errors - I can't find any sorta method in this here doohickey.
+* Return type errors - Woah now, dont go returning nothing.
+* Member access errors - I can't find any sorta member like that in this here doohickey.
+* Mutability errors - Hey now, don't go trying to change that variable's type. 
 
 ## Example Programs
 
