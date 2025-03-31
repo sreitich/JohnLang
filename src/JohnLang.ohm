@@ -48,7 +48,7 @@ JohnLang {
 
     Block       = "{" Statement* "}"
 
-    Return      = return Exp "!"
+    Return      = return Exp? "!"
 
     Exp         = Exp ("||" Exp2)+                              --or
                 | Exp ("&&" Exp2)+                              --and

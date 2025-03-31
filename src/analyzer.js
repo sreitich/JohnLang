@@ -467,7 +467,6 @@ export default function analyze(match) {
         fun.params = params.asIteration().children.map((p) => p.analyze());
         const paramTypes = fun.params.map(param => param.type);
         const returnType = type.children?.[0]?.analyze();
-        // const returnType = type.analyze();
         fun.type = core.functionType(paramTypes, returnType);
         fun.body = block.analyze();
 
@@ -482,9 +481,14 @@ export default function analyze(match) {
         return core.constructorCall(classEntity, args);
     },
 
-    Return(_ret, exp, _excl) {
+    Return(ret, exp, _excl) {
       checkInFunction(this);
-      const retVal = exp.analyze();
+
+      // We intentionally let the parser allow return statements without a return value, so we can catch them here to
+      // give a more helpful error message.
+      check(exp.children.length > 0, messages.returnsNothingError(), ret);
+
+      const retVal = exp.children[0].analyze();
       checkIsReturnable(retVal, { from: context.function }, exp);
       return core.returnStatement(retVal);
     },
