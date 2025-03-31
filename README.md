@@ -31,10 +31,12 @@ As optimistic as he was, he was just as plain. Thus, John Language is not the mo
 * Type errors - Hold up, these types don't match!
 * Declaration errors - Hold your horses, pal! I'm not sure what yer talking bout with this variable thing.
 * Function call errors - Can't go about calling someone without a phone!
+* Function context errors - We can't get goin' 'cause we never even got there!
 * Method call errors - I can't find any sorta method in this here doohickey.
 * Return type errors - Woah now, dont go returning nothing.
 * Member access errors - I can't find any sorta member like that in this here doohickey.
-* Mutability errors - Hey now, don't go trying to change that variable's type. 
+* Mutability errors - Hey now, don't go trying to change that variable's type.
+* Control flow errors - There's no popsicle stand to blow.
 
 ## Example Programs
 
