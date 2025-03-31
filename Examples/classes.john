@@ -1,0 +1,10 @@
+doohickey Rectangle {
+    slapTogether(handful h, handful w) {      
+		    handful me.height: h!
+		    handful me.width: w!
+	  }
+}
+
+Rectangle r: whipUp Rectangle(4.0, 8.0)!
+letMeLearnYouSomething(r.width)!
+r.width: 5!

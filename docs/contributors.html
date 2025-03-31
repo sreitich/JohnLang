@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<!-- HTML -->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,
+        inital-scale=1.0"
+    />
+    <title>Contributors</title>
+  </head>
+  <body>
+    <div class="title">
+      <h1>John Lang</h1>
+    </div>
+
+    <div class="navbar">
+      <a href="/JohnLang">About</a>
+      <a href="examples.html">Examples</a>
+      <a href="contributors.html" class="active">Contributors</a>
+    </div>
+
+    <div class="contents">
+    </div>
+
+    <div class="gallery">
+      <div class="item">
+        <img src="AdiRoitburg.jpg" alt="hi">
+        <div class="caption">Adi "John Piano" Roitburg <p>Adi Roitburg is a junior pursuing a Bachelor of Science in computer science and a minor in game design. His favorite midwestern state is Wisconsin, and his favorite Johnism is, "Get a load of this guy."</p></div>
+      </div>
+
+      <div class="item">
+        <img src="JDElia.jpg" alt="hi">
+        <div class="caption">James "John Youtube" David <p>JD is a junior pursuing a Bachelor of Science in computer science. His favorite midwestern state is "The Liquid State", and his favorite Johnism is, "Ya damn tootin'."</p></div>
+      </div>
+
+      <div class="item">
+        <img src="KyleMatton.jpg" alt="hi">
+        <div class="caption">Kyle "John Florida" Matton <p>Adi Roitburg is a junior pursuing a Bachelor of Science in computer science and a minor in data science. His favorite midwestern state is Kansas, and his favorite Johnism is, "Ope!"</p></div>
+      </div>
+
+      <div class="item">
+        <img src="JacobMendoza.jpg" alt="hi">
+        <div class="caption">Jacob "John Volleyball" Mendoza <p>Adi Roitburg is a junior pursuing a Bachelor of Science in computer science and a minor in game design. His favorite midwestern state is Michigan, and his favorite Johnism is, "Newsflash pal."</p></div>
+      </div>
+
+      <div class="item">
+        <img src="SamReitich.jpg" alt="hi">
+        <div class="caption">Sam "John Tres Leches" Reitich <p>Sam Reitich is a junior pursuing a Bachelor of Science in computer science and a minor in game design. His favorite midwestern state is Minnesota, and his favorite Johnism is, "News flash, pal."</p></div>
+      </div>
+
+      <div class="item">
+        <img src="AllenBoyce.jpg" alt="hi">
+        <div class="caption">Allen "John Theater" Boyce <p>Adi Roitburg is a junior pursuing a Bachelor of Science in computer science. His favorite midwestern state is Ohio, and his favorite Johnism is, "Good grief."</p></div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<!-- CSS -->
+<style>
+  .gallery {
+    display: grid;
+    /* grid-template-columns: repeat(2, 1fr); exactly 2 images per row */
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 50px; /* controls space between them */
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+
+    .item {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      max-width: 600px; /* sets max width */
+      margin: 0 auto;   /* centers items inside the grid cell */
+      margin-bottom: 55px;
+    }
+
+    .item p{
+      font-size: 18px;
+    }
+
+    .item img {
+      width: 100%;
+      /* height: 600px; */
+      aspect-ratio: 2 / 2; /* keeps a nice image ratio */
+      object-fit: cover;
+      display: block;
+
+    }
+
+    .caption {
+      padding: 10px;
+      /* font-size: 50px; */
+      font-size: 2.8rem;
+      color: #333;
+      text-align: center;
+    }
+
+
+
+
+  body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  }
+
+  .title {
+    display: flex;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0px;
+  }
+
+  .contents {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-top: 30px;
+  }
+
+  .contents p {
+    text-align: center;
+    font-size: 23px;
+    line-height: 2;
+  }
+
+  .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; 
+    align-items: center;
+    border: 2px solid black;
+    height: 80px;
+    width: 50%;
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 700px;
+  }
+
+  .navbar a {
+    text-decoration: none;
+    color: black;
+    font-size: 1.5rem;
+    padding: 10px 50px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    flex-shrink: 0;
+  } 
+
+  .navbar a:hover {
+    background-color: rgb(225, 224, 224);
+    border-radius: 5px;
+  }
+
+  .active {
+    background-color: lightgray;
+    border-radius: 5px;
+  }
+
+  .columns {
+    gap: 5%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .pictureleftcol {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-left: 25%;
+  }
+
+  .pictureleftcol img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5/6;
+    object-fit: cover;
+  }
+  
+  .pictureleftcol h2 {
+    text-align: center;
+  }
+
+  .pictureleftcol p {
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .picturerightcol {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-right: 25%;
+  }
+
+  .picturerightcol img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5/6;
+    object-fit: cover;
+  }
+
+  .picturerightcol h2 {
+    text-align: center;
+  }
+
+  .picturerightcol p {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  @media (max-width: 1000px) {
+    .navbar {
+      flex-direction: column;
+      height: auto;
+      padding: 10px 0;
+    }
+
+    .navbar a {
+      padding: 8px 0px;
+      font-size: 1.2rem;
+      width: 100%;
+    }
+}
+</style>
