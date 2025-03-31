@@ -357,6 +357,10 @@ export default function analyze(match) {
       return core.forStatement(iterator, testExp, iterValue, body);
     },
 
+    Statement_call(stmt, _excl) {
+      return stmt.analyze();
+    },
+
     Call(id, open, expList, _close) {
         const callee = id.analyze();
         checkIsCallable(callee, id);
@@ -392,7 +396,10 @@ export default function analyze(match) {
       }
       throw new Error("DotExp not implemented for non-class types");
   },
-    
+
+  Statement_dotCall(stmt, _excl) {
+    return stmt.analyze();
+  },
   
   DotCall(exp, _dot, call) {
     const object = exp.analyze();
@@ -645,18 +652,6 @@ export default function analyze(match) {
     MapLitEntry(key, _col, val) {
       return core.mapEntry(key.analyze(), val.analyze());
     },
-
-    this(_this) {
-      checkIsDeclared(this.sourceString, this);
-      const entity = context.lookup(this.sourceString);
-
-      if (entity && entity.kind === "primitive") {
-        return entity;
-      }
-      if (typeof entity !== "object" || !("type" in entity)) {
-        return entity;
-      }
-    }
   });
 
   return analyzer(match).analyze();

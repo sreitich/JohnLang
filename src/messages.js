@@ -6,7 +6,7 @@
  */
 
 /*
-Some more John sayings we can add:
+Some more Johnisms we can add:
 
     - News flash pal
     - No more mister nice guy
@@ -19,6 +19,8 @@ Some more John sayings we can add:
     - cup of joe
     - yellow?
     - that's it buddy
+    - jeez louise
+    - Please, Louise. Pull me off of my knees. Jack, get back. Come on before we crack. Lose your blues. Everybody cut footloose!
  */
 
 export function alreadyDeclaredError(name) {

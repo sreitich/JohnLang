@@ -9,8 +9,8 @@ JohnLang {
                 | IfStmt
                 | LoopStmt
                 | Call "!"                                      --call
+                | DotCall "!"                                   --dotCall
                 | DotExp
-                | DotCall
                 | ClassDec
                 | Return
                 | break "!"                                     --break
@@ -104,7 +104,6 @@ JohnLang {
     in          = "in" ~idchar
     while       = "holdMyBeer" ~idchar
     class       = "doohickey" ~idchar
-    this        = "me" ~idchar
     construct   = "slapTogether" ~idchar
     new         = "whipUp" ~idchar
     return      = "betterGetGoin" ~idchar
@@ -117,7 +116,7 @@ JohnLang {
     id          = ~keyword letter idchar*
     idchar      = letter | digit | "_"
 
-    keyword     = function | if | elseif | else | for | while | class | this | construct
+    keyword     = function | if | elseif | else | for | while | class | construct
                 | new | return | break | continue | true | false | not
 
     space       += "//" (~"\n" any)*                            --comment

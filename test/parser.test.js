@@ -273,6 +273,11 @@ const syntaxChecks = [
         letMeLearnYouSomething(0)! //
         letMeLearnYouSomething(1)! //
     `],
+
+    ["using members inside and outside classes", `
+        NumberKeeper keeper: whipUp NumberKeeper(0)!
+        keeper.addOne()!
+    `],
 ]
 
 // Programs with syntax errors that the parser will detect

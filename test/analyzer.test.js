@@ -16,9 +16,9 @@ const semanticChecks = [
     ["initializing with empty array", "todo a: []!"],
 
     ["class declarations",
-        `doohickey Square { 
-            slapTogether(handful l) { 
-                handful length: l! 
+        `doohickey Square {
+            slapTogether(handful l) {
+                handful length: l!
             }
         }`],
 
@@ -70,15 +70,15 @@ const semanticChecks = [
 
     ["variables", "todo x: [[[[1]]]]! letMeLearnYouSomething(x[0][0][0][0] + 2)!"],
 
-    ["pseudo recursive class", "doohickey Rectangle { slapTogether(Rectangle r) { Rectangle me.rect: r! } }"],
+    ["pseudo recursive class", "doohickey Rectangle { slapTogether(Rectangle r) { Rectangle rect: r! } }"],
 
     ["member exp",
-        `doohickey T { 
-            slapTogether(handful num) { 
-                handful number: num! 
-            } 
+        `doohickey T {
+            slapTogether(handful num) {
+                handful number: num!
+            }
         }
-        T x: T(1)! 
+        T x: T(1)!
         letMeLearnYouSomething(x.number)!
     `],
 
@@ -92,7 +92,7 @@ const semanticChecks = [
 
     ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
 
-    ["class of arrays and maps", "doohickey S { slapTogether() { todo me.x: []! almanac me.y: {}! } }"],
+    ["class of arrays and maps", "doohickey S { slapTogether() { todo x: []! almanac y: {}! } }"],
 
     ["function return types", `gitErDone square(handful x): handful { betterGetGoin x * x! } gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`],
 
@@ -100,12 +100,12 @@ const semanticChecks = [
 
     ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
 
-    ["self-referencing field", "doohickey C { slapTogether(C c) { C me.c: c! } }"],
+    ["self-referencing field", "doohickey C { slapTogether(C c) { C c: c! } }"],
 
     ["object declaration",
-        `doohickey C { 
-            slapTogether() {} 
-        } 
+        `doohickey C {
+            slapTogether() {}
+        }
         C c: whipUp C()!
         letMeLearnYouSomething(c)!
     `],
@@ -121,9 +121,9 @@ const semanticChecks = [
     ["assign valid primitive", "handful x: 1! x: 2!"],
 
     ["call class with no args",
-        `doohickey C { 
-            slapTogether() {} 
-        } 
+        `doohickey C {
+            slapTogether() {}
+        }
         letMeLearnYouSomething(C())!
     `],
 
