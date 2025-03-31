@@ -152,7 +152,7 @@ if (x > 50) {
 <td>
 
 ```
-tilTheCowsComeHome handful x = 0, x < 10, x: x + 1 {      
+tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 {      
 	letMeLearnYouSomething(x)!
 }
 ```
