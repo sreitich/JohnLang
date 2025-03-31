@@ -37,14 +37,12 @@ JohnLang {
 
     Call        = id "(" ListOf<Exp, ","> ")"
 
-    DotCall     = this "." Call
-                | Exp6 "." Call
-    DotExp      = this "." id
-                | Exp6 "." id
+    DotCall     = Exp6 "." Call
+    DotExp      = Exp6 "." id
 
     ClassDec            = class id "{" ConstructorDec MethodDec* "}"
     ConstructorDec      = construct "(" ListOf<Param, ","> ")" "{" Field* "}"
-    Field               = Type this "." id ":" Exp "!"
+    Field               = Type id ":" Exp "!"
     MethodDec           = function id "(" ListOf<Param, ","> ")" ":" Type Block
     ObjectDec           = new id "(" ListOf<Exp, ","> ")"
 

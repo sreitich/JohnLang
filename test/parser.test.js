@@ -64,11 +64,11 @@ const syntaxChecks = [
     ["Class declaration", `
         doohickey Circle {
             slapTogether(handful r) {
-                handful me.radius: r!
+                handful radius: r!
             }
             
             gitErDone diameter(): handful {
-                betterGetGoin me.radius * 2!
+                betterGetGoin radius * 2!
             }
         }
     `],
@@ -273,18 +273,6 @@ const syntaxChecks = [
         letMeLearnYouSomething(0)! //
         letMeLearnYouSomething(1)! //
     `],
-
-    ["class calling its own methods",
-        "doohickey Calculator { \
-            slapTogether() {} \
-            gitErDone add(handful a, handful b): handful { \
-                betterGetGoin a + b! \
-            } \
-            gitErDone subtract(handful a, handful b): handful { \
-                betterGetGoin me.add(a, -b)! \
-            } \
-        }"
-    ],
 ]
 
 // Programs with syntax errors that the parser will detect
@@ -377,7 +365,7 @@ const syntaxErrors = [
     ["Class with constructor with return type",
         "doohickey Circle {\n" +
         "   slapTogether(handful r): handful {\n" +
-        "       handful me.radius: r!\n" +
+        "       handful radius: r!\n" +
         "   }\n" +
         "}",
         /Line 2, col 27/],
@@ -385,9 +373,9 @@ const syntaxErrors = [
     ["Class with code outside of methods",
         "doohickey Circle {\n" +
         "   slapTogether(handful r) {\n" +
-        "       handful me.radius: r!\n" +
+        "       handful radius: r!\n" +
         "   }\n" +
-        "   handful me.diameter: me.radius * 2!" +
+        "   handful diameter: radius * 2!" +
         "}",
             /Line 5, col 4/],
 
