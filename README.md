@@ -25,7 +25,15 @@ As optimistic as he was, the great John Language™️ was not the inventive typ
 * Enthusiasm! Every lines ends with an exclamation point!
 * Everything is public and accessible. No gatekeepin' here!
 
+## Static Errors
 
+* Type errors
+* Declaration errors
+* Function call errors
+* Method call errors
+* Return type errors
+* Member access errors
+* Mutability errors
 
 ## Example Programs
 
