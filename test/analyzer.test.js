@@ -8,18 +8,28 @@ import {selfReferentialClassError} from "../src/messages.js";
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
-    ["variable declarations", 'handful x: 1! chitchat y: "false"!'],
+
+    // ------------
+    //  Variables
+    // ------------
+
+    ["variable declarations", 'handful x: 1! chitchat y: "false"! switcheroo z: youBetcha!'],
+
+    ["assignment", `handful x: 1! x: 2! chitchat s: "hello"! s: "world"! switcheroo b: youBetcha! b: thinkAgainPal!`],
+
+    ["append strings", `letMeLearnYouSomething("Hello" + ", world")!`],
+
+    ["arithmetic", "handful x: 1! letMeLearnYouSomething(2 * 3 + 5 ** -3 / 2 - 5 % 8)!"],
+
+    // ------------
+    //  Arrays and maps
+    // ------------
 
     ["array types", "todo x: [1, 2]!"],
 
-    ["initializing with empty array", "todo a: []!"],
+    ["nested array types", "todo x: [[[[1]]]]! letMeLearnYouSomething(x[0][0][0][0] + 2)!"],
 
-    ["class declarations",
-        `doohickey Square {
-            slapTogether(handful l) {
-                handful length: l!
-            }
-        }`],
+    ["initializing with empty array", "todo a: []!"],
 
     ["assigning arrays", "todo a: []! todo b: [1]! a: b! b: a!"],
 
@@ -32,6 +42,18 @@ const semanticChecks = [
     ["assigning to map elements", "almanac a: {1: 2, 4: 8}! a[1]: 4!"],
 
     ["size operator", "todo a: []! letMeLearnYouSomething(#a)!"],
+
+    ["subscript array", "todo a: [1,2]! letMeLearnYouSomething(a[0])!"],
+
+    ["subscript map", `almanac a: {"hello": 1}! letMeLearnYouSomething(a["hello"])!`],
+
+    ["subscript assign array", "todo a: [1,2]! a[0]: 2!"],
+
+    ["subscript assign map", `almanac a: {"hello": 1}! a["hello"]: 2!`],
+
+    // ------------
+    //  Control flow
+    // ------------
 
     ["return", "gitErDone f(): handful { betterGetGoin 0! }"],
 
@@ -49,6 +71,14 @@ const semanticChecks = [
 
     ["for each loop", "todo a: []! tilTheCowsComeHome handful x: 0, x < #a, x: x + 1 { letMeLearnYouSomething(0)! }"],
 
+    ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
+
+    ["for loop with declared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 2, x: x + 1 { letMeLearnYouSomething(1)! }"],
+
+    // ------------
+    //  Relations
+    // ------------
+
     ["||", "letMeLearnYouSomething(youBetcha || 1 < 2 || thinkAgainPal || nah youBetcha)!"],
 
     ["&&", "letMeLearnYouSomething(youBetcha && 1 < 2 && thinkAgainPal && nah youBetcha)!"],
@@ -63,13 +93,49 @@ const semanticChecks = [
 
     ["ok to != maps", "letMeLearnYouSomething({1: 2} != {1: 2, 2: 4})!"],
 
-    ["append strings", `letMeLearnYouSomething("Hello" + ", world")!`],
+    ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
 
-    ["arithmetic", "handful x: 1! letMeLearnYouSomething(2 * 3 + 5 ** -3 / 2 - 5 % 8)!"],
+    // ------------
+    //  Functions
+    // ------------
 
-    ["variables", "todo x: [[[[1]]]]! letMeLearnYouSomething(x[0][0][0][0] + 2)!"],
+    ["function return types", `gitErDone square(handful x): handful { betterGetGoin x * x! } gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`],
+
+    ["array parameters", "gitErDone f(todo x): handful { betterGetGoin 0! }"],
+
+    ["function calls",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        add(1, 1)!
+    `],
+
+    ["functions calling other functions",
+        `gitErDone add(handful a, handful b): handful {
+            betterGetGoin a + b!
+        }
+        gitErDone subtract(handful a, handful b): handful {
+            betterGetGoin add(a, -b)!
+        }
+        letMeLearnYouSomething(subtract(3, 2))!
+    `],
+
+    // ------------
+    //  Classes
+    // ------------
+
+    ["class declarations",
+        `doohickey Square {
+            slapTogether(handful l) {
+                handful length: l!
+            }
+        }`],
+
+    ["class of arrays and maps", "doohickey S { slapTogether() { todo x: []! almanac y: {}! } }"],
 
     ["pseudo recursive class", "doohickey Rectangle { slapTogether(Rectangle r) { Rectangle rect: r! } }"],
+
+    ["self-referencing field", "doohickey C { slapTogether(C c) { C c: c! } }"],
 
     ["member exp",
         `doohickey T {
@@ -81,26 +147,6 @@ const semanticChecks = [
         letMeLearnYouSomething(x.number)!
     `],
 
-    ["subscript array", "todo a: [1,2]! letMeLearnYouSomething(a[0])!"],
-
-    ["subscript map", `almanac a: {"hello": 1}! letMeLearnYouSomething(a["hello"])!`],
-
-    ["subscript assign array", "todo a: [1,2]! a[0]: 2!"],
-
-    ["subscript assign map", `almanac a: {"hello": 1}! a["hello"]: 2!`],
-
-    ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
-
-    ["class of arrays and maps", "doohickey S { slapTogether() { todo x: []! almanac y: {}! } }"],
-
-    ["function return types", `gitErDone square(handful x): handful { betterGetGoin x * x! } gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`],
-
-    ["array parameters", "gitErDone f(todo x): handful { betterGetGoin 0! }"],
-
-    ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
-
-    ["self-referencing field", "doohickey C { slapTogether(C c) { C c: c! } }"],
-
     ["object declaration",
         `doohickey C {
             slapTogether() {}
@@ -109,24 +155,12 @@ const semanticChecks = [
         letMeLearnYouSomething(c)!
     `],
 
-    ["id numeric", "handful x: 1! letMeLearnYouSomething(x)!"],
-
-    ["id boolean", "switcheroo b: youBetcha! letMeLearnYouSomething(b)!"],
-
-    ["id string", "chitchat s: \"hello\"! letMeLearnYouSomething(s)!" ],
-
-    ["for loop with declared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 2, x: x + 1 { letMeLearnYouSomething(1)! }"],
-
-    ["assign valid primitive", "handful x: 1! x: 2!"],
-
     ["call class with no args",
         `doohickey C {
             slapTogether() {}
         }
         letMeLearnYouSomething(C())!
     `],
-
-    ["raw string assignment", 'chitchat s: "hello"! s: "world"!'],
 
     ["dot call on object",
         `doohickey Calculator {
@@ -165,23 +199,6 @@ const semanticChecks = [
         }
         Calculator calc: whipUp Calculator()!
         letMeLearnYouSomething(calc.subtract(3, 2))!
-    `],
-
-    ["functions calling other functions",
-        `gitErDone add(handful a, handful b): handful {
-            betterGetGoin a + b!
-        }
-        gitErDone subtract(handful a, handful b): handful {
-            betterGetGoin add(a, -b)!
-        }
-        letMeLearnYouSomething(subtract(3, 2))!
-    `],
-
-    ["standalone function calls",
-        `gitErDone add(handful a, handful b): handful {
-            betterGetGoin a + b!
-        }
-        add(1, 1)!
     `],
 
     ["using members inside and outside classes",
