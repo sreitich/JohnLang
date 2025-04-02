@@ -2,7 +2,6 @@ import * as core from "./core.js";
 import parse from "./parser.js";
 import { assignmentStatement, unaryExpression } from "./core.js";
 import * as messages from "./messages.js";
-import {notDeclaredError, selfReferentialClassError} from "./messages.js";
 
 // A context for tracking scope and control flow
 class Context {
@@ -218,7 +217,7 @@ export default function analyze(match) {
       return core.variableDeclaration(variable, initializer);
     },
 
-    FunDec(_function, id, params, _col, type, block) {
+    FunDec(_function, id, params, col, type, block) {
       checkNotAlreadyDeclared(id.sourceString, id);
 
       const fun = core.fun(id.sourceString);
@@ -227,7 +226,10 @@ export default function analyze(match) {
 
       fun.params = params.analyze();
       const paramTypes = fun.params.map(param => param.type);
-      const returnType = type.children?.[0]?.analyze();
+      // We intentionally let the parser allow functions to be declared without return types so we can give more
+      // helpful error messages.
+      check(type.children.length > 0, messages.noReturnTypeError(), col);
+      const returnType = type.children[0].analyze();
 
       fun.type = core.functionType(paramTypes, returnType);
       fun.body = block.analyze();

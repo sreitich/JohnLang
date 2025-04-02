@@ -17,7 +17,7 @@ JohnLang {
 
     VarDec      = Type id ":" Exp "!"
 
-    FunDec      = function id Params ":" Type Block
+    FunDec      = function id Params ":" Type? Block
     Params      = "(" ListOf<Param, ","> ")"
     Param       = Type id
 

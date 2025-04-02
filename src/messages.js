@@ -100,6 +100,10 @@ export function notInFunctionError() {
     return `We can't get goin' 'cause we never even got there!`;
 }
 
+export function noReturnTypeError() {
+    return `We don't know what kinda doodad we're returning!`;
+}
+
 export function notCallableError() {
     return `Can't go about calling someone without a phone!`
 }
