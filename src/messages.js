@@ -109,11 +109,11 @@ export function notCallableError() {
 }
 
 //Make output better
-export function returnTypeMismatchError(){
+export function returnTypeMismatchError() {
     return 'Hey now, make sure you are returning the right type'
 }
 
-export function returnsNothingError(){
+export function returnsNothingError() {
     return 'Woah now, dont go returning nothing'
 }
 
@@ -137,53 +137,32 @@ export function argumentCountError(argCount, paramCount) {
     let expected;
     let received;
 
-    if (paramCount === 0)
-    {
+    if (paramCount === 0) {
         expected = "We weren't expecting any arguments, ";
-    }
-    else if (paramCount === 1)
-    {
+    } else if (paramCount === 1) {
         expected = "We were looking for 1 argument, ";
-    }
-    else
-    {
+    } else {
         expected = `We were looking for ${paramCount} arguments, `;
     }
 
-    if (argCount === 0)
-    {
-        if (paramCount === 1)
-        {
+    if (argCount === 0) {
+        if (paramCount === 1) {
             received = "but we didn't get one!"
-        }
-        else
-        {
+        } else {
             received = "but we didn't get any!";
         }
-    }
-    else if (argCount === 1)
-    {
-        if (paramCount === 0)
-        {
+    } else if (argCount === 1) {
+        if (paramCount === 0) {
             received = "but we still got one!";
-        }
-        else
-        {
+        } else {
             received = "but we only got 1!";
         }
-    }
-    else
-    {
-        if (paramCount === 0)
-        {
+    } else {
+        if (paramCount === 0) {
             received = "but we still got some!";
-        }
-        else if (argCount < paramCount)
-        {
+        } else if (argCount < paramCount) {
             received = `but we only got ${argCount}!`;
-        }
-        else
-        {
+        } else {
             received = `but we got ${argCount}!`;
         }
     }
