@@ -330,7 +330,7 @@ const semanticErrors = [
     `, messages.notMutableError("add")],
 ]
 
-describe("The analyzer", () => {
+describe("Analyzer tests", () => {
     for (const [scenario, source] of semanticChecks) {
         it(`recognizes ${scenario}`, () => {
             assert.ok(analyze(parse(source)))
