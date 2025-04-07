@@ -57,9 +57,10 @@ class Context {
 export default function analyze(match) {
     let context = Context.root();
 
-    /**
-     * Checks
-     */
+    // -----------------
+    //  Check Utils
+    // -----------------
+
     function check(condition, message, parseTreeNode) {
         if (!condition) {
             const prefix = parseTreeNode.source.getLineAndColumnMessage();
@@ -76,55 +77,41 @@ export default function analyze(match) {
     }
 
     function checkIsNumericType(e, parseTreeNode) {
-        const eType = (typeof e === "number") ? core.numberType : e.type;
-        check(eType === core.numberType, messages.notNumericError(), parseTreeNode);
+        check(e.type === core.numberType, messages.notNumericError(), parseTreeNode);
     }
 
-    function checkIsNumbericOrStringType(e, parseTreeNode) {
+    function checkIsNumericOrStringType(e, parseTreeNode) {
         const expectedTypes = [core.numberType, core.stringType];
         check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
     }
 
     function checkIsBooleanType(e, parseTreeNode) {
-        const eType = (typeof e === "boolean") ? core.booleanType : e.type;
-        check(eType === core.booleanType, messages.notBooleanError(), parseTreeNode);
+        check(e.type === core.booleanType, messages.notBooleanError(), parseTreeNode);
     }
 
     function checkHasCollectionType(e, parseTreeNode) {
-        check(e.type?.kind === "ArrayType" || e.type?.kind === "MapType" || e.array, messages.notCollectionTypeError(), parseTreeNode);
+        const expectedKinds = [core.arrayType().kind, core.mapType().kind];
+        check((expectedKinds.includes(e.type?.kind) || e.array) /* Accounts for nested arrays */, messages.notCollectionTypeError(), parseTreeNode);
     }
 
     function checkIsClassType(e, parseTreeNode) {
-        const classKind = e.kind;
-        check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
+        check(e.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
     }
 
     function checkHasClassType(e, parseTreeNode) {
-        const classKind = e?.type?.kind;
-        check(classKind === "ClassType", messages.notClassError(), parseTreeNode);
+        check(e.type?.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
     }
 
     function equivalent(t1, t2) {
-        if (t2 === core.anyType) return true;
-        return t1 === t2 ||
-            (t1 && t2 && t1.kind === t2.kind && t1.name === t2.name);
-    }
-
-    function typeDescription(type) {
-        if (type.kind === "primitive") return type.name;
-        if (type.kind === "ClassType") return type.name;
-        if (type.kind === "ArrayType") return "todo";
-        if (type.kind === "MapType") return "almanac";
+        return (t2 === core.anyType) || // Super type
+               (t1 === t2) ||           // Value equivalence
+               (t1 && t2 &&             // Object equivalence
+                t1.kind === t2.kind &&
+                t1.name === t2.name);
     }
 
     function assignable(src, target) {
         return equivalent(src, target);
-    }
-
-    function wrapLiteral(e) {
-        if (typeof e === "number") return {value: e, name: e, kind: core.numberType, type: core.numberType};
-        if (typeof e === "boolean") return {value: e, name: e, kind: core.booleanType, type: core.booleanType};
-        if (typeof e === "string") return {value: e, name: e, kind: core.stringType, type: core.stringType};
     }
 
     function checkIsAssignable(e, {toType: type}, parseTreeNode) {
@@ -132,19 +119,15 @@ export default function analyze(match) {
             e = wrapLiteral(e);
         }
 
-        // TODO: Rewrite ?. and force array-array and map-map
-        if (
-            e &&
-            e.kind &&
-            (e.kind === "ArrayExpression" || e.kind === "MapExpression") &&
-            type &&
-            type.kind &&
-            (type.kind === "ArrayType" || type.kind === "MapType")
-        ) {
-            return;
+        // Arrays and maps are always mutable.
+        if (e && e.kind && type && type.kind) {
+            if (e.kind === core.arrayExpression().kind && type.kind === core.arrayType().kind)
+                return;
+            if (e.kind === core.mapExpression().kind && type.kind === core.mapType().kind)
+                return;
         }
 
-        if (e.type.kind === "Function") {
+        if (e.type.kind === core.fun().kind) {
             e.type = e.type.type.returnType;
         }
 
@@ -171,7 +154,7 @@ export default function analyze(match) {
     }
 
     function checkIsCallable(e, parseTreeNode) {
-        const callable = e?.kind === "ClassType" || e.type?.kind === "FunctionType" || e?.kind === "MethodDeclaration";
+        const callable = e.kind === core.classType().kind || e.type?.kind === core.functionType().kind || e.kind === core.methodDeclaration().kind;
         check(callable, messages.notCallableError(), parseTreeNode);
     }
 
@@ -187,6 +170,36 @@ export default function analyze(match) {
 
     function checkCorrectArgumentCount(argCount, paramCount, parseTreeNode) {
         check(argCount === paramCount, messages.argumentCountError(argCount, paramCount), parseTreeNode);
+    }
+
+    // -----------------
+    //  Misc. Utils
+    // -----------------
+
+    function typeDescription(type) {
+        switch (type.kind) {
+            case "primitive":
+                return type.name;
+            case "ClassType":
+                return type.name;
+            case "ArrayType":
+                return "todo";
+            case "MapType":
+                return "almanac";
+            default:
+                return "";
+        }
+    }
+
+    function wrapLiteral(e) {
+        switch (typeof e) {
+            case "number":
+                return {value: e, name: e, kind: core.numberType, type: core.numberType};
+            case "boolean":
+                return {value: e, name: e, kind: core.booleanType, type: core.booleanType};
+            case "string":
+                return {value: e, name: e, kind: core.stringType, type: core.stringType};
+        }
     }
 
     // -----------------
@@ -535,8 +548,8 @@ export default function analyze(match) {
             const x = left.analyze();
             const y = right.analyze();
             if (op.sourceString === "+") {
-                checkIsNumbericOrStringType(x, left);
-                checkIsNumbericOrStringType(y, right);
+                checkIsNumericOrStringType(x, left);
+                checkIsNumericOrStringType(y, right);
             } else {
                 checkIsNumericType(x, left);
                 checkIsNumericType(y, right);
