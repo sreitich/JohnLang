@@ -57,9 +57,9 @@ class Context {
 export default function analyze(match) {
     let context = Context.root();
 
-    // -----------------
+    // --------------------------------
     //  Check Utils
-    // -----------------
+    // --------------------------------
 
     function check(condition, message, parseTreeNode) {
         if (!condition) {
@@ -114,7 +114,7 @@ export default function analyze(match) {
         return equivalent(src, target);
     }
 
-    function checkIsAssignable(e, {toType: type}, parseTreeNode) {
+    function checkIsAssignable(e, type, parseTreeNode) {
         if (typeof e !== "object" || e === null || !("type" in e)) {
             e = wrapLiteral(e);
         }
@@ -165,16 +165,16 @@ export default function analyze(match) {
     }
 
     function checkIsReturnable(e, {from: f}, parseTreeNode) {
-        checkIsAssignable(e, {toType: f.type.returnType}, parseTreeNode);
+        checkIsAssignable(e, f.type.returnType, parseTreeNode);
     }
 
     function checkCorrectArgumentCount(argCount, paramCount, parseTreeNode) {
         check(argCount === paramCount, messages.argumentCountError(argCount, paramCount), parseTreeNode);
     }
 
-    // -----------------
+    // --------------------------------
     //  Misc. Utils
-    // -----------------
+    // --------------------------------
 
     function typeDescription(type) {
         switch (type.kind) {
@@ -202,9 +202,9 @@ export default function analyze(match) {
         }
     }
 
-    // -----------------
+    // --------------------------------
     //  Analyzer
-    // -----------------
+    // --------------------------------
 
     const grammar = match.matcher.grammar;
     const analyzer = grammar.createSemantics().addOperation("analyze", {
@@ -213,7 +213,10 @@ export default function analyze(match) {
             return core.program(statements.children.map((s) => s.analyze()));
         },
 
-        // Statements
+        // --------------------------------
+        //  Statements
+        // --------------------------------
+
         VarDec(type, id, _col, exp, _excl) {
             checkNotAlreadyDeclared(id.sourceString, id);
 
@@ -231,14 +234,15 @@ export default function analyze(match) {
             context.add(id.sourceString, fun);
             context = context.newChildContext({inLoop: false, function: fun});
 
-            fun.params = params.analyze();
-            const paramTypes = fun.params.map(param => param.type);
-            // We intentionally let the parser allow functions to be declared without return types so we can give more
-            // helpful error messages.
-            check(type.children.length > 0, messages.noReturnTypeError(), col);
-            const returnType = type.children[0].analyze();
+            fun.parameters = params.analyze();
+            const paramTypes = fun.parameters.map(param => param.type);
 
+            /* We intentionally let the parser allow functions to be declared without return types so we can give more
+             * helpful error messages. */
+            check(type.children.length, messages.noReturnTypeError(), col);
+            const returnType = type.children[0].analyze();
             fun.type = core.functionType(paramTypes, returnType);
+
             fun.body = block.analyze();
             context = context.parent;
             return core.functionDeclaration(fun);
@@ -259,7 +263,7 @@ export default function analyze(match) {
             const source = right.analyze();
             const target = left.analyze();
             checkIsMutable(target, left);
-            checkIsAssignable(source, {toType: target.type}, left);
+            checkIsAssignable(source, target.type, left);
             return core.assignmentStatement(source, target);
         },
 
@@ -326,7 +330,7 @@ export default function analyze(match) {
             context.add(id.sourceString, iterator);
 
             const init = initExp.analyze();
-            checkIsAssignable(init, {toType: iterator.type}, id);
+            checkIsAssignable(init, iterator.type, id);
 
             const testExp = test.analyze();
             checkIsBooleanType(testExp, test);
@@ -335,7 +339,7 @@ export default function analyze(match) {
             checkIsMutable(iterTarget, iterationVar);
             const iterValue = iterExp.analyze();
 
-            checkIsAssignable(iterValue, {toType: iterTarget.type}, iterationVar);
+            checkIsAssignable(iterValue, iterTarget.type, iterationVar);
             const body = block.analyze();
 
             context = context.parent;
@@ -350,10 +354,9 @@ export default function analyze(match) {
             checkIsBooleanType(testExp, test);
             checkIsMutable(iterator, id);
 
-            const iterTarget = iterationVar.analyze();
             const iterValue = iterExp.analyze();
 
-            checkIsAssignable(iterValue, {toType: iterator.type}, iterationVar);
+            checkIsAssignable(iterValue, iterator.type, iterationVar);
             context = context.newChildContext({inLoop: true});
 
             const body = block.analyze();
@@ -372,18 +375,25 @@ export default function analyze(match) {
             const args = expList.asIteration().children.map(e => e.analyze());
 
             let targetTypes;
-            if (callee?.kind === "ClassType") {
-                check(callee.constructor, messages.selfReferentialClassError(), id);
-                targetTypes = callee.constructor.parameters.map(p => p.type);
-            } else if (callee?.kind === "Function") {
-                targetTypes = callee?.type?.paramTypes;
-            } else if (callee?.kind === "MethodDeclaration") {
-                targetTypes = callee?.fun?.type?.paramTypes;
+            switch (callee?.kind) {
+                // Object declaration
+                case core.classType().kind:
+                    check(callee.constructor, messages.selfReferentialClassError(), id);
+                    targetTypes = callee.constructor.parameters.map(p => p.type);
+                    break;
+                // Function call
+                case core.fun().kind:
+                    targetTypes = callee.type?.paramTypes;
+                    break;
+                // Method call
+                case core.methodDeclaration().kind:
+                    targetTypes = callee.fun?.type?.paramTypes;
+                    break;
             }
 
             checkCorrectArgumentCount(args.length, targetTypes.length, open);
             args.forEach((arg, i) => {
-                checkIsAssignable(arg, {toType: targetTypes[i]}, expList);
+                checkIsAssignable(arg, targetTypes[i], expList);
             });
 
             return core.constructorCall(callee, args)
@@ -391,13 +401,11 @@ export default function analyze(match) {
 
         DotExp(exp, _dot, id) {
             const object = exp.analyze();
-            if (object.type && object.type.kind === "ClassType") {
-                let member = (object.type.members).find(m => m.name === id.sourceString);
+            checkHasClassType(object, exp);
 
-                check(member, messages.noMemberError(), id);
-                return core.memberExpression(object, ".", member);
-            }
-            check(false, messages.notClassError(), exp);
+            let member = (object.type.members).find(m => m.name === id.sourceString);
+            check(member, messages.noMemberError(), id);
+            return core.memberExpression(object, ".", member);
         },
 
         Statement_dotCall(stmt, _excl) {
@@ -412,7 +420,6 @@ export default function analyze(match) {
             return core.memberCall(object, memberCall);
         },
 
-
         Block(_open, statements, _close) {
             return statements.children.map((s) => s.analyze());
         },
@@ -420,65 +427,62 @@ export default function analyze(match) {
         ClassDec(_class, id, _open, constructor, methods, _close) {
             checkNotAlreadyDeclared(id.sourceString, id);
 
-            const classTypeObj = core.classType(id.sourceString, null, []);
+            const classObj = core.classType(id.sourceString, null, [], []);
 
-            context.add(id.sourceString, classTypeObj);
+            context.add(id.sourceString, classObj);
             context = context.newChildContext();
-            context.inClass = classTypeObj;
+            context.inClass = classObj;
 
             const cons = constructor.analyze();
-            classTypeObj.constructor = cons;
+            classObj.constructor = cons;
             const fields = cons.fields;
             const seen = new Set();
 
             for (const field of fields) {
-                if (seen.has(field.name)) {
-                    throw new Error("Duplicate class member: " + messages.nonDistinctMembersError());
-                }
+                check(!seen.has(field.name), messages.nonDistinctMembersError(), constructor);
                 seen.add(field.name);
             }
 
-            classTypeObj.members = [...fields];
-            classTypeObj.methods = methods.children.map(m => m.analyze());
+            classObj.members = [...fields];
+            classObj.methods = methods.children.map(m => m.analyze());
 
             context = context.parent;
-            return classTypeObj;
+            return classObj;
         },
 
         ConstructorDec(_construct, _openParen, params, _closeParen, _openBrace, fields, _closeBrace) {
             const parameters = params.asIteration().children.map(p => p.analyze());
             context = context.newChildContext({function: null});
 
-            // Prevent classes from having themselves as members.
-            // fields.children.map(f => check(f.children[0].sourceString !== context.parent.inClass.name, notDeclaredError(context.parent.inClass.name), f));
-
             parameters.forEach(p => context.add(p.name, p));
-            const fieldDecls = fields.children.map(f => f.analyze());
+            const fieldDecs = fields.children.map(f => f.analyze());
             context = context.parent;
 
-            return {...core.constructorDeclaration(parameters, fieldDecls), fields: fieldDecls};
+            return {...core.constructorDeclaration(parameters, fieldDecs), fields: fieldDecs};
         },
 
         Field(type, id, _col, exp, _excl) {
             const fieldType = type.analyze();
-
             const initializer = exp.analyze();
-            checkIsAssignable(initializer, {toType: fieldType}, id);
+            checkIsAssignable(initializer, fieldType, id);
 
-            return {kind: "FieldDeclaration", name: id.sourceString, type: fieldType, initializer, mutable: true};
+            return core.fieldDeclaration(id.sourceString, fieldType, initializer);
         },
 
         MethodDec(_function, id, _open, params, _close, _col, type, block) {
             checkNotAlreadyDeclared(id.sourceString, id);
 
-            // Add the method to the class's context so the class's other methods can call it.
-            const fun = core.fun(id.sourceString, null, null, null, true);
+            // Add the method to the class's context so the class's other (subsequent) methods can call it.
+            const fun = core.fun(id.sourceString, null, null, null);
             context.add(id.sourceString, fun);
             context = context.newChildContext({function: fun});
+
             fun.params = params.asIteration().children.map((p) => p.analyze());
+
             const paramTypes = fun.params.map(param => param.type);
             const returnType = type.children?.[0]?.analyze();
             fun.type = core.functionType(paramTypes, returnType);
+
             fun.body = block.analyze();
 
             context = context.parent;
@@ -495,8 +499,8 @@ export default function analyze(match) {
         Return(ret, exp, _excl) {
             checkInFunction(this);
 
-            // We intentionally let the parser allow return statements without a return value, so we can catch them here to
-            // give a more helpful error message.
+            /* We intentionally let the parser allow return statements without a return value, so we can catch them here
+             * to give a more helpful error message. */
             check(exp.children.length > 0, messages.returnsNothingError(), ret);
 
             const retVal = exp.children[0].analyze();
@@ -509,7 +513,10 @@ export default function analyze(match) {
             return core.breakStatement();
         },
 
-        // Expressions
+        // --------------------------------
+        //  Expressions
+        // --------------------------------
+
         Exp_or(exp, _op, exps) {
             let left = exp.analyze();
             checkIsBooleanType(left, exp);
@@ -597,7 +604,7 @@ export default function analyze(match) {
 
             checkHasCollectionType(baseExpr, base);
 
-            if (baseExpr.type?.kind === "MapType") {
+            if (baseExpr.type?.kind === core.mapType().kind) {
                 return core.subscriptExpression(baseExpr, idx, core.anyType);
             } else {
                 checkIsNumericType(idx, index);
@@ -643,7 +650,7 @@ export default function analyze(match) {
             return Number(this.sourceString)
         },
 
-        stringlit(_open, chars, close) {
+        stringlit(_open, chars, _close) {
             return chars.sourceString
         },
 

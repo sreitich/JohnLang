@@ -9,9 +9,9 @@ import {selfReferentialClassError} from "../src/messages.js";
 // Programs expected to be semantically correct.
 const semanticChecks = [
 
-    // ------------
+    // --------------------------------
     //  Variables
-    // ------------
+    // --------------------------------
 
     ["variable declarations", 'handful x: 1! chitchat y: "false"! switcheroo z: youBetcha!'],
 
@@ -21,9 +21,9 @@ const semanticChecks = [
 
     ["arithmetic", "handful x: 1! letMeLearnYouSomething(2 * 3 + 5 ** -3 / 2 - 5 % 8)!"],
 
-    // ------------
+    // --------------------------------
     //  Arrays and maps
-    // ------------
+    // --------------------------------
 
     ["array types", "todo x: [1, 2]!"],
 
@@ -51,9 +51,9 @@ const semanticChecks = [
 
     ["subscript assign map", `almanac a: {"hello": 1}! a["hello"]: 2!`],
 
-    // ------------
+    // --------------------------------
     //  Control flow
-    // ------------
+    // --------------------------------
 
     ["return", "gitErDone f(): handful { betterGetGoin 0! }"],
 
@@ -75,9 +75,9 @@ const semanticChecks = [
 
     ["for loop with declared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 2, x: x + 1 { letMeLearnYouSomething(1)! }"],
 
-    // ------------
+    // --------------------------------
     //  Relations
-    // ------------
+    // --------------------------------
 
     ["||", "letMeLearnYouSomething(youBetcha || 1 < 2 || thinkAgainPal || nah youBetcha)!"],
 
@@ -95,9 +95,9 @@ const semanticChecks = [
 
     ["array of struct", "doohickey T { slapTogether() {} } todo x: [T(), T()]!"],
 
-    // ------------
+    // --------------------------------
     //  Functions
-    // ------------
+    // --------------------------------
 
     ["function return types", `gitErDone square(handful x): handful { betterGetGoin x * x! } gitErDone flip(switcheroo y): switcheroo { betterGetGoin nah y! }`],
 
@@ -120,9 +120,9 @@ const semanticChecks = [
         letMeLearnYouSomething(subtract(3, 2))!
     `],
 
-    // ------------
+    // --------------------------------
     //  Classes
-    // ------------
+    // --------------------------------
 
     ["class declarations",
         `doohickey Square {
