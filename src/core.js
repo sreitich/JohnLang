@@ -9,6 +9,7 @@ export const voidType = { kind: "primitive", name: "void" };
 export const anyType = { kind: "primitive", name: "any" };
 
 // Remember: collections are typeless. That's just how John Language rolls, pal.
+// NOTE: arrayType, mapType, and functionType are helpers for analyzing; they don't need to be generated.
 export function arrayType() {
     return { kind: "ArrayType", };
 }

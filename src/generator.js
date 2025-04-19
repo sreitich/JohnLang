@@ -5,9 +5,9 @@ export default function generate(program) {
     const output = []
 
     // Variable and function names in JS will be suffixed with _1, _2, _3,
-    // etc. This is because "switch", for example, is a legal name in Carlos,
-    // but not in JS. So, the Carlos variable "switch" must become something
-    // like "switch_1". We handle this by mapping each name to its suffix.
+    // etc. This is because "class", for example, is a legal name in John Lang,
+    // but not in JS. So, the John Lang variable "class" must become something
+    // like "class_1". We handle this by mapping each name to its suffix.
     const targetName = (mapping => {
         return entity => {
             if (!mapping.has(entity)) {
@@ -26,25 +26,24 @@ export default function generate(program) {
             p.statements.forEach(gen)
         },
         VariableDeclaration(d) {
-            // We don't care about const vs. let in the generated code! The analyzer has
-            // already checked that we never updated a const, so let is always fine.
+            console.log(d.initializer);
             output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`)
+        },
+        Variable(v) {
+            return targetName(v)
+        },
+        ClassType(d) {
+
         },
         FunctionDeclaration(d) {
             output.push(`function ${gen(d.fun)}(${d.fun.params.map(gen).join(", ")}) {`)
             output.push(`return ${gen(d.body)};`);
             output.push("}")
         },
-        Variable(v) {
-            return targetName(v)
-        },
         Function(f) {
             return targetName(f)
         },
-        Increment(s) {
-            output.push(`${gen(s.variable)}++;`)
-        },
-        Assignment(s) {
+        AssignmentStatement(s) {
             output.push(`${gen(s.target)} = ${gen(s.source)};`)
         },
         BreakStatement(s) {
@@ -52,9 +51,6 @@ export default function generate(program) {
         },
         ReturnStatement(s) {
             output.push(`return ${gen(s.expression)};`)
-        },
-        ShortReturnStatement(s) {
-            output.push("return;")
         },
         IfStatement(s) {
             output.push(`if (${gen(s.test)}) {`)
@@ -78,6 +74,18 @@ export default function generate(program) {
             s.body.forEach(gen)
             output.push("}")
         },
+        ForStatement(s) {
+
+        },
+        PrintStatement(s) {
+            output.push(`console.log(${s.argument});`);
+        },
+        ConstructorDeclaration(d) {
+
+        },
+        MethodDeclaration(d) {
+
+        },
         BinaryExpression(e) {
             const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op
             return `(${gen(e.left)} ${op} ${gen(e.right)})`
@@ -93,17 +101,17 @@ export default function generate(program) {
             }
             return `${e.op}(${operand})`
         },
-        EmptyOptional(e) {
-            return "undefined"
-        },
         SubscriptExpression(e) {
             return `${gen(e.array)}[${gen(e.index)}]`
         },
         ArrayExpression(e) {
             return `[${e.elements.map(gen).join(",")}]`
         },
-        EmptyArray(e) {
-            return "[]"
+        MapExpression(e) {
+
+        },
+        MapEntry(e) {
+
         },
         MemberExpression(e) {
             const object = gen(e.object)
@@ -111,16 +119,22 @@ export default function generate(program) {
             const chain = e.op === "." ? "" : e.op
             return `(${object}${chain}[${field}])`
         },
-        FunctionCall(c) {
-            const targetCode = standardFunctions.has(c.callee)
-                ? standardFunctions.get(c.callee)(c.args.map(gen))
-                : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`
-            // Calls in expressions vs in statements are handled differently
-            if (c.callee.type.returnType !== voidType) {
-                return targetCode
-            }
-            output.push(`${targetCode};`)
+        MemberCall(c) {
+
         },
+        ConstructorCall(c) {
+
+        },
+        // FunctionCall(c) {
+        //     const targetCode = standardFunctions.has(c.callee)
+        //         ? standardFunctions.get(c.callee)(c.args.map(gen))
+        //         : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`
+        //     // Calls in expressions vs in statements are handled differently
+        //     if (c.callee.type.returnType !== voidType) {
+        //         return targetCode
+        //     }
+        //     output.push(`${targetCode};`)
+        // },
     }
 
     gen(program)

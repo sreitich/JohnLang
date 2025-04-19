@@ -651,7 +651,8 @@ export default function analyze(match) {
         },
 
         stringlit(_open, chars, _close) {
-            return chars.sourceString
+            // Include the quotation marks instead of just taking the string's contents.
+            return this.sourceString;
         },
 
         true(_) {
