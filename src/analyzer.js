@@ -186,8 +186,6 @@ export default function analyze(match) {
                 return "todo";
             case "MapType":
                 return "almanac";
-            default:
-                return "";
         }
     }
 
