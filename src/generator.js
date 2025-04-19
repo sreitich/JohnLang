@@ -2,7 +2,7 @@ export default function generate(program) {
     // When generating code for statements, we'll accumulate the lines of
     // the target code here. When we finish generating, we'll join the lines
     // with newlines and return the result.
-    const output = []
+    const output = [];
 
     // Variable and function names in JS will be suffixed with _1, _2, _3,
     // etc. This is because "class", for example, is a legal name in John Lang,
@@ -11,29 +11,31 @@ export default function generate(program) {
     const targetName = (mapping => {
         return entity => {
             if (!mapping.has(entity)) {
-                mapping.set(entity, mapping.size + 1)
+                mapping.set(entity, mapping.size + 1);
             }
-            return `${entity.name}_${mapping.get(entity)}`
+            return `${entity.name}_${mapping.get(entity)}`;
         }
-    })(new Map())
+    })(new Map());
 
-    const gen = node => generators?.[node?.kind]?.(node) ?? node
+    const gen = node => generators?.[node?.kind]?.(node) ?? node;
 
     const generators = {
         // Key idea: when generating an expression, just return the JS string; when
         // generating a statement, write lines of translated JS to the output array.
+        ClassType(d) {
+            return targetName(d);
+        },
         Program(p) {
-            p.statements.forEach(gen)
+            p.statements.forEach(gen);
         },
         VariableDeclaration(d) {
-            console.log(d.initializer);
-            output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`)
+            output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`);
         },
         Variable(v) {
-            return targetName(v)
+            return targetName(v);
         },
-        ClassType(d) {
-
+        AssignmentStatement(s) {
+            output.push(`${gen(s.target)} = ${gen(s.source)};`)
         },
         FunctionDeclaration(d) {
             output.push(`function ${gen(d.fun)}(${d.fun.params.map(gen).join(", ")}) {`)
@@ -43,14 +45,11 @@ export default function generate(program) {
         Function(f) {
             return targetName(f)
         },
-        AssignmentStatement(s) {
-            output.push(`${gen(s.target)} = ${gen(s.source)};`)
-        },
-        BreakStatement(s) {
-            output.push("break;")
-        },
         ReturnStatement(s) {
             output.push(`return ${gen(s.expression)};`)
+        },
+        PrintStatement(s) {
+            output.push(`console.log(${gen(s.argument)});`);
         },
         IfStatement(s) {
             output.push(`if (${gen(s.test)}) {`)
@@ -77,18 +76,33 @@ export default function generate(program) {
         ForStatement(s) {
 
         },
-        PrintStatement(s) {
-            output.push(`console.log(${s.argument});`);
+        BreakStatement(s) {
+            output.push("break;")
         },
         ConstructorDeclaration(d) {
 
         },
+        FieldDeclaration(d) {
+            return targetName(d);
+        },
         MethodDeclaration(d) {
 
         },
+        ConstructorCall(c) {
+
+        },
+        MemberExpression(e) {
+            const object = gen(e.object)
+            const field = JSON.stringify(gen(e.field))
+            const chain = e.op === "." ? "" : e.op
+            return `(${object}${chain}[${field}])`
+        },
+        MemberCall(c) {
+
+        },
         BinaryExpression(e) {
-            const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op
-            return `(${gen(e.left)} ${op} ${gen(e.right)})`
+            const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op;
+            return `(${gen(e.left)} ${op} ${gen(e.right)})`;
         },
         UnaryExpression(e) {
             const operand = gen(e.operand)
@@ -111,18 +125,6 @@ export default function generate(program) {
 
         },
         MapEntry(e) {
-
-        },
-        MemberExpression(e) {
-            const object = gen(e.object)
-            const field = JSON.stringify(gen(e.field))
-            const chain = e.op === "." ? "" : e.op
-            return `(${object}${chain}[${field}])`
-        },
-        MemberCall(c) {
-
-        },
-        ConstructorCall(c) {
 
         },
         // FunctionCall(c) {

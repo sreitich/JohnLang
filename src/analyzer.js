@@ -81,7 +81,7 @@ export default function analyze(match) {
     }
 
     function checkIsNumericOrStringType(e, parseTreeNode) {
-        const expectedTypes = [core.numberType, core.stringType];
+        const expectedTypes = [core.numberType, core.stringType, "string" /* Accounts for literals that haven't been wrapped yet (e.g. part of a binary expression). */];
         check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
     }
 
