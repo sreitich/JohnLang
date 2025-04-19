@@ -2,9 +2,9 @@
 
 # [John Lang](https://sreitich.github.io/JohnLang/)
 
-Millenia ago, there was a man. He awoke, unexpectantly, from an ancient slumber. His first words in this mysterious world in which he materialized: "Hello, World!" (he was quite the optimist). His name was John Language. And the first thing he did was create the world's first programming language: John Language.[^1 ] The second thing he did was create the Midwest.
+Millennia ago, there slept an ancient being of mysterious origin. He awoke, unexpectedly. Looking around he noticed a lack normality and the plain. Not content with this, he decided to venture out to new lands to find a world fit to for his desires. He searched long and hard thinking maybe there was no place for him. But after a long journey he found a place for him. Upon reaching this new world, his first words were, "Hello, World!" (he was quite the optimist). Who was this mysterious man we've been following you may ask. Well... his name was John. John Language. And the first thing he did was create the world's first programming language: John Language.[^1 ] The second thing he did was create the Midwestern United States.
 
-As optimistic as he was, the great John Language™️ was not the inventive type (he would not invent creativity for another thousand years!); he's a simple man. Thus, John Language is not the most interesting language—quite mundane even. But, as John Language would tell you, "It'll get ya where you need to go!" Another common saying of John's was, "There's no stopping that neck once it gets going." Archaeologists, however, have yet to uncover what he meant by this.
+As optimistic as he was, he was just as plain. Thus, John Language is not the most interesting language—quite mundane even. Everyone who knows John knows he's not the inventive type (he would not invent creativity for another thousand years!). But, what he would invent are his signature catchphrases used by many today. The classic phrase 'How you like them apples?' And when the going gets tough he always had words of advice for his followers. As John Language would tell you, "It'll get ya where you need to go!" Another common saying of John's was, "There's no stopping that neck once it gets going." Archaeologists, however, have yet to uncover what he meant by this.
 
 ###### Even though John Language is the original creator of John Lang, this *compiler* was created by [Adi Roitburg](https://github.com/Adiro777), [Allen Boyce](https://github.com/AllenBoyce),  [Jacob Mendoza](https://github.com/JacNslash04), [JD Elia](https://github.com/JD-Elia), [Kyle Matton](https://github.com/KyleMatton26), and [Sam Reitich](https://github.com/sreitich).
 
@@ -31,10 +31,12 @@ As optimistic as he was, the great John Language™️ was not the inventive typ
 * Type errors - Hold up, these types don't match!
 * Declaration errors - Hold your horses, pal! I'm not sure what yer talking bout with this variable thing.
 * Function call errors - Can't go about calling someone without a phone!
+* Function context errors - We can't get goin' 'cause we never even got there!
 * Method call errors - I can't find any sorta method in this here doohickey.
 * Return type errors - Woah now, dont go returning nothing.
 * Member access errors - I can't find any sorta member like that in this here doohickey.
-* Mutability errors - Hey now, don't go trying to change that variable's type. 
+* Mutability errors - Hey now, don't go trying to change that variable's type.
+* Control flow errors - There's no popsicle stand to blow.
 
 ## Example Programs
 
@@ -121,7 +123,7 @@ function isEven(x)  {
 ```
 ope x > 50 {
 	betterGetGoin 2!      
-} ope welp x > 25 {
+} welp ope x > 25 {
 	betterGetGoin 1!
 } welp {
 	betterGetGoin 0!
@@ -152,7 +154,7 @@ if (x > 50) {
 <td>
 
 ```
-tilTheCowsComeHome handful x = 0, x < 10, x++ {      
+tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 {      
 	letMeLearnYouSomething(x)!
 }
 ```
@@ -176,7 +178,7 @@ for (var x = 0; x < 10; x++) {
 
 ```
 holdMyBeer x < 10 {      
-	x = x + 1!
+	x: x + 1!
 }
 ```
 
@@ -202,8 +204,8 @@ while (x < 10) {
 ```
 doohickey Rectangle {
 	slapTogether(handful h, handful w) {      
-		handful me.height: h!
-		handful me.width: w!
+		handful height: h!
+		handful width: w!
 	}
 }
 Rectangle r: whipUp Rectangle(4.0, 8.0)!
@@ -291,7 +293,7 @@ throw "Well, dontcha know, my muffler was actin' up the other day—musta been t
 | John Lang     | Acolytes |
 | ------------- | -------- |
 | ope           | if       |
-| ope welp      | else if  |
+| welp ope      | else if  |
 | welp          | else     |
 | youBetcha     | true     |
 | thinkAgainPal | false    |
