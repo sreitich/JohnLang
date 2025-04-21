@@ -113,16 +113,13 @@ export default function generate(program) {
             output.push("}")
         },
         ConstructorCall(c) {
-
+            return `new ${c.callee.name}(${c.args.map(gen).join(", ")})`;
         },
         MemberExpression(e) {
-            const object = gen(e.object)
-            const field = JSON.stringify(gen(e.field))
-            const chain = e.op === "." ? "" : e.op
-            return `(${object}${chain}[${field}])`
-        },
-        MemberCall(c) {
-
+            const object = gen(e.object);
+            // When using a member outside a class definition, we have to yoink out the "this" callee.
+            const field = gen(e.field).split("this.")[1];
+            return `${object}${e.op}${field}`;
         },
         BinaryExpression(e) {
             const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op;

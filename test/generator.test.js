@@ -292,9 +292,9 @@ const fixtures = [
           this.width_5 = w_3;
         }
       }
-      let r_6 = new Rectangle(4.0, 8.0);
+      let r_6 = new Rectangle(4, 8);
       console.log(r_6.width_5);
-      r_6.width_5 = 5.0;
+      r_6.width_5 = 5;
       class Point_7 {
         constructor(xIn_8, yIn_9) {
           this.x_10 = xIn_8;
