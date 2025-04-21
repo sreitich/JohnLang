@@ -4,7 +4,6 @@ import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
 import {program, variableDeclaration, variable, numberType, binaryExpression, } from "../src/core.js"
 import * as messages from "../src/messages.js";
-import {selfReferentialClassError} from "../src/messages.js";
 
 // Programs expected to be semantically correct.
 const semanticChecks = [
@@ -218,6 +217,16 @@ const semanticChecks = [
         keeper.addOne()!
         letMeLearnYouSomething(keeper.number)!
     `],
+
+    // --------------------------------
+    //  Error handling
+    // --------------------------------
+
+    ["throwing exceptions", 'whoopsieDaisy "this is an error"!'],
+
+    ["assertions with literals", 'whenPigsFly(youBetcha)!'],
+
+    ["assertions with expressions", 'whenPigsFly(youBetcha && thinkAgainPal)!'],
 ]
 
 // Programs that are syntactically correct but have semantic errors.
@@ -316,11 +325,11 @@ const semanticErrors = [
 
     ["call of uncallable", "handful x: 1!\nletMeLearnYouSomething(x())!", messages.notCallableError()],
 
-    ["Too many args", "gitErDone f(handful x, handful y): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 2)],
+    ["too many args", "gitErDone f(handful x, handful y): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 2)],
 
-    ["Too few args", "gitErDone f(): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 0)],
+    ["too few args", "gitErDone f(): handful { betterGetGoin 0! } f(1)!", messages.argumentCountError(1, 0)],
 
-    ["Parameter type mismatch", "gitErDone f(handful x): handful { betterGetGoin 0! } f(youBetcha)!", messages.notAssignableError("switcheroo", "handful")],
+    ["parameter type mismatch", "gitErDone f(handful x): handful { betterGetGoin 0! } f(youBetcha)!", messages.notAssignableError("switcheroo", "handful")],
 
     ["dotExp on non-class", "letMeLearnYouSomething((1).foo)!", messages.notClassError()],
 
@@ -333,6 +342,10 @@ const semanticErrors = [
         }
         add: subtract!
     `, messages.notMutableError("add")],
+
+    ["throw without a string expression", "whoopsieDaisy 15!", messages.notStringError()],
+
+    ["assertion without a boolean expression", "whenPigsFly(1)!", messages.notBooleanError()],
 ]
 
 describe("Analyzer tests", () => {
