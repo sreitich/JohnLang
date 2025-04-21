@@ -147,6 +147,7 @@ const semanticChecks = [
         }
         T x: T(1)!
         letMeLearnYouSomething(x.number)!
+        x.number: 5!
     `],
 
     ["object declaration",

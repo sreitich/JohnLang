@@ -22,9 +22,6 @@ export default function generate(program) {
     const generators = {
         // Key idea: when generating an expression, just return the JS string; when
         // generating a statement, write lines of translated JS to the output array.
-        ClassType(d) {
-            return targetName(d);
-        },
         Program(p) {
             p.statements.forEach(gen);
         },
@@ -38,7 +35,7 @@ export default function generate(program) {
             output.push(`${gen(s.target)} = ${gen(s.source)};`)
         },
         FunctionDeclaration(d) {
-            output.push(`function ${gen(d.fun)}(${d.fun.parameters.map(gen).join(", ")}) {`)
+            output.push(`function ${gen(d.fun)}(${d.fun.parameters?.length ? d.fun.parameters.map(gen).join(", ") : ""}) {`)
             d.fun.body.forEach(gen);
             output.push("}")
         },
@@ -83,9 +80,9 @@ export default function generate(program) {
             output.push("}");
         },
         WhileStatement(s) {
-            output.push(`while (${gen(s.test)}) {`)
+            output.push(`while (${gen(s.test)}) {`);
             s.body.forEach(gen);
-            output.push("}")
+            output.push("}");
         },
         ForStatement(s) {
             // The iterator can be formed a lot of different ways.
@@ -95,16 +92,25 @@ export default function generate(program) {
             output.push("}");
         },
         BreakStatement(s) {
-            output.push("break;")
+            output.push("break;");
         },
-        ConstructorDeclaration(d) {
-
+        ClassType(d) {
+            output.push(`class ${targetName(d)} {`);
+            output.push(`constructor(${d.constructor.parameters.map(p => gen(p)).join(", ")}) {`);
+            d.members.forEach((f) => {
+                output.push(`${gen(f)} = ${gen(f.initializer)};`);
+            });
+            output.push(`}`);
+            d.methods.forEach(gen);
+            output.push(`}`);
         },
         FieldDeclaration(d) {
-            return targetName(d);
+            return `this.${targetName(d)}`;
         },
         MethodDeclaration(d) {
-
+            output.push(`${gen(d.fun)}(${d.fun.parameters?.length ? d.fun.parameters.map(gen).join(", ") : ""}) {`)
+            d.fun.body.forEach(gen);
+            output.push("}")
         },
         ConstructorCall(c) {
 

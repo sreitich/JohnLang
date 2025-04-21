@@ -138,7 +138,7 @@ export default function analyze(match) {
     }
 
     function isMutable(e) {
-        return e.mutable;
+        return e.mutable || e.field?.mutable;
     }
 
     function checkIsMutable(e, parseTreeNode) {

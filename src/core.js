@@ -18,10 +18,6 @@ export function mapType() {
     return { kind: "MapType", };
 }
 
-export function classType(name, constructor, members, methods) {
-    return { kind: "ClassType", name, constructor, members, methods };
-}
-
 // --------------------------------
 //  Variables
 // --------------------------------
@@ -101,6 +97,10 @@ export function breakStatement() {
 // --------------------------------
 //  Classes
 // --------------------------------
+
+export function classType(name, constructor, members, methods) {
+    return { kind: "ClassType", name, constructor, members, methods };
+}
 
 export function constructorDeclaration(parameters, body) {
     return { kind: "ConstructorDeclaration", parameters, body, };

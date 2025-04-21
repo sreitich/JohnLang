@@ -268,40 +268,40 @@ const fixtures = [
     source: `
       doohickey Rectangle {
         slapTogether(handful h, handful w) {
-          me.height: h!
-          me.width: w!
+          handful height: h!
+          handful width: w!
         }
       }
       Rectangle r: whipUp Rectangle(4.0, 8.0)!
       letMeLearnYouSomething(r.width)!
       r.width: 5!
       doohickey Point {
-        slapTogether(handful x, handful y) {
-          me.x: x!
-          me.y: y!
+        slapTogether(handful xIn, handful yIn) {
+          handful x: xIn!
+          handful y: yIn!
         }
-        distance(): handful {
+        gitErDone distance(): handful {
           betterGetGoin x * x + y * y!
         }
       }
     `,
     expected: dedent`
-      class Rectangle {
-        constructor(height, width) {
-          this.height = height;
-          this.width = width;
+      class Rectangle_1 {
+        constructor(h_2, w_3) {
+          this.height_4 = h_2;
+          this.width_5 = w_3;
         }
       }
-      let r = new Rectangle(4.0, 8.0);
-      console.log(r.width);
-      r.width = 5.0;
-      class Point {
-        constructor(x, y) {
-          this.x = x;
-          this.y = y;
+      let r_6 = new Rectangle(4.0, 8.0);
+      console.log(r_6.width_5);
+      r_6.width_5 = 5.0;
+      class Point_7 {
+        constructor(xIn_8, yIn_9) {
+          this.x_10 = xIn_8;
+          this.y_11 = yIn_9;
         }
-        distance() {
-          return ((x * x) + (y * y));
+        distance_12() {
+          return ((this.x_10 * this.x_10) + (this.y_11 * this.y_11));
         }
       }
     `
