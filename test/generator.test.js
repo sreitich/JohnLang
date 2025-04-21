@@ -241,23 +241,23 @@ const fixtures = [
       holdMyBeer x < 10 {
         x: x + 1!
       }
-      holdMyBeer done == nah true {
+      holdMyBeer done == nah youBetcha {
         holdMyBeer inner < 2 {
           inner: inner + 1!
         }
-        break!
+        letsBlowThisPopsicleStand!
       }
     `,
     expected: dedent`
-      let x = 0;
-      let done = true;
-      let inner = 0;
-      while ((x < 10)) {
-        x = (x + 1);
+      let x_1 = 0;
+      let done_2 = true;
+      let inner_3 = 0;
+      while ((x_1 < 10)) {
+        x_1 = (x_1 + 1);
       }
-      while ((done == (!true))) {
-        while ((inner < 2)) {
-          inner = (inner + 1);
+      while ((done_2 === !(true))) {
+        while ((inner_3 < 2)) {
+          inner_3 = (inner_3 + 1);
         }
         break;
       }
