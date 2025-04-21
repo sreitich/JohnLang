@@ -49,13 +49,13 @@ const fixtures = [
       letMeLearnYouSomething(nah flag)!
     `,
     expected: dedent`
-      let x = 2;
-      let flag = true;
+      let x_1 = 2;
+      let flag_2 = true;
       console.log("Hello, world");
-      console.log((x % 2 == 0));
+      console.log(((x_1 % 2) === 0));
       console.log(("test" + "case"));
       console.log(123);
-      console.log((!flag));
+      console.log(!(flag_2));
     `
   },
   {
