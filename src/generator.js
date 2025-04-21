@@ -32,12 +32,12 @@ export default function generate(program) {
             return targetName(v);
         },
         AssignmentStatement(s) {
-            output.push(`${gen(s.target)} = ${gen(s.source)};`)
+            output.push(`${gen(s.target)} = ${gen(s.source)};`);
         },
         FunctionDeclaration(d) {
-            output.push(`function ${gen(d.fun)}(${d.fun.parameters?.length ? d.fun.parameters.map(gen).join(", ") : ""}) {`)
+            output.push(`function ${gen(d.fun)}(${d.fun.parameters?.length ? d.fun.parameters.map(gen).join(", ") : ""}) {`);
             d.fun.body.forEach(gen);
-            output.push("}")
+            output.push("}");
         },
         Function(f) {
             return targetName(f);
@@ -94,7 +94,7 @@ export default function generate(program) {
         BreakStatement(s) {
             output.push("break;");
         },
-        ClassType(d) {
+        ClassDeclaration(d) {
             output.push(`class ${targetName(d)} {`);
             output.push(`constructor(${d.constructor.parameters.map(p => gen(p)).join(", ")}) {`);
             d.members.forEach((f) => {

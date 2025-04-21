@@ -20,7 +20,7 @@ class Context {
             retObj = this.locals.get(name);
         } else {
             this.locals.forEach((value, _) => {
-                if (value?.kind === "ClassType") {
+                if (value?.kind === "ClassDeclaration") {
                     value?.methods.forEach((method) => {
                         if (method.fun.name === name) {
                             retObj = method;
@@ -95,11 +95,11 @@ export default function analyze(match) {
     }
 
     function checkIsClassType(e, parseTreeNode) {
-        check(e.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
+        check(e.kind === core.classDeclaration().kind, messages.notClassError(), parseTreeNode);
     }
 
     function checkHasClassType(e, parseTreeNode) {
-        check(e.type?.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
+        check(e.type?.kind === core.classDeclaration().kind, messages.notClassError(), parseTreeNode);
     }
 
     function equivalent(t1, t2) {
@@ -154,7 +154,7 @@ export default function analyze(match) {
     }
 
     function checkIsCallable(e, parseTreeNode) {
-        const callable = e.kind === core.classType().kind || e.type?.kind === core.functionType().kind || e.kind === core.methodDeclaration().kind;
+        const callable = e.kind === core.classDeclaration().kind || e.type?.kind === core.functionType().kind || e.kind === core.methodDeclaration().kind;
         check(callable, messages.notCallableError(), parseTreeNode);
     }
 
@@ -180,7 +180,7 @@ export default function analyze(match) {
         switch (type.kind) {
             case "primitive":
                 return type.name;
-            case "ClassType":
+            case "ClassDeclaration":
                 return type.name;
             case "ArrayType":
                 return "todo";
@@ -397,7 +397,7 @@ export default function analyze(match) {
             let targetTypes;
             switch (callee?.kind) {
                 // Object declaration
-                case core.classType().kind:
+                case core.classDeclaration().kind:
                     check(callee.constructor, messages.selfReferentialClassError(), id);
                     targetTypes = callee.constructor.parameters.map(p => p.type);
                     break;
@@ -450,7 +450,7 @@ export default function analyze(match) {
         ClassDec(_class, id, _open, constructor, methods, _close) {
             checkNotAlreadyDeclared(id.sourceString, id);
 
-            const classObj = core.classType(id.sourceString, null, [], []);
+            const classObj = core.classDeclaration(id.sourceString, null, [], []);
 
             context.add(id.sourceString, classObj);
             context = context.newChildContext();

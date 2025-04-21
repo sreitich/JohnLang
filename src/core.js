@@ -98,8 +98,8 @@ export function breakStatement() {
 //  Classes
 // --------------------------------
 
-export function classType(name, constructor, members, methods) {
-    return { kind: "ClassType", name, constructor, members, methods };
+export function classDeclaration(name, constructor, members, methods) {
+    return { kind: "ClassDeclaration", name, constructor, members, methods };
 }
 
 export function constructorDeclaration(parameters, body) {
