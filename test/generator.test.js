@@ -310,17 +310,19 @@ const fixtures = [
     name: "data_structs",
     source: `
       todo fruits: ["apple", "banana"]!
+      letMeLearnYouSomething(#fruits)!
       almanac fruitPrices: { "apple": 2, "banana": 1 }!
       todo nums: [1,2,3,4]!
       almanac dict: { "one": 1, "two": 2 }!
       todo combo: [nums, dict]!
     `,
     expected: dedent`
-      let fruits = ["apple", "banana"];
-      let fruitPrices = { "apple": 2, "banana": 1 };
-      let nums = [1,2,3,4];
-      let dict = { "one": 1, "two": 2 };
-      let combo = [nums, dict];
+      let fruits_1 = ["apple", "banana"];
+      console.log(fruits_1.length);
+      let fruitPrices_2 = {"apple": 2, "banana": 1};
+      let nums_3 = [1, 2, 3, 4];
+      let dict_4 = {"one": 1, "two": 2};
+      let combo_5 = [nums_3, dict_4];
     `
   },
 ]

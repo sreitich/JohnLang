@@ -126,38 +126,28 @@ export default function generate(program) {
             return `(${gen(e.left)} ${op} ${gen(e.right)})`;
         },
         UnaryExpression(e) {
-            const operand = gen(e.operand)
+            const operand = gen(e.operand);
             if (e.op === "some") {
-                return operand
+                return operand;
             } else if (e.op === "#") {
-                return `${operand}.length`
+                return `${operand}.length`;
             } else if (e.op === "random") {
-                return `((a=>a[~~(Math.random()*a.length)])(${operand}))`
+                return `((a=>a[~~(Math.random()*a.length)])(${operand}))`;
             }
-            return `${e.op}(${operand})`
+            return `${e.op}(${operand})`;
         },
         SubscriptExpression(e) {
-            return `${gen(e.array)}[${gen(e.index)}]`
+            return `${gen(e.array)}[${gen(e.index)}]`;
         },
         ArrayExpression(e) {
-            return `[${e.elements.map(gen).join(",")}]`
+            return `[${e.elements.map(gen).join(", ")}]`;
         },
         MapExpression(e) {
-
+            return `{${e.elements.map(gen).join(", ")}}`;
         },
         MapEntry(e) {
-
+            return `${gen(e.key)}: ${gen(e.value)}`;
         },
-        // FunctionCall(c) {
-        //     const targetCode = standardFunctions.has(c.callee)
-        //         ? standardFunctions.get(c.callee)(c.args.map(gen))
-        //         : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`
-        //     // Calls in expressions vs in statements are handled differently
-        //     if (c.callee.type.returnType !== voidType) {
-        //         return targetCode
-        //     }
-        //     output.push(`${targetCode};`)
-        // },
     }
 
     gen(program)
