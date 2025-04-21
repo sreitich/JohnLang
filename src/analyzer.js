@@ -81,7 +81,7 @@ export default function analyze(match) {
     }
 
     function checkIsStringType(e, parseTreeNode) {
-        check(e.type === core.stringType, messages.notStringError(), parseTreeNode);
+        check(e.type === core.stringType || typeof e === "string" /* Accounts for literals that haven't been wrapped yet. */, messages.notStringError(), parseTreeNode);
     }
 
     function checkIsNumericOrStringType(e, parseTreeNode) {

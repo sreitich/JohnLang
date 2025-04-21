@@ -348,9 +348,9 @@ const fixtures = [
     `,
     expected: dedent`
       let x_1 = false;
-      console.assert(true);
-      console.assert((true || false));
-      console.assert(x_1);
+      if (!true) { throw \`Assertion failed: true\` };
+      if (!(true || false)) { throw \`Assertion failed: (true || false)\` };
+      if (!x_1) { throw \`Assertion failed: x_1\` };
       throw "this is an error";
     `
   },

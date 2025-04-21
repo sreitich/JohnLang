@@ -143,7 +143,8 @@ export default function generate(program) {
             return `${gen(e.key)}: ${gen(e.value)}`;
         },
         CheckStatement(s) {
-            output.push(`console.assert(${gen(s.test)});`);
+            const test = gen(s.test);
+            output.push(`if (!${test}) { throw \`Assertion failed: ${test}\` };`);
         },
         ThrowStatement(s) {
             output.push(`throw ${gen(s.message)};`);
