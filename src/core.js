@@ -163,6 +163,18 @@ export function mapEntry(key, value) {
 }
 
 // --------------------------------
+//  Error handling
+// --------------------------------
+
+export function checkStataement(test) {
+    return { kind: "CheckStatement", test, };
+}
+
+export function throwStatement(message) {
+    return { kind: "ThrowStatement", message, };
+}
+
+// --------------------------------
 //  Internals
 // --------------------------------
 

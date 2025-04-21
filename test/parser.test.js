@@ -286,9 +286,14 @@ const syntaxChecks = [
         letMeLearnYouSomething(1)! //
     `],
 
-    ["using members inside and outside classes", `
+    ["Using members inside and outside classes", `
         NumberKeeper keeper: whipUp NumberKeeper(0)!
         keeper.addOne()!
+    `],
+
+    ["Error handling", `
+        whenPigsFly(thinkAgainPal)!
+        whoopsieDaisy "this is an error"!
     `],
 ]
 
@@ -445,6 +450,14 @@ const syntaxErrors = [
     ["String literal with code point too long",
         'letMeLearnYouSomething("\\u{1111111}")!',
             /Line 1, col 34/],
+
+    ["Assert without an expression", `
+        whenPigsFly()!
+    `],
+
+    ["Throw without a message", `
+        whoopsieDaisy!
+    `],
 ]
 
 describe("Parsing tests", () => {

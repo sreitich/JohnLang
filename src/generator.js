@@ -142,6 +142,13 @@ export default function generate(program) {
         MapEntry(e) {
             return `${gen(e.key)}: ${gen(e.value)}`;
         },
+        CheckStatement(s) {
+            const test = gen(s.test);
+            output.push(`if (!${test}) { throw \`Assertion failed: ${test}\` };`);
+        },
+        ThrowStatement(s) {
+            output.push(`throw ${gen(s.message)};`);
+        }
     }
 
     gen(program);

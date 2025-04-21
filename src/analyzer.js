@@ -80,6 +80,10 @@ export default function analyze(match) {
         check(e.type === core.numberType, messages.notNumericError(), parseTreeNode);
     }
 
+    function checkIsStringType(e, parseTreeNode) {
+        check(e.type === core.stringType || typeof e === "string" /* Accounts for literals that haven't been wrapped yet. */, messages.notStringError(), parseTreeNode);
+    }
+
     function checkIsNumericOrStringType(e, parseTreeNode) {
         const expectedTypes = [core.numberType, core.stringType, "string" /* Accounts for literals that haven't been wrapped yet (e.g. part of a binary expression). */];
         check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
@@ -534,6 +538,18 @@ export default function analyze(match) {
         Statement_break(_break, _excl) {
             checkInLoop(this);
             return core.breakStatement();
+        },
+
+        CheckStmt(_check, _open, exp, _close, _excl) {
+            const test = exp.analyze();
+            checkIsBooleanType(test, exp);
+            return core.checkStataement(test);
+        },
+
+        ThrowStmt(_throw, exp, _excl) {
+            const message = exp.analyze();
+            checkIsStringType(message, exp);
+            return core.throwStatement(message);
         },
 
         // --------------------------------

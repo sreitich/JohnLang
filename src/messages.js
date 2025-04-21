@@ -36,6 +36,10 @@ export function notNumericError() {
     return `We were expectin' a handful!`;
 }
 
+export function notStringError() {
+    return `We were expectin' a chitchat!`;
+}
+
 export function notNumericOrStringError() {
     return `We were expectin' a handful or chitchat!`;
 }
