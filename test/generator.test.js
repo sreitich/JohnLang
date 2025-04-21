@@ -172,16 +172,30 @@ const fixtures = [
       tilTheCowsComeHome handful x: 0, x < 10, x: x + 1 {
         letMeLearnYouSomething(x)!
       }
-      tilTheCowsComeHome handful k: 5, k < 8, k: k + 1 {
-        letMeLearnYouSomething(k)!
+
+      handful y: 0!
+      tilTheCowsComeHome y: 5, y < 10, y: y + 1 {
+        letMeLearnYouSomething(y)!
+      }
+
+      handful z: 5!
+      tilTheCowsComeHome z, z < 10, z: z + 1 {
+        letMeLearnYouSomething(z)!
       }
     `,
     expected: dedent`
-      for (var x = 0; x < 10; x++) {
-        console.log(x);
+      for (let x_1 = 0; (x_1 < 10); x_1 = (x_1 + 1)) {
+        console.log(x_1);
       }
-      for (var k = 5; k < 8; k++) {
-        console.log(k);
+
+      let y_2 = 0;
+      for (y_2 = 5; (y_2 < 10); y_2 = (y_2 + 1)) {
+        console.log(y_2);
+      }
+
+      let z_3 = 5;
+      for (z_3; (z_3 < 10); z_3 = (z_3 + 1)) {
+        console.log(z_3);
       }
     `
   },

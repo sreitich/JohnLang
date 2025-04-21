@@ -211,11 +211,7 @@ export default function analyze(match) {
         if (type)
         {
             checkNotAlreadyDeclared(id.sourceString, id);
-
-            // Declare the iterator as a new variable.
             iterator = core.variable(id.sourceString, type.analyze());
-            context = context.newChildContext({inLoop: true});
-            context.add(id.sourceString, iterator);
 
             isDeclaredInline = true;
         }
@@ -227,6 +223,9 @@ export default function analyze(match) {
 
             isDeclaredInline = false;
         }
+
+        context = context.newChildContext({inLoop: true});
+        context.add(id.sourceString, iterator);
 
         // If given an iterator assignment, check if the iterator can be assigned to it.
         const init = (initExp ? initExp.analyze() : null);

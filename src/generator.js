@@ -74,7 +74,11 @@ export default function generate(program) {
             output.push("}")
         },
         ForStatement(s) {
-
+            // The iterator can be formed a lot of different ways.
+            const iter = `${s.isDeclaredInline ? "let " : ""}${gen(s.variable)}${s.initialValue != null ? ` = ${gen(s.initialValue)}` : ""}`;
+            output.push(`for (${iter}; ${gen(s.test)}; ${gen(s.iterVar)} = ${gen(s.iterExp)}) {`);
+            s.body.forEach(gen);
+            output.push("}");
         },
         BreakStatement(s) {
             output.push("break;")
