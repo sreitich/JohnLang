@@ -86,8 +86,8 @@ export function whileStatement(test, body) {
     return { kind: "WhileStatement", test, body, };
 }
 
-export function forStatement(variable, test, iteration, body) {
-    return { kind: "ForStatement", variable, test, iteration, body, };
+export function forStatement(variable, initialValue, test, iterVar, iterExp, body, isDeclaredInline) {
+    return { kind: "ForStatement", variable, initialValue, test, iterVar, iterExp, body, isDeclaredInline};
 }
 
 export function breakStatement() {

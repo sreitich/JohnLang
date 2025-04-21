@@ -31,7 +31,7 @@ JohnLang {
 
     LoopStmt    = while Exp Block                                               --while
                 | for (Type id ":" Exp) "," (Exp) "," (Exp6 ":" Exp) Block      --for
-                | for id "," (Exp) "," (Exp6 ":" Exp) Block                     --forWithDeclaredIter
+                | for id (":" Exp)? "," (Exp) "," (Exp6 ":" Exp) Block          --forWithExistingIter
 
     Call        = id "(" ListOf<Exp, ","> ")"
 

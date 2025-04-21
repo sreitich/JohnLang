@@ -200,6 +200,57 @@ export default function analyze(match) {
         }
     }
 
+    /* Because of how types are defined in Ohm, we have to have two separate rules for for-loops, depending on whether
+     * they declare a new variable for their iterator. We reuse this function to avoid rewriting most of the code in
+     * LoopStmt_for and LoopStmt_forWithExistingIter. */
+    function forLoop(type, id, initExp, test, iterationVar, iterationExp, block) {
+        let iterator;
+        let isDeclaredInline;
+
+        // If a type is provided, declare the iterator as a new variable.
+        if (type)
+        {
+            checkNotAlreadyDeclared(id.sourceString, id);
+
+            // Declare the iterator as a new variable.
+            iterator = core.variable(id.sourceString, type.analyze());
+            context = context.newChildContext({inLoop: true});
+            context.add(id.sourceString, iterator);
+
+            isDeclaredInline = true;
+        }
+        // If there's no type given, assume the iterator is a pre-declared variable.
+        else
+        {
+            iterator = id.analyze();
+            checkIsMutable(iterator, id);
+
+            isDeclaredInline = false;
+        }
+
+        // If given an iterator assignment, check if the iterator can be assigned to it.
+        const init = (initExp ? initExp.analyze() : null);
+        if (init)
+        {
+            checkIsAssignable(init, iterator.type, id);
+        }
+
+        // Loop's test expression.
+        const testExp = test.analyze();
+        checkIsBooleanType(testExp, test);
+
+        // The assignment evaluated each iteration.
+        const iterVar = iterationVar.analyze();
+        checkIsMutable(iterVar, iterationVar);
+        const iterExp = iterationExp.analyze();
+        checkIsAssignable(iterExp, iterVar.type, iterationVar);
+
+        const body = block.analyze();
+
+        context = context.parent;
+        return core.forStatement(iterator, init, testExp, iterVar, iterExp, body, isDeclaredInline);
+    }
+
     // --------------------------------
     //  Analyzer
     // --------------------------------
@@ -320,46 +371,15 @@ export default function analyze(match) {
         },
 
         // For loop that declares its own iterator.
-        LoopStmt_for(_for, type, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col2, iterExp, block) {
-            checkNotAlreadyDeclared(id.sourceString, id);
-
-            const iterator = core.variable(id.sourceString, type.analyze());
-            context = context.newChildContext({inLoop: true});
-            context.add(id.sourceString, iterator);
-
-            const init = initExp.analyze();
-            checkIsAssignable(init, iterator.type, id);
-
-            const testExp = test.analyze();
-            checkIsBooleanType(testExp, test);
-            const iterTarget = iterationVar.analyze();
-
-            checkIsMutable(iterTarget, iterationVar);
-            const iterValue = iterExp.analyze();
-
-            checkIsAssignable(iterValue, iterTarget.type, iterationVar);
-            const body = block.analyze();
-
-            context = context.parent;
-            return core.forStatement(iterator, testExp, iterValue, body);
+        LoopStmt_for(_for, type, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col2, iterationExp, block) {
+            return forLoop(type, id, initExp, test, iterationVar, iterationExp, block);
         },
 
-        // For loop that uses a pre-declared iterator.
-        LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterationVar, _col, iterExp, block) {
-            const iterator = id.analyze();
-            const testExp = test.analyze();
-
-            checkIsBooleanType(testExp, test);
-            checkIsMutable(iterator, id);
-
-            const iterValue = iterExp.analyze();
-
-            checkIsAssignable(iterValue, iterator.type, iterationVar);
-            context = context.newChildContext({inLoop: true});
-
-            const body = block.analyze();
-            context = context.parent;
-            return core.forStatement(iterator, testExp, iterValue, body);
+        // For loop that uses a declared variable as the iterator.
+        LoopStmt_forWithExistingIter(_for, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col, iterationExp, block) {
+            // If the iterator is already declared, initializing it is optional.
+            let initializationExpression = (initExp.children.length ? initExp.children[0] : null);
+            return forLoop(null, id, initializationExpression, test, iterationVar, iterationExp, block);
         },
 
         Statement_call(stmt, _excl) {
