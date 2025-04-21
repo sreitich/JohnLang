@@ -382,7 +382,10 @@ export default function analyze(match) {
         },
 
         Statement_call(stmt, _excl) {
-            return stmt.analyze();
+            // Flag the function call as a statement (as opposed to being part of an expression) for code generation.
+            let funcCall = stmt.analyze();
+            funcCall.isStatement = true;
+            return funcCall;
         },
 
         Call(id, open, expList, _close) {
@@ -413,7 +416,7 @@ export default function analyze(match) {
                 checkIsAssignable(arg, targetTypes[i], expList);
             });
 
-            return core.constructorCall(callee, args)
+            return core.functionCall(callee, args, false);
         },
 
         DotExp(exp, _dot, id) {
@@ -426,7 +429,10 @@ export default function analyze(match) {
         },
 
         Statement_dotCall(stmt, _excl) {
-            return stmt.analyze();
+            // Flag the dot call as a statement (as opposed to an expression) for code generation.
+            let dotCall = stmt.analyze();
+            dotCall.isStatement = true;
+            return dotCall;
         },
 
         DotCall(exp, _dot, call) {

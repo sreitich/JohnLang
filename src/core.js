@@ -66,6 +66,10 @@ export function printStatement(argument) {
     return { kind: "PrintStatement", argument, };
 }
 
+export function functionCall(callee, args, isStatement) {
+    return { kind: "FunctionCall", callee, args, isStatement, type: callee };
+}
+
 // --------------------------------
 //  If Statements
 // --------------------------------

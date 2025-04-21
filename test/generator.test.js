@@ -64,74 +64,96 @@ const fixtures = [
       gitErDone isEven(handful x): switcheroo {
         betterGetGoin x % 2 == 0!
       }
-      gitErDone f2(handful x): handful {
+      gitErDone timesTwo(handful x): handful {
         betterGetGoin x * 2!
       }
-      gitErDone f3(handful x, handful y): handful {
+      gitErDone add(handful x, handful y): handful {
         betterGetGoin x + y!
       }
-      gitErDone f4(chitchat s): chitchat {
+      gitErDone returnParameter(chitchat s): chitchat {
         betterGetGoin s!
       }
-      gitErDone f5(): handful {
+      gitErDone zero(): handful {
         betterGetGoin 0!
       }
-      gitErDone f6(): handful {
-        betterGetGoin f2(3)!
+      gitErDone doubleThree(): handful {
+        betterGetGoin timesTwo(3)!
       }
-      gitErDone f7(handful x, switcheroo b): handful {
+      gitErDone returnIfTrue(handful x, switcheroo b): handful {
         ope b {
           betterGetGoin x!
         } welp {
           betterGetGoin 0!
         }
       }
-      gitErDone f8(chitchat greeting): chitchat {
+      gitErDone printMessage(chitchat greeting): chitchat {
         letMeLearnYouSomething(greeting)!
         betterGetGoin greeting!
       }
-      gitErDone f9(): switcheroo {
+      gitErDone flip(): switcheroo {
         betterGetGoin nah youBetcha!
       }
-      gitErDone f10(handful x): handful {
+      gitErDone decrement(handful x): handful {
         betterGetGoin x - 1!
+      }
+      gitErDone timesFour(handful x): handful {
+        betterGetGoin timesTwo(timesTwo(x))!
+      }
+      gitErDone printTwice(chitchat message): chitchat {
+        printMessage(message)!
+        betterGetGoin printMessage(message)!
+      }
+      gitErDone printFlipped(): handful {
+        letMeLearnYouSomething(flip())!
+        betterGetGoin 0!
       }
     `,
     expected: dedent`
-      function isEven(x) {
-        return x % 2 == 0;
+      function isEven_1(x_2) {
+        return ((x_2 % 2) === 0);
       }
-      function f2(x) {
-        return (x * 2);
+      function timesTwo_3(x_4) {
+        return (x_4 * 2);
       }
-      function f3(x, y) {
-        return (x + y);
+      function add_5(x_6, y_7) {
+        return (x_6 + y_7);
       }
-      function f4(s) {
-        return s;
+      function returnParameter_8(s_9) {
+        return s_9;
       }
-      function f5() {
+      function zero_10() {
         return 0;
       }
-      function f6() {
-        return f2(3);
+      function doubleThree_11() {
+        return timesTwo_3(3);
       }
-      function f7(x, b) {
-        if (b) {
-          return x;
+      function returnIfTrue_12(x_13, b_14) {
+        if (b_14) {
+          return x_13;
         } else {
           return 0;
         }
       }
-      function f8(greeting) {
-        console.log(greeting);
-        return greeting;
+      function printMessage_15(greeting_16) {
+        console.log(greeting_16);
+        return greeting_16;
       }
-      function f9() {
-        return (!true);
+      function flip_17() {
+        return !(true);
       }
-      function f10(x) {
-        return (x - 1);
+      function decrement_18(x_19) {
+        return (x_19 - 1);
+      }
+      function timesFour_20(x_21) {
+        return timesTwo_3(timesTwo_3(x_21));
+      }
+      function printTwice_22(message_23) {
+        printMessage_15(message_23);
+        return printMessage_15(message_23);
+      }
+      function printFlipped_24() {
+        console.log(flip_17());
+        return 0;
       }
     `
   },

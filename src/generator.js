@@ -38,18 +38,32 @@ export default function generate(program) {
             output.push(`${gen(s.target)} = ${gen(s.source)};`)
         },
         FunctionDeclaration(d) {
-            output.push(`function ${gen(d.fun)}(${d.fun.params.map(gen).join(", ")}) {`)
-            output.push(`return ${gen(d.body)};`);
+            output.push(`function ${gen(d.fun)}(${d.fun.parameters.map(gen).join(", ")}) {`)
+            d.fun.body.forEach(gen);
             output.push("}")
         },
         Function(f) {
-            return targetName(f)
+            return targetName(f);
         },
         ReturnStatement(s) {
-            output.push(`return ${gen(s.expression)};`)
+            output.push(`return ${gen(s.expression)};`);
         },
         PrintStatement(s) {
             output.push(`console.log(${gen(s.argument)});`);
+        },
+        FunctionCall(f)
+        {
+            const code = `${gen(f.callee)}(${f.args.map(gen).join(", ")})`;
+
+            // Calls in expressions and statement calls need to be handled differently.
+            if (f.isStatement)
+            {
+                output.push(`${code};`);
+            }
+            else
+            {
+                return code;
+            }
         },
         IfStatement(s) {
             output.push(`if (${gen(s.test)}) {`)
@@ -65,12 +79,12 @@ export default function generate(program) {
         },
         ShortIfStatement(s) {
             output.push(`if (${gen(s.test)}) {`)
-            s.consequent.forEach(gen)
+            s.consequent.forEach(gen);
             output.push("}")
         },
         WhileStatement(s) {
             output.push(`while (${gen(s.test)}) {`)
-            s.body.forEach(gen)
+            s.body.forEach(gen);
             output.push("}")
         },
         ForStatement(s) {
