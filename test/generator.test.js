@@ -162,29 +162,40 @@ const fixtures = [
     source: `
       handful x: 100!
       switcheroo ready: youBetcha!
-      ope x > 50 {
-        betterGetGoin 2!
-      } welp ope x > 25 {
-        betterGetGoin 1!
-      } welp {
-        betterGetGoin 0!
-      }
       ope ready {
-        betterGetGoin 100!
+        letMeLearnYouSomething("go!")!
+      }
+      ope x >= 0 {
+        letMeLearnYouSomething("positive")!
+      } welp {
+        letMeLearnYouSomething("negative")!
+      }
+      ope x > 50 {
+        letMeLearnYouSomething(2)!
+      } welp ope x > 25 {
+        letMeLearnYouSomething(1)!
+      } welp {
+        letMeLearnYouSomething(0)!
       }
     `,
     expected: dedent`
-      let x = 100;
-      let ready = true;
-      if (x > 50) {
-        return 2;
-      } else if (x > 25) {
-        return 1;
-      } else {
-        return 0;
+      let x_1 = 100;
+      let ready_2 = true;
+      if (ready_2) {
+        console.log("go!");
       }
-      if (ready) {
-        return 100;
+      if ((x_1 >= 0)) {
+        console.log("positive");
+      } else {
+        console.log("negative");
+      }
+      if ((x_1 > 50)) {
+        console.log(2);
+      } else
+      if ((x_1 > 25)) {
+        console.log(1);
+      } else {
+        console.log(0);
       }
     `
   },
