@@ -337,6 +337,23 @@ const fixtures = [
       let combo_5 = [nums_3, dict_4];
     `
   },
+  {
+    name: "error_handling",
+    source: `
+      switcheroo x: thinkAgainPal!
+      whenPigsFly(youBetcha)!
+      whenPigsFly(youBetcha || thinkAgainPal)!
+      whenPigsFly(x)!
+      whoopsieDaisy "this is an error"!
+    `,
+    expected: dedent`
+      let x_1 = false;
+      console.assert(true);
+      console.assert((true || false));
+      console.assert(x_1);
+      throw "this is an error";
+    `
+  },
 ]
 
 describe("The code generator", () => {

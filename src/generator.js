@@ -142,6 +142,12 @@ export default function generate(program) {
         MapEntry(e) {
             return `${gen(e.key)}: ${gen(e.value)}`;
         },
+        CheckStatement(s) {
+            output.push(`console.assert(${gen(s.test)});`);
+        },
+        ThrowStatement(s) {
+            output.push(`throw ${gen(s.message)};`);
+        }
     }
 
     gen(program);
