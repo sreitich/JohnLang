@@ -17,15 +17,13 @@ JohnLang {
 
     VarDec      = Type id ":" Exp "!"
 
-    FunDec      = function id Params ":" Type Block
+    FunDec      = function id Params ":" Type? Block
     Params      = "(" ListOf<Param, ","> ")"
     Param       = Type id
 
     Assignment  = ~literal Exp6 ":" Exp "!"
 
     Print       = print "(" Exp ")" "!"
-
-    IfStmtOld   = if Exp Block (elseif Exp Block)* (else Block)?
 
     IfStmt      = if Exp Block else Block                       --long
                 | if Exp Block else IfStmt                      --elseif

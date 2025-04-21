@@ -19,22 +19,22 @@ const fixtures = [
       chitchat message: "Eat the rich!"!
       switcheroo notX: nah x!
       handful diff: y - 1!
-      switcheroo isEq: x == y!
-      handful prod: x * diff!
+      switcheroo isEq: y == diff!
+      handful prod: y * diff!
       handful quotient: prod / 2!
       chitchat empty: ""!
     `,
     expected: dedent`
-      let x = true;
-      let y = 2;
-      let isPositive = (y >= 2);
-      let message = "Eat the rich";
-      let notX = (!x);
-      let diff = (y - 1);
-      let isEq = (x == y);
-      let prod = (x * diff);
-      let quotient = (prod / 2);
-      let empty = "";
+      let x_1 = true;
+      let y_2 = 2;
+      let isPositive_3 = (y_2 >= 2);
+      let message_4 = "Eat the rich!";
+      let notX_5 = !(x_1);
+      let diff_6 = (y_2 - 1);
+      let isEq_7 = (y_2 === diff_6);
+      let prod_8 = (y_2 * diff_6);
+      let quotient_9 = (prod_8 / 2);
+      let empty_10 = "";
     `
   },
   {

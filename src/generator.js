@@ -2,59 +2,54 @@ export default function generate(program) {
     // When generating code for statements, we'll accumulate the lines of
     // the target code here. When we finish generating, we'll join the lines
     // with newlines and return the result.
-    const output = []
+    const output = [];
 
     // Variable and function names in JS will be suffixed with _1, _2, _3,
-    // etc. This is because "switch", for example, is a legal name in Carlos,
-    // but not in JS. So, the Carlos variable "switch" must become something
-    // like "switch_1". We handle this by mapping each name to its suffix.
+    // etc. This is because "class", for example, is a legal name in John Lang,
+    // but not in JS. So, the John Lang variable "class" must become something
+    // like "class_1". We handle this by mapping each name to its suffix.
     const targetName = (mapping => {
         return entity => {
             if (!mapping.has(entity)) {
-                mapping.set(entity, mapping.size + 1)
+                mapping.set(entity, mapping.size + 1);
             }
-            return `${entity.name}_${mapping.get(entity)}`
+            return `${entity.name}_${mapping.get(entity)}`;
         }
-    })(new Map())
+    })(new Map());
 
-    const gen = node => generators?.[node?.kind]?.(node) ?? node
+    const gen = node => generators?.[node?.kind]?.(node) ?? node;
 
     const generators = {
         // Key idea: when generating an expression, just return the JS string; when
         // generating a statement, write lines of translated JS to the output array.
+        ClassType(d) {
+            return targetName(d);
+        },
         Program(p) {
-            p.statements.forEach(gen)
+            p.statements.forEach(gen);
         },
         VariableDeclaration(d) {
-            // We don't care about const vs. let in the generated code! The analyzer has
-            // already checked that we never updated a const, so let is always fine.
-            output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`)
+            output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`);
+        },
+        Variable(v) {
+            return targetName(v);
+        },
+        AssignmentStatement(s) {
+            output.push(`${gen(s.target)} = ${gen(s.source)};`)
         },
         FunctionDeclaration(d) {
             output.push(`function ${gen(d.fun)}(${d.fun.params.map(gen).join(", ")}) {`)
             output.push(`return ${gen(d.body)};`);
             output.push("}")
         },
-        Variable(v) {
-            return targetName(v)
-        },
         Function(f) {
             return targetName(f)
-        },
-        Increment(s) {
-            output.push(`${gen(s.variable)}++;`)
-        },
-        Assignment(s) {
-            output.push(`${gen(s.target)} = ${gen(s.source)};`)
-        },
-        BreakStatement(s) {
-            output.push("break;")
         },
         ReturnStatement(s) {
             output.push(`return ${gen(s.expression)};`)
         },
-        ShortReturnStatement(s) {
-            output.push("return;")
+        PrintStatement(s) {
+            output.push(`console.log(${gen(s.argument)});`);
         },
         IfStatement(s) {
             output.push(`if (${gen(s.test)}) {`)
@@ -78,9 +73,36 @@ export default function generate(program) {
             s.body.forEach(gen)
             output.push("}")
         },
+        ForStatement(s) {
+
+        },
+        BreakStatement(s) {
+            output.push("break;")
+        },
+        ConstructorDeclaration(d) {
+
+        },
+        FieldDeclaration(d) {
+            return targetName(d);
+        },
+        MethodDeclaration(d) {
+
+        },
+        ConstructorCall(c) {
+
+        },
+        MemberExpression(e) {
+            const object = gen(e.object)
+            const field = JSON.stringify(gen(e.field))
+            const chain = e.op === "." ? "" : e.op
+            return `(${object}${chain}[${field}])`
+        },
+        MemberCall(c) {
+
+        },
         BinaryExpression(e) {
-            const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op
-            return `(${gen(e.left)} ${op} ${gen(e.right)})`
+            const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op;
+            return `(${gen(e.left)} ${op} ${gen(e.right)})`;
         },
         UnaryExpression(e) {
             const operand = gen(e.operand)
@@ -93,34 +115,28 @@ export default function generate(program) {
             }
             return `${e.op}(${operand})`
         },
-        EmptyOptional(e) {
-            return "undefined"
-        },
         SubscriptExpression(e) {
             return `${gen(e.array)}[${gen(e.index)}]`
         },
         ArrayExpression(e) {
             return `[${e.elements.map(gen).join(",")}]`
         },
-        EmptyArray(e) {
-            return "[]"
+        MapExpression(e) {
+
         },
-        MemberExpression(e) {
-            const object = gen(e.object)
-            const field = JSON.stringify(gen(e.field))
-            const chain = e.op === "." ? "" : e.op
-            return `(${object}${chain}[${field}])`
+        MapEntry(e) {
+
         },
-        FunctionCall(c) {
-            const targetCode = standardFunctions.has(c.callee)
-                ? standardFunctions.get(c.callee)(c.args.map(gen))
-                : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`
-            // Calls in expressions vs in statements are handled differently
-            if (c.callee.type.returnType !== voidType) {
-                return targetCode
-            }
-            output.push(`${targetCode};`)
-        },
+        // FunctionCall(c) {
+        //     const targetCode = standardFunctions.has(c.callee)
+        //         ? standardFunctions.get(c.callee)(c.args.map(gen))
+        //         : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`
+        //     // Calls in expressions vs in statements are handled differently
+        //     if (c.callee.type.returnType !== voidType) {
+        //         return targetCode
+        //     }
+        //     output.push(`${targetCode};`)
+        // },
     }
 
     gen(program)
