@@ -9,16 +9,13 @@ export const voidType = { kind: "primitive", name: "void" };
 export const anyType = { kind: "primitive", name: "any" };
 
 // Remember: collections are typeless. That's just how John Language rolls, pal.
+// NOTE: arrayType, mapType, and functionType are helpers for analyzing; they don't need to be generated.
 export function arrayType() {
     return { kind: "ArrayType", };
 }
 
 export function mapType() {
     return { kind: "MapType", };
-}
-
-export function classType(name, constructor, members, methods) {
-    return { kind: "ClassType", name, constructor, members, methods };
 }
 
 // --------------------------------
@@ -65,6 +62,10 @@ export function printStatement(argument) {
     return { kind: "PrintStatement", argument, };
 }
 
+export function functionCall(callee, args, isStatement) {
+    return { kind: "FunctionCall", callee, args, isStatement, type: callee };
+}
+
 // --------------------------------
 //  If Statements
 // --------------------------------
@@ -85,8 +86,8 @@ export function whileStatement(test, body) {
     return { kind: "WhileStatement", test, body, };
 }
 
-export function forStatement(variable, test, iteration, body) {
-    return { kind: "ForStatement", variable, test, iteration, body, };
+export function forStatement(variable, initialValue, test, iterVar, iterExp, body, isDeclaredInline) {
+    return { kind: "ForStatement", variable, initialValue, test, iterVar, iterExp, body, isDeclaredInline};
 }
 
 export function breakStatement() {
@@ -96,6 +97,10 @@ export function breakStatement() {
 // --------------------------------
 //  Classes
 // --------------------------------
+
+export function classDeclaration(name, constructor, members, methods) {
+    return { kind: "ClassDeclaration", name, constructor, members, methods };
+}
 
 export function constructorDeclaration(parameters, body) {
     return { kind: "ConstructorDeclaration", parameters, body, };

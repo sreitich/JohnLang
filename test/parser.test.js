@@ -167,6 +167,18 @@ const syntaxChecks = [
         }
     `],
 
+    ["For loop with pre-declared iterator", `
+        tilTheCowsComeHome x, x < 10, x: x + 1 {
+            letMeLearnYouSomething(x)!
+        }
+    `],
+
+    ["For loop with re-assigned iterator", `
+        tilTheCowsComeHome x: 5, x < 10, x: x + 1 {
+            letMeLearnYouSomething(x)!
+        }
+    `],
+
     ["For each loop", `
         tilTheCowsComeHome handful x: 0, x < #a, x: x + 1 {
             letMeLearnYouSomething(x)!
@@ -345,6 +357,12 @@ const syntaxErrors = [
         "holdMyBeer youBetcha\n" +
         "letMeLearnYouSomething(1)!",
             /Line 2, col 1/],
+
+    ["Uninitialized for-loop iterator", `
+        tilTheCowsComeHome handful x, x < 10, x: x + 1 {
+            letMeLearnYouSomething(x)!
+        }
+    `],
 
     ["If without braces",
         "ope x < 3\n" +

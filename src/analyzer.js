@@ -20,7 +20,7 @@ class Context {
             retObj = this.locals.get(name);
         } else {
             this.locals.forEach((value, _) => {
-                if (value?.kind === "ClassType") {
+                if (value?.kind === "ClassDeclaration") {
                     value?.methods.forEach((method) => {
                         if (method.fun.name === name) {
                             retObj = method;
@@ -81,7 +81,7 @@ export default function analyze(match) {
     }
 
     function checkIsNumericOrStringType(e, parseTreeNode) {
-        const expectedTypes = [core.numberType, core.stringType];
+        const expectedTypes = [core.numberType, core.stringType, "string" /* Accounts for literals that haven't been wrapped yet (e.g. part of a binary expression). */];
         check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
     }
 
@@ -95,11 +95,11 @@ export default function analyze(match) {
     }
 
     function checkIsClassType(e, parseTreeNode) {
-        check(e.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
+        check(e.kind === core.classDeclaration().kind, messages.notClassError(), parseTreeNode);
     }
 
     function checkHasClassType(e, parseTreeNode) {
-        check(e.type?.kind === core.classType().kind, messages.notClassError(), parseTreeNode);
+        check(e.type?.kind === core.classDeclaration().kind, messages.notClassError(), parseTreeNode);
     }
 
     function equivalent(t1, t2) {
@@ -138,7 +138,7 @@ export default function analyze(match) {
     }
 
     function isMutable(e) {
-        return e.mutable;
+        return e.mutable || e.field?.mutable;
     }
 
     function checkIsMutable(e, parseTreeNode) {
@@ -154,7 +154,7 @@ export default function analyze(match) {
     }
 
     function checkIsCallable(e, parseTreeNode) {
-        const callable = e.kind === core.classType().kind || e.type?.kind === core.functionType().kind || e.kind === core.methodDeclaration().kind;
+        const callable = e.kind === core.classDeclaration().kind || e.type?.kind === core.functionType().kind || e.kind === core.methodDeclaration().kind;
         check(callable, messages.notCallableError(), parseTreeNode);
     }
 
@@ -180,7 +180,7 @@ export default function analyze(match) {
         switch (type.kind) {
             case "primitive":
                 return type.name;
-            case "ClassType":
+            case "ClassDeclaration":
                 return type.name;
             case "ArrayType":
                 return "todo";
@@ -198,6 +198,56 @@ export default function analyze(match) {
             case "string":
                 return {value: e, name: e, kind: core.stringType, type: core.stringType};
         }
+    }
+
+    /* Because of how types are defined in Ohm, we have to have two separate rules for for-loops, depending on whether
+     * they declare a new variable for their iterator. We reuse this function to avoid rewriting most of the code in
+     * LoopStmt_for and LoopStmt_forWithExistingIter. */
+    function forLoop(type, id, initExp, test, iterationVar, iterationExp, block) {
+        let iterator;
+        let isDeclaredInline;
+
+        // If a type is provided, declare the iterator as a new variable.
+        if (type)
+        {
+            checkNotAlreadyDeclared(id.sourceString, id);
+            iterator = core.variable(id.sourceString, type.analyze());
+
+            isDeclaredInline = true;
+        }
+        // If there's no type given, assume the iterator is a pre-declared variable.
+        else
+        {
+            iterator = id.analyze();
+            checkIsMutable(iterator, id);
+
+            isDeclaredInline = false;
+        }
+
+        context = context.newChildContext({inLoop: true});
+        context.add(id.sourceString, iterator);
+
+        // If given an iterator assignment, check if the iterator can be assigned to it.
+        const init = (initExp ? initExp.analyze() : null);
+        if (init)
+        {
+            checkIsAssignable(init, iterator.type, id);
+        }
+
+        // Loop's test expression.
+        const testExp = test.analyze();
+        checkIsBooleanType(testExp, test);
+
+        // The assignment evaluated each iteration.
+        const iterVar = iterationVar.analyze();
+        checkIsMutable(iterVar, iterationVar);
+        const iterExp = iterationExp.analyze();
+        checkIsAssignable(iterExp, iterVar.type, iterationVar);
+
+        const body = block.analyze();
+
+        context = context.parent;
+        return core.forStatement(iterator, init, testExp, iterVar, iterExp, body, isDeclaredInline);
     }
 
     // --------------------------------
@@ -320,50 +370,22 @@ export default function analyze(match) {
         },
 
         // For loop that declares its own iterator.
-        LoopStmt_for(_for, type, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col2, iterExp, block) {
-            checkNotAlreadyDeclared(id.sourceString, id);
-
-            const iterator = core.variable(id.sourceString, type.analyze());
-            context = context.newChildContext({inLoop: true});
-            context.add(id.sourceString, iterator);
-
-            const init = initExp.analyze();
-            checkIsAssignable(init, iterator.type, id);
-
-            const testExp = test.analyze();
-            checkIsBooleanType(testExp, test);
-            const iterTarget = iterationVar.analyze();
-
-            checkIsMutable(iterTarget, iterationVar);
-            const iterValue = iterExp.analyze();
-
-            checkIsAssignable(iterValue, iterTarget.type, iterationVar);
-            const body = block.analyze();
-
-            context = context.parent;
-            return core.forStatement(iterator, testExp, iterValue, body);
+        LoopStmt_for(_for, type, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col2, iterationExp, block) {
+            return forLoop(type, id, initExp, test, iterationVar, iterationExp, block);
         },
 
-        // For loop that uses a pre-declared iterator.
-        LoopStmt_forWithDeclaredIter(_for, id, _comma1, test, _comma2, iterationVar, _col, iterExp, block) {
-            const iterator = id.analyze();
-            const testExp = test.analyze();
-
-            checkIsBooleanType(testExp, test);
-            checkIsMutable(iterator, id);
-
-            const iterValue = iterExp.analyze();
-
-            checkIsAssignable(iterValue, iterator.type, iterationVar);
-            context = context.newChildContext({inLoop: true});
-
-            const body = block.analyze();
-            context = context.parent;
-            return core.forStatement(iterator, testExp, iterValue, body);
+        // For loop that uses a declared variable as the iterator.
+        LoopStmt_forWithExistingIter(_for, id, _col1, initExp, _comma1, test, _comma2, iterationVar, _col, iterationExp, block) {
+            // If the iterator is already declared, initializing it is optional.
+            let initializationExpression = (initExp.children.length ? initExp.children[0] : null);
+            return forLoop(null, id, initializationExpression, test, iterationVar, iterationExp, block);
         },
 
         Statement_call(stmt, _excl) {
-            return stmt.analyze();
+            // Flag the function call as a statement (as opposed to being part of an expression) for code generation.
+            let funcCall = stmt.analyze();
+            funcCall.isStatement = true;
+            return funcCall;
         },
 
         Call(id, open, expList, _close) {
@@ -375,7 +397,7 @@ export default function analyze(match) {
             let targetTypes;
             switch (callee?.kind) {
                 // Object declaration
-                case core.classType().kind:
+                case core.classDeclaration().kind:
                     check(callee.constructor, messages.selfReferentialClassError(), id);
                     targetTypes = callee.constructor.parameters.map(p => p.type);
                     break;
@@ -394,7 +416,7 @@ export default function analyze(match) {
                 checkIsAssignable(arg, targetTypes[i], expList);
             });
 
-            return core.constructorCall(callee, args)
+            return core.functionCall(callee, args, false);
         },
 
         DotExp(exp, _dot, id) {
@@ -407,7 +429,10 @@ export default function analyze(match) {
         },
 
         Statement_dotCall(stmt, _excl) {
-            return stmt.analyze();
+            // Flag the dot call as a statement (as opposed to an expression) for code generation.
+            let dotCall = stmt.analyze();
+            dotCall.isStatement = true;
+            return dotCall;
         },
 
         DotCall(exp, _dot, call) {
@@ -425,7 +450,7 @@ export default function analyze(match) {
         ClassDec(_class, id, _open, constructor, methods, _close) {
             checkNotAlreadyDeclared(id.sourceString, id);
 
-            const classObj = core.classType(id.sourceString, null, [], []);
+            const classObj = core.classDeclaration(id.sourceString, null, [], []);
 
             context.add(id.sourceString, classObj);
             context = context.newChildContext();
@@ -649,7 +674,8 @@ export default function analyze(match) {
         },
 
         stringlit(_open, chars, _close) {
-            return chars.sourceString
+            // Include the quotation marks instead of just taking the string's contents.
+            return this.sourceString;
         },
 
         true(_) {

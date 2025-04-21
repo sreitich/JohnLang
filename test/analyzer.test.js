@@ -73,7 +73,9 @@ const semanticChecks = [
 
     ["outer variable", "handful x: 1! holdMyBeer(thinkAgainPal) { letMeLearnYouSomething(x)! }"],
 
-    ["for loop with declared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 2, x: x + 1 { letMeLearnYouSomething(1)! }"],
+    ["for loop with predeclared iterator", "handful x: 1!\ntilTheCowsComeHome x, x < 3, x: x + 1 { letMeLearnYouSomething(1)! }"],
+
+    ["for loop with re-assigned iterator", "handful x: 1!\ntilTheCowsComeHome x: 2, x < 3, x: x + 1 { letMeLearnYouSomething(1)! }"],
 
     // --------------------------------
     //  Relations
@@ -145,6 +147,7 @@ const semanticChecks = [
         }
         T x: T(1)!
         letMeLearnYouSomething(x.number)!
+        x.number: 5!
     `],
 
     ["object declaration",
@@ -249,7 +252,9 @@ const semanticErrors = [
 
     ["non-boolean while test", "holdMyBeer 1 {}", messages.notBooleanError()],
 
-    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i, i < 10, i: i + 1 {}", messages.notNumericError()],
+    ["for loop with undeclared iterator", "tilTheCowsComeHome x, x < 10, x: x + 1 {}", messages.notDeclaredError("x")],
+
+    ["non-integer for loop", "switcheroo i: youBetcha! tilTheCowsComeHome i: i, i < 10, i: i + 1 {}", messages.notNumericError()],
 
     ["bad types for ||", "letMeLearnYouSomething(thinkAgainPal || 1)!", messages.notBooleanError()],
 

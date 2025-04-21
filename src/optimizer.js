@@ -1,4 +1,4 @@
-export default function optimize(program) {
+export default function optimize(node) {
     // TODO: Implement
-    return program;
+    return node;
 }
