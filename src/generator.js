@@ -108,9 +108,9 @@ export default function generate(program) {
             return `this.${targetName(d)}`;
         },
         MethodDeclaration(d) {
-            output.push(`${gen(d.fun)}(${d.fun.parameters?.length ? d.fun.parameters.map(gen).join(", ") : ""}) {`)
+            output.push(`${gen(d.fun)}(${d.fun.params?.length ? d.fun.params.map(gen).join(", ") : ""}) {`);
             d.fun.body.forEach(gen);
-            output.push("}")
+            output.push("}");
         },
         ConstructorCall(c) {
             return `new ${c.callee.name}(${c.args.map(gen).join(", ")})`;
@@ -127,13 +127,7 @@ export default function generate(program) {
         },
         UnaryExpression(e) {
             const operand = gen(e.operand);
-            if (e.op === "some") {
-                return operand;
-            } else if (e.op === "#") {
-                return `${operand}.length`;
-            } else if (e.op === "random") {
-                return `((a=>a[~~(Math.random()*a.length)])(${operand}))`;
-            }
+            if (e.op === "#") return `${operand}.length`;
             return `${e.op}(${operand})`;
         },
         SubscriptExpression(e) {
@@ -150,6 +144,6 @@ export default function generate(program) {
         },
     }
 
-    gen(program)
-    return output.join("\n")
+    gen(program);
+    return output.join("\n");
 }

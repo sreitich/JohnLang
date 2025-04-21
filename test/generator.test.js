@@ -283,6 +283,11 @@ const fixtures = [
         gitErDone distance(): handful {
           betterGetGoin x * x + y * y!
         }
+        gitErDone add(handful deltaX, handful deltaY): handful {
+          x: x + deltaX!
+          y: y + deltaY!
+          betterGetGoin 0!
+        }
       }
     `,
     expected: dedent`
@@ -303,6 +308,11 @@ const fixtures = [
         distance_12() {
           return ((this.x_10 * this.x_10) + (this.y_11 * this.y_11));
         }
+        add_13(deltaX_14, deltaY_15) {
+          this.x_10 = (this.x_10 + deltaX_14);
+          this.y_11 = (this.y_11 + deltaY_15);
+          return 0;
+        }
       }
     `
   },
@@ -311,6 +321,7 @@ const fixtures = [
     source: `
       todo fruits: ["apple", "banana"]!
       letMeLearnYouSomething(#fruits)!
+      letMeLearnYouSomething(fruits[0])!
       almanac fruitPrices: { "apple": 2, "banana": 1 }!
       todo nums: [1,2,3,4]!
       almanac dict: { "one": 1, "two": 2 }!
@@ -319,6 +330,7 @@ const fixtures = [
     expected: dedent`
       let fruits_1 = ["apple", "banana"];
       console.log(fruits_1.length);
+      console.log(fruits_1[0]);
       let fruitPrices_2 = {"apple": 2, "banana": 1};
       let nums_3 = [1, 2, 3, 4];
       let dict_4 = {"one": 1, "two": 2};
