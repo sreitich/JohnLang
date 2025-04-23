@@ -1,0 +1,30 @@
+handful x: 5!
+switcheroo y: youBetcha!
+chitchat z: "Dontcha know!"!
+
+letMeLearnYouSomething(x)!
+letMeLearnYouSomething(y)!
+letMeLearnYouSomething(z)!
+
+handful a: 1!
+handful b: (2 + 4)!
+handful c: a - b!
+handful d: 5 * c + 2!
+letMeLearnYouSomething(c)!
+letMeLearnYouSomething(d)!
+
+letMeLearnYouSomething((d % 2) == 0)!
+
+a: 4!
+b: 8!
+c: (a ** a + b ** b) ** 0.5!
+letMeLearnYouSomething(c)!
+
+switcheroo g: (c >= d)!
+switcheroo l: (c <= 10)!
+switcheroo o: (g || l)!
+letMeLearnYouSomething(o)!
+
+chitchat first: "hold your horses"!
+chitchat second: ", pal!"!
+letMeLearnYouSomething(first + second)!
