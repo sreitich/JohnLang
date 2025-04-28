@@ -30,7 +30,16 @@ const optimizers = {
     return s;
   },
 
-  IfStmt(s) {
+  IfStmtLong(s) {
+    return s;
+  },
+
+  IfStmtShort(s) {
+    s.test = optimize(s.test);
+    s.consequent = s.consequent.flatMap(optimize);
+    if(s.test.constructor === Boolean) {
+        return s.test ? s.consequent : [];
+    }
     return s;
   },
 
