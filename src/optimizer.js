@@ -1,3 +1,8 @@
+//----------------------------------------------------
+// Optimizer Functionality
+//----------------------------------------------------
+
+
 import * as core from "./core.js";
 
 export default function optimize(node) {
