@@ -17,7 +17,7 @@ letMeLearnYouSomething((d % 2) == 0)!
 
 a: 4!
 b: 8!
-c: (a ** a + b ** b) ** 0.5!
+c: (a ** 2 + b ** 2) ** 0.5!
 letMeLearnYouSomething(c)!
 
 switcheroo g: (c >= d)!
