@@ -1,7 +1,13 @@
 //----------------------------------------------------
 // Optimizer Functionality
+//      - Assumes x = x as no-ops
+//      - False "IfStmts" as dead code
+//      - False "WhileLoops" as dead code
+//      - Constant Folding
+//      - Assumes x = x as no-ops
+//      - Assumes x = x as no-ops
+//      - Assumes x = x as no-ops
 //----------------------------------------------------
-
 
 import * as core from "./core.js";
 
@@ -16,30 +22,19 @@ const optimizers = {
     return p;
   },
 
-  VarDec(s) {
-    return s;
-  },
-
-  FunDec(f) {
-    return f;
-  },
-
-  Assignment(s) {
+  AssignmentStatement(s) {
     s.source = optimize(s.source);
     s.target = optimize(s.target);
     if (s.source == s.target) return [];
     return s;
   },
 
-  Print(s) {
+  PrintStatement(s) {
+    s.argument = optimize(s.argument);
     return s;
   },
 
-  IfStmtLong(s) {
-    return s;
-  },
-
-  IfStmtShort(s) {
+  ShortIfStatement(s) {
     s.test = optimize(s.test);
     s.consequent = s.consequent.flatMap(optimize);
     if(s.test.constructor === Boolean) {
@@ -48,39 +43,42 @@ const optimizers = {
     return s;
   },
 
-  LoopStmt(s) {
+  WhileStatement(s) {
+    s.test = optimize(s.test);
+    if(s.test === false) {
+        return []
+    }
+    s.body = s.body.flatMap(optimize);
+
     return s;
   },
 
-  Call(s) {
-    return s;
-  },
+  BinaryExpression(e) {
+    e.op = optimize(e.op);
+    e.left = optimize(e.left);
+    e.right = optimize(e.right);
 
-  DotCall(s) {
-    return s;
-  },
+    if([Number, BigInt].includes(e.right.constructor)) {
+        if(e.op === "+") return e.left + e.right;
+        if(e.op === "-") return e.left - e.right;
+        if(e.op === "/") return e.left / e.right;
+        if(e.op === "*") return e.left * e.right;
+        if(e.op === "%") return e.left % e.right;
+        if(e.op === "<=") return e.left <= e.right;
+        if(e.op === "<") return e.left < e.right;
+        if(e.op === "==") return e.left === e.right;
+        if(e.op === "!=") return e.left != e.right;
+        if(e.op === ">=") return e.left >= e.right;
+        if(e.op === ">") return e.left > e.right;
 
-  DotExp(s) {
-    return s;
-  },
 
-  ClassDec(s) {
-    return s;
-  },
+    } else if(e.op === "||") {
+        if(e.left === true) return true;
+        if(e.right === true) return true;
+    } else if(e.op === "&&") {
+        if(e.left === false) return false;
+        if(e.right === false) return false;
+    }
 
-  Return(s) {
-    return s;
-  },
-
-  Break(s) {
-    return s;
-  },
-
-  CheckStmt(s) {
-    return s;
-  },
-
-  ThrowStmt(s) {
-    return s;
   },
 };
