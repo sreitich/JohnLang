@@ -22,6 +22,14 @@ const optimizers = {
     return p;
   },
 
+  VariableDeclaration(d) {
+   
+  },
+
+  Variable(v) {
+   
+  },
+
   AssignmentStatement(s) {
     s.source = optimize(s.source);
     s.target = optimize(s.target);
@@ -29,9 +37,33 @@ const optimizers = {
     return s;
   },
 
+  FunctionDeclaration(d) {
+   
+  },
+
+  Function(f) {
+   
+  },
+
+  FunctionType(t) {
+   
+  },
+
+  ReturnStatement(s) {
+   
+  },
+
   PrintStatement(s) {
     s.argument = optimize(s.argument);
     return s;
+  },
+
+  FunctionCall(c) {
+   
+  },
+
+  IfStatement(s) {
+   
   },
 
   ShortIfStatement(s) {
@@ -51,6 +83,42 @@ const optimizers = {
     s.body = s.body.flatMap(optimize);
 
     return s;
+  },
+
+  ForStatement(s) {
+   
+  },
+
+  BreakStatement(s) {
+   
+  },
+
+  ClassDeclaration(d) {
+   
+  },
+
+  ConstructorDeclaration(d) {
+   
+  },
+
+  FieldDeclaration(d) {
+   
+  },
+
+  MethodDeclaration(d) {
+   
+  },
+
+  ConstructorCall(c) {
+   
+  },
+
+  MemberExpression(ed) {
+   
+  },
+
+  MemberCall(c) {
+   
   },
 
   BinaryExpression(e) {
@@ -79,6 +147,35 @@ const optimizers = {
         if(e.left === false) return false;
         if(e.right === false) return false;
     }
-
   },
+
+  UnaryExpression(e) {
+   
+  },
+
+  SubscriptExpression(e) {
+   
+  },
+
+  ArrayExpression(e) {
+   
+  },
+
+  MapExpression(e) {
+   
+  },
+
+  MemMapEntryberCall(c) {
+   
+  },
+
+  CheckStatement(s) {
+   
+  },
+
+  ThrowStatement(s) {
+   
+  },
+
+  
 };
