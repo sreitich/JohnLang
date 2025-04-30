@@ -299,7 +299,7 @@ export default function analyze(match) {
 
             /* We intentionally let the parser allow functions to be declared without return types so we can give more
              * helpful error messages. */
-            check(type.children.length, messages.noReturnTypeError(), col);
+            check(col.children.length && type.children.length, messages.noReturnTypeError(), col);
             const returnType = type.children[0].analyze();
             fun.type = core.functionType(paramTypes, returnType);
 
