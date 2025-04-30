@@ -5,6 +5,11 @@ import analyze from "../src/analyzer.js"
 import optimize from "../src/optimizer.js"
 import generate from "../src/generator.js"
 
+/**
+ * NOTE: These tests are run WITHOUT the optimizer. This is done so we can more clearly map source code to generated
+ * code, without worrying about the optimizer affecting our output.
+ */
+
 function dedent(s) {
   return `${s}`.replace(/(?<=\n)\s+/g, "").trim()
 }
@@ -359,7 +364,8 @@ const fixtures = [
 describe("The code generator", () => {
   for (const fixture of fixtures) {
     it(`produces expected js output for the ${fixture.name} program`, () => {
-      const actual = generate(optimize(analyze(parse(fixture.source))))
+      // Run without the optimizer.
+      const actual = generate(analyze(parse(fixture.source)))
       assert.deepEqual(actual, fixture.expected)
     })
   }
