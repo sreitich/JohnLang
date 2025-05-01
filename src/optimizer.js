@@ -12,7 +12,6 @@
 import * as core from "./core.js";
 
 export default function optimize(node) {
-  // TODO: Implement
   return optimizers?.[node.kind]?.(node) ?? node;
 }
 
@@ -23,6 +22,8 @@ const optimizers = {
   },
 
   VariableDeclaration(d) {
+    d.variable = optimize(d.variable);
+    d.initalizer = optimize(d.initalizer);
     return d;
   },
 
@@ -38,11 +39,13 @@ const optimizers = {
   },
 
   FunctionDeclaration(d) {
+    d.fun = optimize(d.fun);    
     return d;
   },
 
   Function(f) {
     if (f.body) f.body = f.body.flatMap(optimize);
+    return f;
   },
 
   FunctionType(t) {
@@ -50,6 +53,7 @@ const optimizers = {
   },
 
   ReturnStatement(s) {
+    s.expression = optimize(s.expression);
     return s;
   },
 
@@ -125,6 +129,7 @@ const optimizers = {
       if (e.op === "-") return e.left - e.right;
       if (e.op === "/") return e.left / e.right;
       if (e.op === "*") return e.left * e.right;
+      if (e.op === "**") return e.left ** e.right;
       if (e.op === "%") return e.left % e.right;
       if (e.op === "<=") return e.left <= e.right;
       if (e.op === "<") return e.left < e.right;
