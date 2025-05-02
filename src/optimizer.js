@@ -39,7 +39,7 @@ const optimizers = {
   },
 
   FunctionDeclaration(d) {
-    d.fun = optimize(d.fun);    
+    d.fun = optimize(d.fun);
     return d;
   },
 
@@ -101,28 +101,61 @@ const optimizers = {
     return s;
   },
 
-  ForStatement(s) {return s;},
+  ForStatement(s) {
+    return s;
+  },
 
-  BreakStatement(s) {return s;},
+  BreakStatement(s) {
+    return s;
+  },
 
-  ClassDeclaration(d) {return d;},
+  ClassDeclaration(d) {
+    return d;
+  },
 
-  ConstructorDeclaration(d) {return d;},
+  ConstructorDeclaration(d) {
+    return d;
+  },
 
-  FieldDeclaration(d) {return d;},
+  FieldDeclaration(d) {
+    return d;
+  },
 
-  MethodDeclaration(d) {return d;},
+  MethodDeclaration(d) {
+    return d;
+  },
 
-  ConstructorCall(c) {return c;},
+  ConstructorCall(c) {
+    return c;
+  },
 
-  MemberExpression(e) {return e;},
+  MemberExpression(e) {
+    return e;
+  },
 
-  MemberCall(c) {return c;},
+  MemberCall(c) {
+    return c;
+  },
 
   BinaryExpression(e) {
     e.op = optimize(e.op);
     e.left = optimize(e.left);
     e.right = optimize(e.right);
+
+    // Check for multiplication by 0 or 1 first
+    if (e.op === "*") {
+      if (e.left === 0 || e.right === 0) return 0;
+      if (e.left === 1) return e.right;
+      if (e.right === 1) return e.left;
+    }
+    if (e.op == "+") {
+      if (e.left === 0) return e.right;
+      if (e.right === 0) return e.left;
+    }
+    if (e.op == "-") {
+      if (e.left == 0) return core.unaryExpression("-", e.right);
+      if (e.right === 0) return e.left;
+    }
 
     if ([Number, BigInt].includes(e.right.constructor)) {
       if (e.op === "+") return e.left + e.right;
@@ -144,19 +177,35 @@ const optimizers = {
       if (e.left === false) return false;
       if (e.right === false) return false;
     }
+
+    return e;
   },
 
-  UnaryExpression(e) {return e;},
+  UnaryExpression(e) {
+    return e;
+  },
 
-  SubscriptExpression(e) {return e;},
+  SubscriptExpression(e) {
+    return e;
+  },
 
-  ArrayExpression(e) {return e;},
+  ArrayExpression(e) {
+    return e;
+  },
 
-  MapExpression(e) {return e;},
+  MapExpression(e) {
+    return e;
+  },
 
-  MemMapEntryberCall(c) {return c;},
+  MemMapEntryberCall(c) {
+    return c;
+  },
 
-  CheckStatement(s) {return s;},
+  CheckStatement(s) {
+    return s;
+  },
 
-  ThrowStatement(s) {return s;},
+  ThrowStatement(s) {
+    return s;
+  },
 };
