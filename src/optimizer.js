@@ -175,7 +175,9 @@ const optimizers = {
     // Optimizing "%" 
     // ----------------------------------------------------
     if (e.op === "%") {
-      if(e.left < e.right) return e.left;
+      if(e.left <= 0 && e.right <= 0){
+        if(e.left < e.right) return e.left;
+      }
     }
 
     // General Constant Folding
@@ -205,6 +207,12 @@ const optimizers = {
   },
 
   UnaryExpression(e) {
+    e.op = optimize(e.op);
+    e.operand = optimize(e.operand);
+    if(e.operand.constructor === Number) {
+      if(e.op === "-") return -e.operand;
+    }
+
     return e;
   },
 

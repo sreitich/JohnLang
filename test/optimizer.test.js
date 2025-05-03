@@ -9,7 +9,7 @@ import * as core from "../src/core.js";
 const x = core.variable("x", core.numberType, true);
 const y = core.variable("y", core.numberType, true);
 const z = core.variable("z", core.numberType, true);
-
+const print = core.printStatement(x)
 const negate = (x) => core.unaryExpression("-", x);
 //----------------------------------
 // Tests
@@ -40,11 +40,17 @@ const tests = [
   ["optimizes **1", core.binaryExpression("**", x, 1), x],
   ["optimizes **-1", core.binaryExpression("**", x, -1), 1/x],
   ["optimizes %", core.binaryExpression("%", 5, 10), 5],
+
+  
+
   ["removes x=x from the beginning", core.program([core.assignmentStatement(x, x), core.printStatement(y)]), core.program([core.printStatement(y)])],
   ["removes x=x from the middle", core.program([core.printStatement(y), core.assignmentStatement(x, x), core.printStatement(z)]), core.program([core.printStatement(y), core.printStatement(z)])],
   ["removes x=x from the end", core.program([core.printStatement(y), core.printStatement(z), core.assignmentStatement(x, x)]), core.program([core.printStatement(y), core.printStatement(z)])],
-
-
+  ["if optimization (false)", core.ifStatement(false, [print], []), []],
+  ["if optimization (true)", core.ifStatement(true, [print], []), [print]],
+  ["short-if optimization (false)", core.shortIfStatement(false, [print]), []],
+  ["short-if optimization (true)", core.shortIfStatement(true, [print]), [print]],
+  ["while optimization (false)", core.program([core.whileStatement(false, [print])]), core.program([])],
 ];
 
 describe("The optimizer", () => {
