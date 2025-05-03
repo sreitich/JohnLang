@@ -4,7 +4,7 @@
 //      - False "IfStmts" as dead code
 //      - False "WhileLoops" as dead code
 //      - Constant Folding
-//      - Assumes x = x as no-ops
+//      - Strength Reduction (+0, -0, *0, *1)
 //      - Assumes x = x as no-ops
 //      - Assumes x = x as no-ops
 //----------------------------------------------------
@@ -34,7 +34,7 @@ const optimizers = {
   AssignmentStatement(s) {
     s.source = optimize(s.source);
     s.target = optimize(s.target);
-    if (s.source == s.target) return [];
+    if (s.source === s.target) return [];
     return s;
   },
 
@@ -142,21 +142,44 @@ const optimizers = {
     e.left = optimize(e.left);
     e.right = optimize(e.right);
 
-    // Check for multiplication by 0 or 1 first
+    // Optimizing "**" 
+    // ----------------------------------------------------
+    if(e.op === "**") {
+      if(e.right === 0) return 1;
+      if(e.right === 1) return e.left;
+      if(e.right === -1) return 1 / e.left;
+    }
+
+    // Optimizing "*" 
+    // ----------------------------------------------------
     if (e.op === "*") {
       if (e.left === 0 || e.right === 0) return 0;
       if (e.left === 1) return e.right;
       if (e.right === 1) return e.left;
     }
-    if (e.op == "+") {
+
+    // Optimizing "+" 
+    // ----------------------------------------------------
+    if (e.op === "+") {
       if (e.left === 0) return e.right;
       if (e.right === 0) return e.left;
     }
-    if (e.op == "-") {
+
+    // Optimizing "-" 
+    // ----------------------------------------------------
+    if (e.op === "-") {
       if (e.left == 0) return core.unaryExpression("-", e.right);
       if (e.right === 0) return e.left;
     }
 
+    // Optimizing "%" 
+    // ----------------------------------------------------
+    if (e.op === "%") {
+      if(e.left < e.right) return e.left;
+    }
+
+    // General Constant Folding
+    // ----------------------------------------------------
     if ([Number, BigInt].includes(e.right.constructor)) {
       if (e.op === "+") return e.left + e.right;
       if (e.op === "-") return e.left - e.right;
