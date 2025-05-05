@@ -23,7 +23,7 @@ const optimizers = {
 
   VariableDeclaration(d) {
     d.variable = optimize(d.variable);
-    d.initalizer = optimize(d.initalizer);
+    d.initalizer = optimize(d.initializer);
     return d;
   },
 
