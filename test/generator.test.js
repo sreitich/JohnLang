@@ -168,9 +168,6 @@ const fixtures = [
       }
       ope x == 0 {
         letMeLearnYouSomething(1)!
-      }
-      ope x == 0 {
-        letMeLearnYouSomething(1)!
       } welp {
         letMeLearnYouSomething(2)!
       }
@@ -190,7 +187,7 @@ const fixtures = [
     expected: dedent`
       let x_1 = 0;
       if ((x_1 === 0)) {
-        console.log("1");
+        console.log(1);
       }
       if ((x_1 === 0)) {
         console.log(1);
@@ -200,16 +197,16 @@ const fixtures = [
       if ((x_1 === 0)) {
         console.log(1);
       } else
-        if ((x_1 === 2)) {
-          console.log(3);
-        }
+      if ((x_1 === 1)) {
+        console.log(2);
+      }
       if ((x_1 === 0)) {
         console.log(1);
       } else
-      if ((x_1 === 2)) {
-        console.log(3);
+      if ((x_1 === 1)) {
+        console.log(2);
       } else {
-        console.log(4);
+        console.log(3);
       }
     `
   },
