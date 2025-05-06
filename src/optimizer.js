@@ -199,7 +199,7 @@ const optimizers = {
 
     // General Constant Folding
     // ----------------------------------------------------
-    if ([Number, BigInt].includes(e.right.constructor)) {
+    if ([Number, BigInt].includes(e.right.constructor) && [Number, BigInt].includes(e.left.constructor)) {
       if (e.op === "+") return e.left + e.right;
       if (e.op === "-") return e.left - e.right;
       if (e.op === "/") return e.left / e.right;
