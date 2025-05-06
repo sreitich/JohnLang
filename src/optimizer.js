@@ -8,6 +8,7 @@
 //      - Strength Reduction (+0, -0, *0, *1)
 //      - Shortens "&&" and "||" operators
 //      - Quicker Caluclations
+//      - Program, Arrays, Functions all FlatMapped
 //----------------------------------------------------
 
 import * as core from "./core.js";
@@ -45,6 +46,7 @@ const optimizers = {
   },
 
   Function(f) {
+    f.parameters = f.parameters.flatMap(optimize); 
     if (f.body) f.body = f.body.flatMap(optimize);
     return f;
   },
@@ -65,7 +67,7 @@ const optimizers = {
 
   FunctionCall(c) {
     c.callee = optimize(c.callee)
-    c.args = c.args.map(optimize)
+    c.args = c.args.flatMap(optimize)
     return c;
   },
 
@@ -105,6 +107,12 @@ const optimizers = {
   },
 
   ForStatement(s) {
+    s.initialValue = optimize(s.initialValue);
+    s.test = optimize(s.test);
+    s.body = s.body.flatMap(optimize);
+    if(s.test === false){
+      return [];
+    }
     return s;
   },
 

@@ -11,10 +11,11 @@ const y = core.variable("y", core.numberType, true);
 const z = core.variable("z", core.numberType, true);
 const print = core.printStatement(x)
 const negate = (x) => core.unaryExpression("-", x);
+const add = (x, y) => core.binaryExpression("+", x, y);
+
 //----------------------------------
 // Tests
 //----------------------------------
-
 const tests = [
   ["folds +", core.binaryExpression("+", 10, 5), 15],
   ["folds -", core.binaryExpression("-", 10, 5), 5],
@@ -54,6 +55,8 @@ const tests = [
   ["optimzes || op (2)", core.binaryExpression("||", false, true), true],
   ["optimzes subscript expressions", core.subscriptExpression(x, core.binaryExpression("+", 1, 2)), core.subscriptExpression(x, 3)],
   ["optimizes unary expressions", core.unaryExpression("-", 3), -3],
+  ["optimizes function arguments", core.fun("TestFunction", [add(x, 0)], []),  core.fun("TestFunction", [x], [])],
+  ["optimizes for-false statements", core.forStatement(x, 5, false, x, core.binaryExpression("+", x, 1), [], true), []],
   ["optimzes statements in an array", 
     core.arrayExpression([
       core.binaryExpression("+", 1, 2),
@@ -68,9 +71,42 @@ const tests = [
       core.printStatement(-3)
     ])
   ],
+  ["optimizes statements inside a function",
+    core.fun("TestFunction", [], 
+      [
+        core.binaryExpression("+", 1, 2),
+        core.assignmentStatement(x, x),
+        core.binaryExpression("+", 5, 5),
+        core.printStatement(core.unaryExpression("-", 3))
+      ]
+    ), 
 
+    core.fun("TestFunction", [], 
+      [
+        3,
+        10,
+        core.printStatement(-3)
+      ]
+    )
+  ],
+  ["optimizes statements inside a for loop", 
+    core.forStatement(x, 5, true, x, core.binaryExpression("+", x, 1), 
+    [
+      core.binaryExpression("+", 1, 2),
+      core.assignmentStatement(x, x),
+      core.binaryExpression("+", 5, 5),
+      core.printStatement(core.unaryExpression("-", 3))
+    ], 
+    true),
 
-
+    core.forStatement(x, 5, true, x, core.binaryExpression("+", x, 1), 
+    [
+      3,
+      10,
+      core.printStatement(-3)
+    ], 
+    true),
+  ],
 ];
 
 describe("The optimizer", () => {
