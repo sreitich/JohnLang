@@ -2,11 +2,12 @@
 // Optimizer Functionality
 //      - Assumes x = x as no-ops
 //      - False "IfStmts" as dead code
+//      - False "ShortIfStmts" as dead code
 //      - False "WhileLoops" as dead code
 //      - Constant Folding
 //      - Strength Reduction (+0, -0, *0, *1)
-//      - Assumes x = x as no-ops
-//      - Assumes x = x as no-ops
+//      - Shortens "&&" and "||" operators
+//      - Quicker Caluclations
 //----------------------------------------------------
 
 import * as core from "./core.js";
@@ -63,6 +64,8 @@ const optimizers = {
   },
 
   FunctionCall(c) {
+    c.callee = optimize(c.callee)
+    c.args = c.args.map(optimize)
     return c;
   },
 
@@ -126,10 +129,13 @@ const optimizers = {
   },
 
   ConstructorCall(c) {
+    c.callee = optimize(c.callee);
+    c.args = c.args.map(optimize)
     return c;
   },
 
   MemberExpression(e) {
+    e.object = optimize(e.object)
     return e;
   },
 
@@ -217,18 +223,22 @@ const optimizers = {
   },
 
   SubscriptExpression(e) {
+    e.array = optimize(e.array)
+    e.index = optimize(e.index)
     return e;
   },
 
   ArrayExpression(e) {
+    e.elements = e.elements.flatMap(optimize);
     return e;
   },
 
   MapExpression(e) {
+    e.elements = e.elements.map(optimize);
     return e;
   },
 
-  MemMapEntryberCall(c) {
+  MapEntry(c) {
     return c;
   },
 

@@ -40,9 +40,6 @@ const tests = [
   ["optimizes **1", core.binaryExpression("**", x, 1), x],
   ["optimizes **-1", core.binaryExpression("**", x, -1), 1/x],
   ["optimizes %", core.binaryExpression("%", 5, 10), 5],
-
-  
-
   ["removes x=x from the beginning", core.program([core.assignmentStatement(x, x), core.printStatement(y)]), core.program([core.printStatement(y)])],
   ["removes x=x from the middle", core.program([core.printStatement(y), core.assignmentStatement(x, x), core.printStatement(z)]), core.program([core.printStatement(y), core.printStatement(z)])],
   ["removes x=x from the end", core.program([core.printStatement(y), core.printStatement(z), core.assignmentStatement(x, x)]), core.program([core.printStatement(y), core.printStatement(z)])],
@@ -51,6 +48,29 @@ const tests = [
   ["short-if optimization (false)", core.shortIfStatement(false, [print]), []],
   ["short-if optimization (true)", core.shortIfStatement(true, [print]), [print]],
   ["while optimization (false)", core.program([core.whileStatement(false, [print])]), core.program([])],
+  ["optimzes && op (1)", core.binaryExpression("&&", true, false), false],
+  ["optimzes && op (2)", core.binaryExpression("&&", false, true), false],
+  ["optimzes || op (1)", core.binaryExpression("||", true, false), true],
+  ["optimzes || op (2)", core.binaryExpression("||", false, true), true],
+  ["optimzes subscript expressions", core.subscriptExpression(x, core.binaryExpression("+", 1, 2)), core.subscriptExpression(x, 3)],
+  ["optimizes unary expressions", core.unaryExpression("-", 3), -3],
+  ["optimzes statements in an array", 
+    core.arrayExpression([
+      core.binaryExpression("+", 1, 2),
+      core.assignmentStatement(x, x),
+      core.binaryExpression("+", 5, 5),
+      core.printStatement(core.unaryExpression("-", 3))
+    ]),
+
+    core.arrayExpression([
+      3,
+      10,
+      core.printStatement(-3)
+    ])
+  ],
+
+
+
 ];
 
 describe("The optimizer", () => {
