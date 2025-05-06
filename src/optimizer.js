@@ -107,7 +107,10 @@ const optimizers = {
   },
 
   ForStatement(s) {
-    s.initialValue = optimize(s.initialValue);
+    if (s.initialValue)
+    {
+      s.initialValue = optimize(s.initialValue);
+    }
     s.test = optimize(s.test);
     s.body = s.body.flatMap(optimize);
     if(s.test === false){
