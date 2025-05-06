@@ -51,10 +51,6 @@ const optimizers = {
     return f;
   },
 
-  FunctionType(t) {
-    return t;
-  },
-
   ReturnStatement(s) {
     s.expression = optimize(s.expression);
     return s;
@@ -146,11 +142,14 @@ const optimizers = {
   },
 
   MemberExpression(e) {
-    e.object = optimize(e.object)
+    e.object = optimize(e.object);
+    e.field = optimize(e.field);  
     return e;
   },
 
   MemberCall(c) {
+    c.object = optimize(c.object);
+    c.member = optimize(c.member);
     return c;
   },
 

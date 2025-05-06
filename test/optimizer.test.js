@@ -6,6 +6,7 @@ import * as core from "../src/core.js";
 //----------------------------------
 // Preinitialize Test Cases
 //----------------------------------
+const obj = core.variable("obj", core.anyType, true)
 const x = core.variable("x", core.numberType, true);
 const y = core.variable("y", core.numberType, true);
 const z = core.variable("z", core.numberType, true);
@@ -106,6 +107,40 @@ const tests = [
       core.printStatement(-3)
     ], 
     true),
+  ],
+  [
+    "optimizes constructor arguments",
+    core.constructorCall(
+      x, 
+      [
+        core.binaryExpression("+", 1, 2), // should fold to 3
+        core.binaryExpression("*", 2, 5)  // should fold to 10
+      ]
+    ),
+    core.constructorCall(
+      x,
+      [3, 10] 
+    )
+  ],
+
+  [
+    "optimizes member expression and member call",
+    core.memberCall(
+      core.memberExpression(
+        obj,
+        ".",
+        core.assignmentStatement(x, x) 
+      ),
+      core.binaryExpression("+", 1, 2)
+    ),
+    core.memberCall(
+      core.memberExpression(
+        obj,
+        ".",
+        [] 
+      ),
+      3 
+    )
   ],
 ];
 
