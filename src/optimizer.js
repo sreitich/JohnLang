@@ -188,14 +188,6 @@ const optimizers = {
       if (e.right === 0) return e.left;
     }
 
-    // Optimizing "%" 
-    // ----------------------------------------------------
-    if (e.op === "%") {
-      if(e.left <= 0 && e.right <= 0){
-        if(e.left < e.right) return e.left;
-      }
-    }
-
     // General Constant Folding
     // ----------------------------------------------------
     if ([Number, BigInt].includes(e.right.constructor) && [Number, BigInt].includes(e.left.constructor)) {

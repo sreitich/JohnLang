@@ -41,7 +41,6 @@ const tests = [
   ["optimizes **0", core.binaryExpression("**", x, 0), 1],
   ["optimizes **1", core.binaryExpression("**", x, 1), x],
   ["optimizes **-1", core.binaryExpression("**", x, -1), 1/x],
-  ["optimizes %", core.binaryExpression("%", 5, 10), 5],
   ["removes x=x from the beginning", core.program([core.assignmentStatement(x, x), core.printStatement(y)]), core.program([core.printStatement(y)])],
   ["removes x=x from the middle", core.program([core.printStatement(y), core.assignmentStatement(x, x), core.printStatement(z)]), core.program([core.printStatement(y), core.printStatement(z)])],
   ["removes x=x from the end", core.program([core.printStatement(y), core.printStatement(z), core.assignmentStatement(x, x)]), core.program([core.printStatement(y), core.printStatement(z)])],
@@ -141,6 +140,40 @@ const tests = [
       ),
       3 
     )
+  ],
+
+  [
+    "leaves BreakStatement unchanged",
+    core.breakStatement(),
+    core.breakStatement()
+  ],
+  
+  [
+    "leaves ClassDeclaration unchanged",
+    core.classDeclaration("MyClass", null, [], [])
+    ,
+    core.classDeclaration("MyClass", null, [], [])
+  ],
+  
+  [
+    "leaves ConstructorDeclaration unchanged",
+    core.constructorDeclaration([], [])
+    ,
+    core.constructorDeclaration([], [])
+  ],
+  
+  [
+    "leaves FieldDeclaration unchanged",
+    core.fieldDeclaration("field", core.numberType, 42)
+    ,
+    core.fieldDeclaration("field", core.numberType, 42)
+  ],
+  
+  [
+    "leaves MethodDeclaration unchanged",
+    core.methodDeclaration(core.fun("method", [], [], core.voidType))
+    ,
+    core.methodDeclaration(core.fun("method", [], [], core.voidType))
   ],
 ];
 
