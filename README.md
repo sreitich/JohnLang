@@ -8,7 +8,7 @@ As optimistic as he was, he was just as plain. Thus, John Language is not the mo
 
 ###### Even though John Language is the original creator of John Lang, this *compiler* was created by [Adi Roitburg](https://github.com/Adiro777), [Allen Boyce](https://github.com/AllenBoyce),  [Jacob Mendoza](https://github.com/JacNslash04), [JD Elia](https://github.com/JD-Elia), [Kyle Matton](https://github.com/KyleMatton26), and [Sam Reitich](https://github.com/sreitich).
 
-[^1]: John Language was retroactively renamed to John Lang by Oracle in 2020 following the devastating extinction of giraffes during the COVID-19 Pandemic.
+[^1]: John Language was retroactively renamed to John Lang by Oracle in 2020.
 
 
 
