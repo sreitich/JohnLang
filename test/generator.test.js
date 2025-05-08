@@ -44,6 +44,7 @@ const fixtures = [
       switcheroo flag: youBetcha!
       letMeLearnYouSomething("Hello, world")!
       letMeLearnYouSomething(x % 2 == 0)!
+      letMeLearnYouSomething(x * -1 == -x)!
       letMeLearnYouSomething("test" + "case")!
       letMeLearnYouSomething(123)!
       letMeLearnYouSomething(nah flag)!
@@ -53,6 +54,7 @@ const fixtures = [
       let flag_2 = true;
       console.log("Hello, world");
       console.log(((x_1 % 2) === 0));
+      console.log(((x_1 * -1) === -(x_1)));
       console.log(("test" + "case"));
       console.log(123);
       console.log(!(flag_2));
@@ -160,42 +162,51 @@ const fixtures = [
   {
     name: "if_stmts",
     source: `
-      handful x: 100!
-      switcheroo ready: youBetcha!
-      ope ready {
-        letMeLearnYouSomething("go!")!
+      handful x: 0!
+      ope x == 0 {
+        letMeLearnYouSomething(1)!
       }
-      ope x >= 0 {
-        letMeLearnYouSomething("positive")!
-      } welp {
-        letMeLearnYouSomething("negative")!
-      }
-      ope x > 50 {
-        letMeLearnYouSomething(2)!
-      } welp ope x > 25 {
+      ope x == 0 {
         letMeLearnYouSomething(1)!
       } welp {
-        letMeLearnYouSomething(0)!
+        letMeLearnYouSomething(2)!
+      }
+      ope x == 0 {
+        letMeLearnYouSomething(1)!
+      } welp ope x == 1 {
+        letMeLearnYouSomething(2)!
+      }
+      ope x == 0 {
+        letMeLearnYouSomething(1)!
+      } welp ope x == 1 {
+        letMeLearnYouSomething(2)!
+      } welp {
+        letMeLearnYouSomething(3)!
       }
     `,
     expected: dedent`
-      let x_1 = 100;
-      let ready_2 = true;
-      if (ready_2) {
-        console.log("go!");
+      let x_1 = 0;
+      if ((x_1 === 0)) {
+        console.log(1);
       }
-      if ((x_1 >= 0)) {
-        console.log("positive");
-      } else {
-        console.log("negative");
-      }
-      if ((x_1 > 50)) {
-        console.log(2);
-      } else
-      if ((x_1 > 25)) {
+      if ((x_1 === 0)) {
         console.log(1);
       } else {
-        console.log(0);
+        console.log(2);
+      }
+      if ((x_1 === 0)) {
+        console.log(1);
+      } else
+      if ((x_1 === 1)) {
+        console.log(2);
+      }
+      if ((x_1 === 0)) {
+        console.log(1);
+      } else
+      if ((x_1 === 1)) {
+        console.log(2);
+      } else {
+        console.log(3);
       }
     `
   },

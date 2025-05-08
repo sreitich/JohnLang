@@ -77,7 +77,7 @@ export default function analyze(match) {
     }
 
     function checkIsNumericType(e, parseTreeNode) {
-        check(e.type === core.numberType, messages.notNumericError(), parseTreeNode);
+        check(e.type === core.numberType || typeof e === "number", messages.notNumericError(), parseTreeNode);
     }
 
     function checkIsStringType(e, parseTreeNode) {
@@ -85,7 +85,7 @@ export default function analyze(match) {
     }
 
     function checkIsNumericOrStringType(e, parseTreeNode) {
-        const expectedTypes = [core.numberType, core.stringType, "string" /* Accounts for literals that haven't been wrapped yet (e.g. part of a binary expression). */];
+        const expectedTypes = [core.numberType, core.stringType, "number", "string" /* Accounts for literals that haven't been wrapped yet (e.g. part of a binary expression). */];
         check(expectedTypes.includes(e.type), messages.notNumericOrStringError(), parseTreeNode);
     }
 
@@ -204,6 +204,14 @@ export default function analyze(match) {
         }
     }
 
+    function tryWrapLiteral(e) {
+        if (typeof e !== "object" || e === null || !("type" in e)) {
+            e = wrapLiteral(e);
+        }
+
+        return e;
+    }
+
     /* Because of how types are defined in Ohm, we have to have two separate rules for for-loops, depending on whether
      * they declare a new variable for their iterator. We reuse this function to avoid rewriting most of the code in
      * LoopStmt_for and LoopStmt_forWithExistingIter. */
@@ -291,7 +299,7 @@ export default function analyze(match) {
 
             /* We intentionally let the parser allow functions to be declared without return types so we can give more
              * helpful error messages. */
-            check(type.children.length, messages.noReturnTypeError(), col);
+            check(col.children.length && type.children.length, messages.noReturnTypeError(), col);
             const returnType = type.children[0].analyze();
             fun.type = core.functionType(paramTypes, returnType);
 
@@ -581,8 +589,13 @@ export default function analyze(match) {
         Exp2_compare(exp1, op, exp2) {
             const left = exp1.analyze();
             const right = exp2.analyze();
+
+            // Wrap these for our type check, in case they haven't been wrapped yet.
+            const leftWrapped = tryWrapLiteral(left);
+            const rightWrapped = tryWrapLiteral(right);
+
             if (op.sourceString === "==" || op.sourceString === "!=") {
-                check(equivalent(left.type, right.type), messages.twoDifferentTypesError(), op);
+                check(equivalent(leftWrapped.type, rightWrapped.type), messages.twoDifferentTypesError(), op);
             } else {
                 checkIsNumericType(left, exp1);
                 checkIsNumericType(right, exp2);

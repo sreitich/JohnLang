@@ -251,7 +251,11 @@ const semanticErrors = [
 
     ["return nothing from function", "gitErDone f(): handful { betterGetGoin! }", messages.returnsNothingError()],
 
+    ["function without return signature", "gitErDone f() { betterGetGoin 0! }", messages.noReturnTypeError()],
+
     ["function without return type", "gitErDone f(): { betterGetGoin 0! }", messages.noReturnTypeError()],
+
+    ["function without return formatting", "gitErDone f() handful { betterGetGoin 0! }", messages.noReturnTypeError()],
 
     ["return type mismatch", "gitErDone f(): handful { betterGetGoin thinkAgainPal! }", messages.notAssignableError("switcheroo", "handful")],
 
