@@ -29,10 +29,6 @@ const optimizers = {
     return d;
   },
 
-  Variable(v) {
-    return v;
-  },
-
   AssignmentStatement(s) {
     s.source = optimize(s.source);
     s.target = optimize(s.target);
@@ -113,26 +109,6 @@ const optimizers = {
       return [];
     }
     return s;
-  },
-
-  BreakStatement(s) {
-    return s;
-  },
-
-  ClassDeclaration(d) {
-    return d;
-  },
-
-  ConstructorDeclaration(d) {
-    return d;
-  },
-
-  FieldDeclaration(d) {
-    return d;
-  },
-
-  MethodDeclaration(d) {
-    return d;
   },
 
   ConstructorCall(c) {
@@ -238,17 +214,5 @@ const optimizers = {
   MapExpression(e) {
     e.elements = e.elements.map(optimize);
     return e;
-  },
-
-  MapEntry(c) {
-    return c;
-  },
-
-  CheckStatement(s) {
-    return s;
-  },
-
-  ThrowStatement(s) {
-    return s;
   },
 };

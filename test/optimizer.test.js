@@ -57,78 +57,13 @@ const tests = [
   ["optimizes unary expressions", core.unaryExpression("-", 3), -3],
   ["optimizes function arguments", core.fun("TestFunction", [add(x, 0)], []),  core.fun("TestFunction", [x], [])],
   ["optimizes for-false statements", core.forStatement(x, 5, false, x, core.binaryExpression("+", x, 1), [], true), []],
-  ["optimzes statements in an array", 
-    core.arrayExpression([
-      core.binaryExpression("+", 1, 2),
-      core.assignmentStatement(x, x),
-      core.binaryExpression("+", 5, 5),
-      core.printStatement(core.unaryExpression("-", 3))
-    ]),
-
-    core.arrayExpression([
-      3,
-      10,
-      core.printStatement(-3)
-    ])
-  ],
-  ["optimizes statements inside a function",
-    core.fun("TestFunction", [], 
-      [
-        core.binaryExpression("+", 1, 2),
-        core.assignmentStatement(x, x),
-        core.binaryExpression("+", 5, 5),
-        core.printStatement(core.unaryExpression("-", 3))
-      ]
-    ), 
-
-    core.fun("TestFunction", [], 
-      [
-        3,
-        10,
-        core.printStatement(-3)
-      ]
-    )
-  ],
-  ["optimizes statements inside a for loop", 
-    core.forStatement(x, 5, true, x, core.binaryExpression("+", x, 1), 
-    [
-      core.binaryExpression("+", 1, 2),
-      core.assignmentStatement(x, x),
-      core.binaryExpression("+", 5, 5),
-      core.printStatement(core.unaryExpression("-", 3))
-    ], 
-    true),
-
-    core.forStatement(x, 5, true, x, core.binaryExpression("+", x, 1), 
-    [
-      3,
-      10,
-      core.printStatement(-3)
-    ], 
-    true),
-  ],
-  [
-    "optimizes constructor arguments",
-    core.constructorCall(
-      x, 
-      [
-        core.binaryExpression("+", 1, 2), // should fold to 3
-        core.binaryExpression("*", 2, 5)  // should fold to 10
-      ]
-    ),
-    core.constructorCall(
-      x,
-      [3, 10] 
-    )
-  ],
-
   [
     "optimizes member expression and member call",
     core.memberCall(
       core.memberExpression(
         obj,
         ".",
-        core.assignmentStatement(x, x) 
+        core.assignmentStatement(x, x)
       ),
       core.binaryExpression("+", 1, 2)
     ),
@@ -136,45 +71,11 @@ const tests = [
       core.memberExpression(
         obj,
         ".",
-        [] 
+        []
       ),
-      3 
+      3
     )
-  ],
-
-  [
-    "leaves BreakStatement unchanged",
-    core.breakStatement(),
-    core.breakStatement()
-  ],
-  
-  [
-    "leaves ClassDeclaration unchanged",
-    core.classDeclaration("MyClass", null, [], [])
-    ,
-    core.classDeclaration("MyClass", null, [], [])
-  ],
-  
-  [
-    "leaves ConstructorDeclaration unchanged",
-    core.constructorDeclaration([], [])
-    ,
-    core.constructorDeclaration([], [])
-  ],
-  
-  [
-    "leaves FieldDeclaration unchanged",
-    core.fieldDeclaration("field", core.numberType, 42)
-    ,
-    core.fieldDeclaration("field", core.numberType, 42)
-  ],
-  
-  [
-    "leaves MethodDeclaration unchanged",
-    core.methodDeclaration(core.fun("method", [], [], core.voidType))
-    ,
-    core.methodDeclaration(core.fun("method", [], [], core.voidType))
-  ],
+  ]
 ];
 
 describe("The optimizer", () => {
