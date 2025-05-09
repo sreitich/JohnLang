@@ -113,7 +113,7 @@ export default function generate(program) {
             output.push("}");
         },
         ConstructorCall(c) {
-            return `new ${c.callee.name}(${c.args.map(gen).join(", ")})`;
+            return `new ${targetName(c.callee)}(${c.args.map(gen).join(", ")})`;
         },
         MemberExpression(e) {
             const object = gen(e.object);
