@@ -307,7 +307,6 @@ throw "Well, dontcha know, my muffler was actin' up the other day—musta been t
 | tilTheCowsComeHome        | for      |
 | holdMyBeer                | while    |
 | letsBlowThisPopsicleStand | break    |
-| letsNotGetCarriedAway     | continue |
 
 ### Functions
 
