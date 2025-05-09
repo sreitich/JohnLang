@@ -90,7 +90,8 @@ export default function analyze(match) {
     }
 
     function checkIsBooleanType(e, parseTreeNode) {
-        check(e.type === core.booleanType, messages.notBooleanError(), parseTreeNode);
+        const expectedTypes = [core.booleanType, "boolean"]
+        check(expectedTypes.includes(e.type), messages.notBooleanError(), parseTreeNode);
     }
 
     function checkHasCollectionType(e, parseTreeNode) {

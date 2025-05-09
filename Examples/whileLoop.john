@@ -2,9 +2,7 @@ handful x: 0!
 
 holdMyBeer youBetcha {
     x: x + 1!
-    ope x < 5 {
-        letsNotGetCarriedAway!
-    } welp {
+    ope x > 5 {
         letsBlowThisPopsicleStand!
     }
 }
